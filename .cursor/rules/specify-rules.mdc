@@ -1,0 +1,29 @@
+# alicooks Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2025-12-15
+
+## Active Technologies
+
+- TypeScript 5.3+ + React 18, Vite 5, Tailwind CSS 3 (001-meal-planner)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+npm test && npm run lint
+
+## Code Style
+
+TypeScript 5.3+: Follow standard conventions
+
+## Recent Changes
+
+- 001-meal-planner: Added TypeScript 5.3+ + React 18, Vite 5, Tailwind CSS 3
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->

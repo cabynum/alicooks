@@ -89,19 +89,7 @@ The slash commands (`/speckit.constitution`, `/speckit.specify`, etc.) now work 
 
 ## What's Next
 
-With the tooling in place, it's time to actually *think* about what we're building. The next step is `/speckit.constitution` to establish the foundational principles:
-
-- What matters most? (Simplicity? Speed? Reliability?)
-- Who is this for? (My wife — non-technical, needs intuitive UX)
-- What will this app *not* do? (Recipes? Grocery lists? Nutritional tracking?)
-
-Stay tuned for Part 2, where we dive into the specification process...
-
----
-
-## The Stack (TBD)
-
-*To be determined after the planning phase — that's the whole point!*
+With the tooling in place, it's time to actually *think* about what we're building. In [Part 2](./part-2-specification.md), we establish the constitution and create detailed specifications.
 
 ---
 
@@ -115,4 +103,7 @@ Stay tuned for Part 2, where we dive into the specification process...
 
 *This is Part 1 of a series documenting the build of "AliCooks" — a family meal planning application.*
 
+**Next:** [Part 2 — Constitution, Specification & Planning](./part-2-specification.md)
+
 December 2024
+

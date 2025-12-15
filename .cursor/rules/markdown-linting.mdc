@@ -29,6 +29,7 @@ If the user reports a linting error that wasn't caught, apologize and fix it imm
 - Missing blank lines around code fences (MD031)
 - Trailing whitespace (MD009)
 - Missing language tags on code blocks (MD040)
+- **Bold text alone on a line used as heading (MD036)** — use actual `#` headings instead
 
 ## Formatting Preferences
 
