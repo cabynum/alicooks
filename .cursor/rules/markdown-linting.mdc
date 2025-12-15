@@ -9,10 +9,17 @@ globs: ["**/*.md"]
 
 After writing or editing ANY markdown file (`.md`):
 
-1. **Immediately** call `read_lints` on the specific file path
+1. Call `read_lints` on the specific file path
 2. If errors are found, fix them before proceeding
 3. Re-run `read_lints` to verify the fix
 4. Do NOT proceed to other tasks until linting passes with zero errors
+
+**Known Issue**: The linter may not catch errors on the first check due to timing.
+If the user reports a linting error that wasn't caught, apologize and fix it immediately.
+
+**Prevention**: When writing markdown files, ensure:
+- No trailing blank lines at end of file
+- Exactly one newline at end of file (no more, no less)
 
 ## Common Issues to Avoid
 

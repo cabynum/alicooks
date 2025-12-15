@@ -62,4 +62,3 @@ None at this time.
 
 - Use two trailing spaces for line breaks (not tables) unless truly tabular
 - All markdown files must pass linting before merge
-
