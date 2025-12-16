@@ -37,33 +37,30 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2024-12-15  
+**Last Updated**: 2024-12-16  
 **Current Branch**: `001-meal-planner`  
-**Current Phase**: Phase 0 in progress (Task 0.1 complete)
+**Current Phase**: Phase 0 in progress (Tasks 0.1–0.4 complete)
 
 ### Completed This Session
 
-- ✅ Created task breakdown: `specs/001-meal-planner/tasks.md` (47 tasks)
-- ✅ **Task 0.1**: Initialized Vite + React 19 + TypeScript 5.9 project
-- ✅ Configured strict mode and path aliases (`@/` → `src/`)
-- ✅ Verified dev server runs at localhost:5173
+- ✅ **Task 0.2**: Added Tailwind CSS v4 with Vite plugin
+- ✅ **Task 0.3**: Created folder structure (components, pages, hooks, services, types, utils, tests)
+- ✅ **Task 0.4**: Setup testing with Vitest + React Testing Library
+- ✅ Established conventions: commit after each task, update tasks.md checkboxes
 
 ### Recommended Next Steps
 
 When starting the next session, propose these options to the user:
 
-1. **Continue Phase 0** — Pick up where we left off
-   - Task 0.2: Add Tailwind CSS
-   - Task 0.3: Create folder structure
-   - Task 0.4: Setup testing (Vitest)
+1. **Continue Phase 0** — Two tasks remain
    - Task 0.5: Setup routing (React Router)
    - Task 0.6: PWA foundation
 
 2. **Complete Phase 0 + start Phase 1** — Finish setup, begin foundation
    - All remaining Phase 0 tasks
-   - Start on types and StorageService
+   - Start on types (Task 1.1) and StorageService (Task 1.2)
 
-**Recommendation**: Continue with Task 0.2 (Tailwind CSS).
+**Recommendation**: Continue with Task 0.5 (React Router).
 
 ### Key Files
 
@@ -82,7 +79,7 @@ When starting the next session, propose these options to the user:
 
 ### Open Decisions
 
-- **Markdown lint cleanup**: 227 pre-existing lint errors (mostly line length).
+- **Markdown lint cleanup**: ~195 pre-existing lint errors (mostly line length).
   Consider a dedicated cleanup pass or relaxing the 80-char rule.
 
 ### Notes
