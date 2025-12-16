@@ -15,4 +15,3 @@ The SVG files can be kept as favicon sources for modern browsers.
 
 - [Maskable icons guide](https://web.dev/maskable-icon/)
 - [PWA icon requirements](https://web.dev/add-manifest/#icons)
-

@@ -46,6 +46,7 @@ Before we end, please:
 - ✅ **Task 0.5**: Setup React Router with `/` and `/add` routes
 - ✅ **Task 0.6**: PWA foundation (manifest.json, icons, meta tags)
 - ✅ Created placeholder `HomePage` and `AddDishPage` components
+- ✅ **Fix**: Added PNG icons for PWA compatibility (SVGs don't work)
 
 ### Recommended Next Steps
 
