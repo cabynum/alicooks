@@ -39,28 +39,29 @@ Before we end, please:
 
 **Last Updated**: 2024-12-16  
 **Current Branch**: `001-meal-planner`  
-**Current Phase**: Phase 0 in progress (Tasks 0.1–0.4 complete)
+**Current Phase**: Phase 0 complete ✅ — Ready for Phase 1
 
 ### Completed This Session
 
-- ✅ **Task 0.2**: Added Tailwind CSS v4 with Vite plugin
-- ✅ **Task 0.3**: Created folder structure (components, pages, hooks, services, types, utils, tests)
-- ✅ **Task 0.4**: Setup testing with Vitest + React Testing Library
-- ✅ Established conventions: commit after each task, update tasks.md checkboxes
+- ✅ **Task 0.5**: Setup React Router with `/` and `/add` routes
+- ✅ **Task 0.6**: PWA foundation (manifest.json, icons, meta tags)
+- ✅ Created placeholder `HomePage` and `AddDishPage` components
 
 ### Recommended Next Steps
 
 When starting the next session, propose these options to the user:
 
-1. **Continue Phase 0** — Two tasks remain
-   - Task 0.5: Setup routing (React Router)
-   - Task 0.6: PWA foundation
+1. **Start Phase 1** — Foundation Layer
+   - Task 1.1: Define TypeScript types (`Dish`, `MealPlan`, etc.)
+   - Task 1.2: Implement StorageService (dishes CRUD)
+   - Task 1.3: Implement StorageService (plans CRUD)
 
-2. **Complete Phase 0 + start Phase 1** — Finish setup, begin foundation
-   - All remaining Phase 0 tasks
-   - Start on types (Task 1.1) and StorageService (Task 1.2)
+2. **Quick win: UI primitives first**
+   - Tasks 1.6–1.9: Build Button, Input, Card, EmptyState components
+   - These are visual and satisfying to complete
 
-**Recommendation**: Continue with Task 0.5 (React Router).
+**Recommendation**: Start with Task 1.1 (TypeScript types) — everything
+else depends on these definitions.
 
 ### Key Files
 
