@@ -55,12 +55,12 @@ Foundation infrastructure. Must complete before any feature work.
 
 ---
 
-### 0.5 Setup Routing
+### 0.5 Setup Routing ✅
 
-- [ ] Install React Router DOM
-- [ ] Create basic `App.tsx` with router setup
-- [ ] Add placeholder pages: `HomePage`, `AddDishPage`
-- [ ] Verify navigation between routes works
+- [x] Install React Router DOM
+- [x] Create basic `App.tsx` with router setup
+- [x] Add placeholder pages: `HomePage`, `AddDishPage`
+- [x] Verify navigation between routes works
 
 **Verify**: Can navigate between `/` and `/add` routes
 
