@@ -142,50 +142,50 @@ Core types, services, and UI primitives. Needed before feature components.
 
 ---
 
-### 1.6 Build Button Component
+### 1.6 Build Button Component ✅
 
-- [ ] Create `components/ui/Button.tsx`
-- [ ] Implement `primary`, `secondary`, `ghost` variants
-- [ ] Implement `sm`, `md`, `lg` sizes
-- [ ] Add loading spinner state
-- [ ] Ensure minimum 44px touch target
-- [ ] Write component tests
+- [x] Create `components/ui/Button.tsx`
+- [x] Implement `primary`, `secondary`, `ghost` variants
+- [x] Implement `sm`, `md`, `lg` sizes
+- [x] Add loading spinner state
+- [x] Ensure minimum 44px touch target
+- [x] Write component tests
 
 **Verify**: All button variants render correctly and are touchable
 
 ---
 
-### 1.7 Build Input Component
+### 1.7 Build Input Component ✅
 
-- [ ] Create `components/ui/Input.tsx`
-- [ ] Implement label, placeholder, and error display
-- [ ] Style for mobile (larger touch targets)
-- [ ] Auto-focus support
-- [ ] Write component tests
+- [x] Create `components/ui/Input.tsx`
+- [x] Implement label, placeholder, and error display
+- [x] Style for mobile (larger touch targets)
+- [x] Auto-focus support
+- [x] Write component tests
 
 **Verify**: Input renders with label, shows error when provided
 
 ---
 
-### 1.8 Build Card Component
+### 1.8 Build Card Component ✅
 
-- [ ] Create `components/ui/Card.tsx`
-- [ ] Implement padding options (`none`, `sm`, `md`, `lg`)
-- [ ] Implement `elevated` shadow variant
-- [ ] Add click handler support for interactive cards
-- [ ] Write component tests
+- [x] Create `components/ui/Card.tsx`
+- [x] Implement padding options (`none`, `sm`, `md`, `lg`)
+- [x] Implement `elevated` shadow variant
+- [x] Add click handler support for interactive cards
+- [x] Write component tests
 
 **Verify**: Card renders children with proper styling
 
 ---
 
-### 1.9 Build EmptyState Component
+### 1.9 Build EmptyState Component ✅
 
-- [ ] Create `components/ui/EmptyState.tsx`
-- [ ] Implement icon, title, message props
-- [ ] Implement optional action button
-- [ ] Style for friendly, encouraging appearance
-- [ ] Write component tests
+- [x] Create `components/ui/EmptyState.tsx`
+- [x] Implement icon, title, message props
+- [x] Implement optional action button
+- [x] Style for friendly, encouraging appearance
+- [x] Write component tests
 
 **Verify**: EmptyState renders with icon, message, and action button
 
@@ -195,60 +195,60 @@ Core types, services, and UI primitives. Needed before feature components.
 
 First user story: users can add dishes to their collection.
 
-### 2.1 Build DishTypeSelector Component
+### 2.1 Build DishTypeSelector Component ✅
 
-- [ ] Create `components/meals/DishTypeSelector.tsx`
-- [ ] Render three options: Entree, Side Dish, Other
-- [ ] Show clear selected state
-- [ ] Ensure 44px touch targets
-- [ ] Write component tests
+- [x] Create `components/meals/DishTypeSelector.tsx`
+- [x] Render three options: Entree, Side Dish, Other
+- [x] Show clear selected state
+- [x] Ensure 44px touch targets
+- [x] Write component tests
 
 **Verify**: Tapping options changes selection visually
 
 ---
 
-### 2.2 Build DishForm Component
+### 2.2 Build DishForm Component ✅
 
-- [ ] Create `components/meals/DishForm.tsx`
-- [ ] Include name Input field
-- [ ] Include DishTypeSelector
-- [ ] Implement validation (name required)
-- [ ] Show inline error for empty name
-- [ ] Implement `onSubmit` and `onCancel` callbacks
-- [ ] Write component tests
+- [x] Create `components/meals/DishForm.tsx`
+- [x] Include name Input field
+- [x] Include DishTypeSelector
+- [x] Implement validation (name required)
+- [x] Show inline error for empty name
+- [x] Implement `onSubmit` and `onCancel` callbacks
+- [x] Write component tests
 
 **Verify**: Form validates, shows error if empty, calls onSubmit with data
 
 ---
 
-### 2.3 Build AddDishPage
+### 2.3 Build AddDishPage ✅
 
-- [ ] Create `pages/AddDishPage.tsx`
-- [ ] Render DishForm
-- [ ] Connect to useDishes hook to save dish
-- [ ] Navigate back to home on success
-- [ ] Write page tests
+- [x] Create `pages/AddDishPage.tsx`
+- [x] Render DishForm
+- [x] Connect to useDishes hook to save dish
+- [x] Navigate back to home on success
+- [x] Write page tests
 
 **Verify**: Can add a dish from the page, navigates back after save
 
 ---
 
-### 2.4 Connect AddDishPage to Router
+### 2.4 Connect AddDishPage to Router ✅
 
-- [ ] Add `/add` route in App.tsx
-- [ ] Add navigation from HomePage to AddDishPage
-- [ ] Verify full flow works end-to-end
+- [x] Add `/add` route in App.tsx
+- [x] Add navigation from HomePage to AddDishPage
+- [x] Verify full flow works end-to-end
 
 **Verify**: User can navigate to /add, add a dish, and return home
 
 ---
 
-### 2.5 Polish Add Dish Flow
+### 2.5 Polish Add Dish Flow ✅
 
-- [ ] Add micro-interaction on save (subtle animation/feedback)
-- [ ] Ensure form is keyboard-friendly
-- [ ] Test on mobile viewport
-- [ ] Verify meets SC-001 (<15s to add a meal)
+- [x] Add micro-interaction on save (subtle animation/feedback)
+- [x] Ensure form is keyboard-friendly
+- [x] Test on mobile viewport
+- [x] Verify meets SC-001 (<15s to add a meal)
 
 **Verify**: Flow feels polished and quick on mobile
 
@@ -586,18 +586,19 @@ Refinements for production readiness.
 
 ## Summary
 
-| Phase | Tasks | Focus |
-|-------|-------|-------|
-| 0 | 6 | Project setup (Vite, Tailwind, testing, routing) |
-| 1 | 9 | Foundation (types, storage, hooks, UI primitives) |
-| 2 | 5 | P1 - Add a Dish |
-| 3 | 5 | P2 - View My Dishes |
-| 4 | 6 | P3 - Get Meal Suggestions |
-| 5 | 7 | P4 - Plan a Menu |
-| 6 | 2 | Edit & Delete Dishes |
-| 7 | 2 | Data Export |
-| 8 | 5 | Final Polish |
-| **Total** | **47** | |
+| Phase     | Tasks  | Focus                                              |
+| --------- | ------ | -------------------------------------------------- |
+| 0         | 6      | Project setup (Vite, Tailwind, testing, routing)   |
+| 1         | 9      | Foundation (types, storage, hooks, UI primitives)  |
+| 2         | 5      | P1 - Add a Dish                                    |
+| 3         | 5      | P2 - View My Dishes                                |
+| 4         | 6      | P3 - Get Meal Suggestions                          |
+| 5         | 7      | P4 - Plan a Menu                                   |
+| 6         | 2      | Edit & Delete Dishes                               |
+| 7         | 2      | Data Export                                        |
+| 8         | 5      | Final Polish                                       |
+| **Total** | **47** |                                                    |
 
-**Recommended approach**: Complete phases sequentially. Each phase delivers testable, working functionality before moving to the next. This aligns with the constitution's "work incrementally" principle.
-
+**Recommended approach**: Complete phases sequentially. Each phase delivers testable, working
+functionality before moving to the next. This aligns with the constitution's "work incrementally"
+principle.

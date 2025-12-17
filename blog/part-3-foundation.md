@@ -8,7 +8,8 @@
 
 ## From Plan to Code
 
-With the specification complete, it was time to build. But where do you start when you have a blank canvas and a list of user stories?
+With the specification complete, it was time to build. But where do you start when you have a blank canvas and a
+list of user stories?
 
 The answer: **foundation first**. Before we can build "Add a Dish," we need:
 
@@ -17,7 +18,8 @@ The answer: **foundation first**. Before we can build "Add a Dish," we need:
 - React hooks to manage state
 - UI primitives to compose interfaces
 
-This is the unsexy work. No visible features, no screenshots to show off. But it pays dividends when you start building actual pages.
+This is the unsexy work. No visible features, no screenshots to show off. But it pays dividends when you start
+building actual pages.
 
 ---
 
@@ -40,7 +42,8 @@ export interface Dish {
 }
 ```
 
-Simple, but deliberate. Every dish has an ID (UUID), timestamps for tracking, and a type that drives the suggestion logic later.
+Simple, but deliberate. Every dish has an ID (UUID), timestamps for tracking, and a type that drives the
+suggestion logic later.
 
 The naming decision from Part 2 shows up here: it's `Dish`, not `Meal`. A meal is *composed* of dishes.
 
@@ -65,7 +68,8 @@ export const storageService = {
 
 All data lives in localStorage under `alicooks_` prefixed keys. Human-readable JSON, portable, no server required.
 
-We wrote unit tests for every operation — 34 tests covering dishes, plans, and export/import. The export includes a version number for future migration support:
+We wrote unit tests for every operation — 34 tests covering dishes, plans, and export/import. The export includes
+a version number for future migration support:
 
 ```json
 {
@@ -92,7 +96,8 @@ function useDishes() {
 }
 ```
 
-This hook is the bridge between storage and UI. Components call `addDish()` and the state updates automatically. No manual localStorage calls scattered through the codebase.
+This hook is the bridge between storage and UI. Components call `addDish()` and the state updates automatically.
+No manual localStorage calls scattered through the codebase.
 
 We added 20 more tests for the hook, verifying loading states, CRUD operations, and the type filtering helper.
 
@@ -100,7 +105,8 @@ We added 20 more tests for the hook, verifying loading states, CRUD operations, 
 
 ## UI Primitives: The Design System
 
-With data infrastructure complete, we turned to UI. But we didn't jump straight to building the "Add Dish" page. First, we built **primitives** — the reusable building blocks.
+With data infrastructure complete, we turned to UI. But we didn't jump straight to building the "Add Dish" page.
+First, we built **primitives** — the reusable building blocks.
 
 ### Button
 
@@ -119,7 +125,8 @@ interface ButtonProps {
 
 All buttons meet the 44px minimum touch target requirement. Mobile-first.
 
-The color palette uses warm amber for primary actions and stone grays for secondary. It's a cooking app — warmth fits the brand.
+The color palette uses warm amber for primary actions and stone grays for secondary. It's a cooking app — warmth
+fits the brand.
 
 ### Input
 
@@ -150,7 +157,8 @@ interface CardProps {
 }
 ```
 
-When `onClick` is provided, the Card renders as a `<button>` with proper keyboard support. Touch targets, focus rings, hover states — all automatic.
+When `onClick` is provided, the Card renders as a `<button>` with proper keyboard support. Touch targets, focus
+rings, hover states — all automatic.
 
 ### EmptyState
 
@@ -165,7 +173,8 @@ interface EmptyStateProps {
 }
 ```
 
-This will be used throughout the app: no dishes yet, no plans yet, no search results. Consistent, encouraging, with optional call-to-action.
+This will be used throughout the app: no dishes yet, no plans yet, no search results. Consistent, encouraging,
+with optional call-to-action.
 
 ---
 
@@ -195,19 +204,23 @@ Every component, every edge case, tested. This might seem excessive for a small 
 
 ### 1. Foundation Work Compounds
 
-Building primitives before features felt slow. But now every page we build can compose from tested, consistent pieces. The Add Dish page? It's just Input + Button + Card arranged on a page.
+Building primitives before features felt slow. But now every page we build can compose from tested, consistent
+pieces. The Add Dish page? It's just Input + Button + Card arranged on a page.
 
 ### 2. TypeScript Catches Mistakes Early
 
-We caught several data model issues during type definition — before writing any implementation. The `DishType` enum prevents typos. Required fields can't be forgotten.
+We caught several data model issues during type definition — before writing any implementation. The `DishType`
+enum prevents typos. Required fields can't be forgotten.
 
 ### 3. Mobile-First Changes Everything
 
-Designing for 44px touch targets from the start means we never have to "fix mobile later." Every component works on a phone by default.
+Designing for 44px touch targets from the start means we never have to "fix mobile later." Every component works
+on a phone by default.
 
 ### 4. Storage Abstraction Pays Off
 
-All localStorage access goes through `storageService`. When we eventually add sync or migration, there's one place to change. Components don't know or care where data lives.
+All localStorage access goes through `storageService`. When we eventually add sync or migration, there's one
+place to change. Components don't know or care where data lives.
 
 ---
 

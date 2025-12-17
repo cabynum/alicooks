@@ -4,11 +4,11 @@ Quick reference for starting and ending AI pair programming sessions.
 
 ## Slash Commands
 
-| Command | Purpose |
-|---------|---------|
-| `/alicooks.start` | Start a new session (loads context) |
-| `/alicooks.lint` | Check all markdown files for linting errors |
-| `/alicooks.save` | End a session (saves context, suggests commit) |
+| Command           | Purpose                                        |
+| ----------------- | ---------------------------------------------- |
+| `/alicooks.start` | Start a new session (loads context)            |
+| `/alicooks.lint`  | Check all markdown files for linting errors    |
+| `/alicooks.save`  | End a session (saves context, suggests commit) |
 
 ## Starting a New Session
 
@@ -39,60 +39,77 @@ Before we end, please:
 
 **Last Updated**: 2024-12-17  
 **Current Branch**: `001-meal-planner`  
-**Current Phase**: Phase 1 complete ✅ — Ready for Phase 2
+**Current Phase**: Phase 2 complete ✅ — Ready for Phase 3
 
 ### Completed This Session
 
-- ✅ **Task 1.6**: Button component (primary, secondary, ghost variants + sizes + loading)
-- ✅ **Task 1.7**: Input component (label, error display, autoFocus)
-- ✅ **Task 1.8**: Card component (padding options, elevation, interactive mode)
-- ✅ **Task 1.9**: EmptyState component (icon, title, message, action button)
-- ✅ 80 UI component tests passing
-- ✅ Blog Part 3 written
+- ✅ **Bug resolved**: Dishes now display correctly after adding
+  - Root cause: Stale Vite cache (`node_modules/.vite`)
+  - Fix: Cleared cache and restarted dev server
+- ✅ Added `npm run dev:fresh` script to prevent future cache issues
+- ✅ Removed debug console.log statements (cleanup)
+- ✅ Updated `tasks.md` to mark Phase 1 & 2 tasks complete
+- ✅ Created **blog/part-4-first-feature.md** documenting Phase 2 and the cache debugging lesson
+- ✅ 196 tests passing
 
-### Phase 1 Summary
+### Phase 1 & 2 Summary
 
-All foundation work complete:
+All code complete and working:
 
-| Layer | Tests |
-|-------|-------|
-| Storage Service | 34 |
-| useDishes Hook | 20 |
-| Button | 26 |
-| Input | 22 |
-| Card | 18 |
-| EmptyState | 14 |
-| **Total** | **134** |
+| Phase                | Tasks   | Status      |
+| -------------------- | ------- | ----------- |
+| Phase 1 (Foundation) | 1.1–1.9 | ✅ Complete |
+| Phase 2 (Add a Dish) | 2.1–2.5 | ✅ Complete |
+
+Full add dish flow verified in browser:
+
+- Navigate to `/add`
+- Enter dish name, select type
+- Submit → dish saved to localStorage
+- Navigate back to `/` → dish appears in list
+
+### Test Count
+
+| Layer            | Tests   |
+| ---------------- | ------- |
+| Storage Service  | 34      |
+| useDishes Hook   | 15      |
+| Button           | 26      |
+| Input            | 22      |
+| Card             | 18      |
+| EmptyState       | 14      |
+| DishTypeSelector | 18      |
+| DishForm         | 28      |
+| AddDishPage      | 14      |
+| App              | 2       |
+| **Total**        | **196** |
 
 ### Recommended Next Steps
 
-When starting the next session, begin **Phase 2 — Add a Dish**:
-
-1. **Task 2.1**: DishTypeSelector component (entree/side/other picker)
-2. **Task 2.2**: DishForm component (name + type + validation)
-3. **Task 2.3**: AddDishPage (full page using the form)
-4. **Task 2.4**: Connect routing (already has placeholder at `/add`)
-5. **Task 2.5**: Polish the flow (micro-interactions, mobile testing)
+1. **Begin Phase 3 — View My Dishes**
+   - 3.1 DishCard component (display dish with type badge)
+   - 3.2 DishList component (list of DishCards + empty state)
+   - 3.3 HomePage polish (integrate DishList, improve layout)
+2. Optional: Add dish type filtering (Task 3.4)
 
 ### Key Files
 
-| Purpose | Path |
-|---------|------|
-| Constitution | `.specify/memory/constitution.md` |
-| Feature Spec | `specs/001-meal-planner/spec.md` |
-| Implementation Plan | `specs/001-meal-planner/plan.md` |
-| **Task Breakdown** | `specs/001-meal-planner/tasks.md` |
-| Data Model | `specs/001-meal-planner/data-model.md` |
-| Component Contracts | `specs/001-meal-planner/contracts/components.md` |
-| Quality Checklist | `specs/001-meal-planner/checklists/requirements.md` |
-| Blog Posts | `blog/` (Part 1 & Part 2) |
-| Markdown Rules | `.cursor/rules/markdown-linting.mdc` |
-| This Guide | `.specify/memory/session-guide.md` |
+| Purpose             | Path                                                |
+| ------------------- | --------------------------------------------------- |
+| Constitution        | `.specify/memory/constitution.md`                   |
+| Feature Spec        | `specs/001-meal-planner/spec.md`                    |
+| Implementation Plan | `specs/001-meal-planner/plan.md`                    |
+| **Task Breakdown**  | `specs/001-meal-planner/tasks.md`                   |
+| Data Model          | `specs/001-meal-planner/data-model.md`              |
+| Component Contracts | `specs/001-meal-planner/contracts/components.md`    |
+| Quality Checklist   | `specs/001-meal-planner/checklists/requirements.md` |
+| Blog Posts          | `blog/` (Part 1 & Part 2)                           |
+| Markdown Rules      | `.cursor/rules/markdown-linting.mdc`                |
+| This Guide          | `.specify/memory/session-guide.md`                  |
 
 ### Open Decisions
 
-- **Markdown lint cleanup**: ~195 pre-existing lint errors (mostly line length).
-  Consider a dedicated cleanup pass or relaxing the 80-char rule.
+- None currently — markdown lint issue resolved (relaxed to 120 chars)
 
 ### Notes
 

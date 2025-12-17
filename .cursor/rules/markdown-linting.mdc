@@ -21,6 +21,13 @@ If the user reports a linting error that wasn't caught, apologize and fix it imm
 - No trailing blank lines at end of file
 - Exactly one newline at end of file (no more, no less)
 
+## Line Length (MD013)
+
+**Configured in `.markdownlint.json`**: 120 characters max (relaxed from default 80)
+
+- Tables are exempt from line length checks (they often need more room)
+- This balances readability with practical prose writing
+
 ## Common Issues to Avoid
 
 - Multiple consecutive blank lines (MD012)

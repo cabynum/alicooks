@@ -1,13 +1,15 @@
 # AliCooks Blog Series
 
-A series documenting the build of AliCooks — a family meal planning application using spec-driven development and AI pair programming.
+A series documenting the build of AliCooks — a family meal planning application using spec-driven
+development and AI pair programming.
 
 ## Posts
 
 1. [Part 1: Setup](./part-1-setup.md) — Installing spec-kit, initializing the project
 2. [Part 2: Specification & Planning](./part-2-specification.md) — Constitution, features, tech stack
 3. [Part 3: Building the Foundation](./part-3-foundation.md) — Types, storage, hooks, UI primitives
-4. Part 4: Add a Dish — *coming soon*
+4. [Part 4: The First Feature](./part-4-first-feature.md) — Add a Dish, debugging a stale cache
+5. Part 5: View My Dishes — *coming soon*
 
 ## About This Series
 
