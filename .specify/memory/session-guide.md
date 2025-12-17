@@ -39,32 +39,40 @@ Before we end, please:
 
 **Last Updated**: 2024-12-17  
 **Current Branch**: `001-meal-planner`  
-**Current Phase**: Phase 1 in progress — Foundation Layer
+**Current Phase**: Phase 1 complete ✅ — Ready for Phase 2
 
 ### Completed This Session
 
-- ✅ **Task 1.1**: Define TypeScript types (`Dish`, `MealPlan`, `DayAssignment`)
-- ✅ **Task 1.2**: Implement StorageService (dishes CRUD)
-- ✅ **Task 1.3**: Implement StorageService (plans CRUD + export/import)
-- ✅ **Task 1.5**: Create `useDishes` hook for React state management
-- ✅ 54 unit tests passing (storage + hook)
+- ✅ **Task 1.6**: Button component (primary, secondary, ghost variants + sizes + loading)
+- ✅ **Task 1.7**: Input component (label, error display, autoFocus)
+- ✅ **Task 1.8**: Card component (padding options, elevation, interactive mode)
+- ✅ **Task 1.9**: EmptyState component (icon, title, message, action button)
+- ✅ 80 UI component tests passing
+- ✅ Blog Part 3 written
+
+### Phase 1 Summary
+
+All foundation work complete:
+
+| Layer | Tests |
+|-------|-------|
+| Storage Service | 34 |
+| useDishes Hook | 20 |
+| Button | 26 |
+| Input | 22 |
+| Card | 18 |
+| EmptyState | 14 |
+| **Total** | **134** |
 
 ### Recommended Next Steps
 
-When starting the next session, propose these options to the user:
+When starting the next session, begin **Phase 2 — Add a Dish**:
 
-1. **Continue Phase 1 — UI Primitives**
-   - Task 1.6: Button component (primary, secondary, ghost variants)
-   - Task 1.7: Input component (with label and error display)
-   - Task 1.8: Card component (with padding/elevation options)
-   - Task 1.9: EmptyState component (friendly empty state display)
-
-2. **Jump to Phase 2 — Add a Dish**
-   - Skip UI primitives for now, build with Tailwind directly
-   - Task 2.1–2.5: DishTypeSelector, DishForm, AddDishPage
-
-**Recommendation**: Build UI primitives first (1.6–1.9). They're quick,
-satisfying, and will make the Add Dish flow faster to build.
+1. **Task 2.1**: DishTypeSelector component (entree/side/other picker)
+2. **Task 2.2**: DishForm component (name + type + validation)
+3. **Task 2.3**: AddDishPage (full page using the form)
+4. **Task 2.4**: Connect routing (already has placeholder at `/add`)
+5. **Task 2.5**: Polish the flow (micro-interactions, mobile testing)
 
 ### Key Files
 

@@ -254,6 +254,6 @@ The `/alicooks.save` command updates this file, so the next session's `/alicooks
 *This is Part 2 of a series documenting the build of "AliCooks" — a family meal planning application.*
 
 **Previous:** [Part 1 — Setup](./part-1-setup.md)  
-**Next:** Part 3 — Building the Foundation (coming soon)
+**Next:** [Part 3 — Building the Foundation](./part-3-foundation.md)
 
 December 2025
