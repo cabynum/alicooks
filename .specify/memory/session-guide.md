@@ -37,32 +37,34 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2024-12-16  
+**Last Updated**: 2024-12-17  
 **Current Branch**: `001-meal-planner`  
-**Current Phase**: Phase 0 complete ✅ — Ready for Phase 1
+**Current Phase**: Phase 1 in progress — Foundation Layer
 
 ### Completed This Session
 
-- ✅ **Task 0.5**: Setup React Router with `/` and `/add` routes
-- ✅ **Task 0.6**: PWA foundation (manifest.json, icons, meta tags)
-- ✅ Created placeholder `HomePage` and `AddDishPage` components
-- ✅ **Fix**: Added PNG icons for PWA compatibility (SVGs don't work)
+- ✅ **Task 1.1**: Define TypeScript types (`Dish`, `MealPlan`, `DayAssignment`)
+- ✅ **Task 1.2**: Implement StorageService (dishes CRUD)
+- ✅ **Task 1.3**: Implement StorageService (plans CRUD + export/import)
+- ✅ **Task 1.5**: Create `useDishes` hook for React state management
+- ✅ 54 unit tests passing (storage + hook)
 
 ### Recommended Next Steps
 
 When starting the next session, propose these options to the user:
 
-1. **Start Phase 1** — Foundation Layer
-   - Task 1.1: Define TypeScript types (`Dish`, `MealPlan`, etc.)
-   - Task 1.2: Implement StorageService (dishes CRUD)
-   - Task 1.3: Implement StorageService (plans CRUD)
+1. **Continue Phase 1 — UI Primitives**
+   - Task 1.6: Button component (primary, secondary, ghost variants)
+   - Task 1.7: Input component (with label and error display)
+   - Task 1.8: Card component (with padding/elevation options)
+   - Task 1.9: EmptyState component (friendly empty state display)
 
-2. **Quick win: UI primitives first**
-   - Tasks 1.6–1.9: Build Button, Input, Card, EmptyState components
-   - These are visual and satisfying to complete
+2. **Jump to Phase 2 — Add a Dish**
+   - Skip UI primitives for now, build with Tailwind directly
+   - Task 2.1–2.5: DishTypeSelector, DishForm, AddDishPage
 
-**Recommendation**: Start with Task 1.1 (TypeScript types) — everything
-else depends on these definitions.
+**Recommendation**: Build UI primitives first (1.6–1.9). They're quick,
+satisfying, and will make the Add Dish flow faster to build.
 
 ### Key Files
 

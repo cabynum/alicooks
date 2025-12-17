@@ -81,62 +81,62 @@ Foundation infrastructure. Must complete before any feature work.
 
 Core types, services, and UI primitives. Needed before feature components.
 
-### 1.1 Define TypeScript Types
+### 1.1 Define TypeScript Types ✅
 
-- [ ] Create `types/dish.ts` with `Dish` and `DishType` types
-- [ ] Create `types/plan.ts` with `MealPlan` and `DayAssignment` types
-- [ ] Create `types/index.ts` that re-exports all types
-- [ ] Add JSDoc comments explaining each type
+- [x] Create `types/dish.ts` with `Dish` and `DishType` types
+- [x] Create `types/plan.ts` with `MealPlan` and `DayAssignment` types
+- [x] Create `types/index.ts` that re-exports all types
+- [x] Add JSDoc comments explaining each type
 
 **Verify**: Types can be imported from `@/types`
 
 ---
 
-### 1.2 Implement StorageService (Dishes)
+### 1.2 Implement StorageService (Dishes) ✅
 
-- [ ] Create `services/storage.ts`
-- [ ] Implement `getDishes()` - read from localStorage
-- [ ] Implement `getDish(id)` - find single dish
-- [ ] Implement `saveDish()` - create new dish with auto ID/timestamps
-- [ ] Implement `updateDish()` - update existing dish
-- [ ] Implement `deleteDish()` - remove dish
-- [ ] Write unit tests for all dish operations
+- [x] Create `services/storage.ts`
+- [x] Implement `getDishes()` - read from localStorage
+- [x] Implement `getDish(id)` - find single dish
+- [x] Implement `saveDish()` - create new dish with auto ID/timestamps
+- [x] Implement `updateDish()` - update existing dish
+- [x] Implement `deleteDish()` - remove dish
+- [x] Write unit tests for all dish operations
 
 **Verify**: All dish CRUD tests pass
 
 ---
 
-### 1.3 Implement StorageService (Plans)
+### 1.3 Implement StorageService (Plans) ✅
 
-- [ ] Implement `getPlans()` - read from localStorage
-- [ ] Implement `getPlan(id)` - find single plan
-- [ ] Implement `savePlan()` - create new plan
-- [ ] Implement `updatePlan()` - update existing plan
-- [ ] Implement `deletePlan()` - remove plan
-- [ ] Write unit tests for all plan operations
+- [x] Implement `getPlans()` - read from localStorage
+- [x] Implement `getPlan(id)` - find single plan
+- [x] Implement `savePlan()` - create new plan
+- [x] Implement `updatePlan()` - update existing plan
+- [x] Implement `deletePlan()` - remove plan
+- [x] Write unit tests for all plan operations
 
 **Verify**: All plan CRUD tests pass
 
 ---
 
-### 1.4 Implement StorageService (Export/Import)
+### 1.4 Implement StorageService (Export/Import) ✅
 
-- [ ] Implement `exportData()` - return JSON string with all data
-- [ ] Implement `importData(json)` - parse and replace data
-- [ ] Add version number to export format
-- [ ] Write unit tests for export/import
+- [x] Implement `exportData()` - return JSON string with all data
+- [x] Implement `importData(json)` - parse and replace data
+- [x] Add version number to export format
+- [x] Write unit tests for export/import
 
 **Verify**: Can export, clear storage, import, and data is restored
 
 ---
 
-### 1.5 Create useDishes Hook
+### 1.5 Create useDishes Hook ✅
 
-- [ ] Create `hooks/useDishes.ts`
-- [ ] Implement state management for dishes array
-- [ ] Implement `addDish`, `updateDish`, `deleteDish` functions
-- [ ] Implement `getDishesByType` helper
-- [ ] Handle loading state
+- [x] Create `hooks/useDishes.ts`
+- [x] Implement state management for dishes array
+- [x] Implement `addDish`, `updateDish`, `deleteDish` functions
+- [x] Implement `getDishesByType` helper
+- [x] Handle loading state
 
 **Verify**: Hook can be used in a component to display and modify dishes
 
