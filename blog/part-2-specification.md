@@ -142,7 +142,7 @@ Three simple entities:
 
 ```text
 Dish
-| side |
+├── id, name, type (entree | side | other)
 └── createdAt, updatedAt
 
 MealPlan
