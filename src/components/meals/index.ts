@@ -1,6 +1,9 @@
 // Meal-related components (DishCard, DishForm, DishList, etc.)
 // Re-export components as they're created
 
+export { DaySlot } from './DaySlot';
+export type { DaySlotProps } from './DaySlot';
+
 export { DishCard } from './DishCard';
 export type { DishCardProps } from './DishCard';
 

@@ -52,8 +52,13 @@ export function HomePage() {
     navigate('/suggest');
   };
 
+  const handlePlanClick = () => {
+    navigate('/plan');
+  };
+
   // Check if we have enough dishes to suggest (at least one entree)
   const hasEntrees = dishes.some((d) => d.type === 'entree');
+  const hasDishes = dishes.length > 0;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -83,10 +88,11 @@ export function HomePage() {
               </span>
             </Button>
             <Button
-              variant="secondary"
-              disabled
-              className="flex-1 opacity-50"
-              aria-label="Plan menu - coming soon"
+              variant={hasDishes ? 'secondary' : 'secondary'}
+              disabled={!hasDishes}
+              className={`flex-1 ${!hasDishes ? 'opacity-50' : ''}`}
+              onClick={handlePlanClick}
+              aria-label={hasDishes ? 'Plan a menu' : 'Plan menu - add dishes first'}
             >
               <span className="flex items-center gap-2">
                 <span>📅</span>

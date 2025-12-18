@@ -76,3 +76,49 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
+
+/* ============================================================================
+   Custom Animations for Plan Feature
+   ============================================================================ */
+
+/* Staggered fade-in for day slots */
+@keyframes day-slot-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-day-slot-enter {
+  animation: day-slot-enter 0.3s ease-out forwards;
+}
+
+/* Staggered delay helper classes for lists */
+.animation-delay-1 { animation-delay: 0.05s; opacity: 0; }
+.animation-delay-2 { animation-delay: 0.1s; opacity: 0; }
+.animation-delay-3 { animation-delay: 0.15s; opacity: 0; }
+.animation-delay-4 { animation-delay: 0.2s; opacity: 0; }
+.animation-delay-5 { animation-delay: 0.25s; opacity: 0; }
+.animation-delay-6 { animation-delay: 0.3s; opacity: 0; }
+.animation-delay-7 { animation-delay: 0.35s; opacity: 0; }
+
+/* Success checkmark pulse for assignment */
+@keyframes success-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-success-pulse {
+  animation: success-pulse 0.3s ease-out;
+}

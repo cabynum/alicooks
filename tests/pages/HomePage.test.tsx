@@ -77,6 +77,11 @@ function renderHomePage() {
     return <div>Suggest Page</div>;
   }
 
+  function PlanPage() {
+    navigatedTo = '/plan';
+    return <div>Plan Page</div>;
+  }
+
   return render(
     <MemoryRouter initialEntries={['/']}>
       <Routes>
@@ -84,6 +89,7 @@ function renderHomePage() {
         <Route path="/add" element={<AddDishPage />} />
         <Route path="/edit/:dishId" element={<EditDishPage />} />
         <Route path="/suggest" element={<SuggestPage />} />
+        <Route path="/plan" element={<PlanPage />} />
       </Routes>
     </MemoryRouter>
   );
@@ -248,12 +254,31 @@ describe('HomePage', () => {
       expect(navigatedTo).toBe('/suggest');
     });
 
-    it('renders Plan button (disabled)', () => {
+    it('renders Plan button (disabled when no dishes)', () => {
       renderHomePage();
 
-      const planButton = screen.getByRole('button', { name: /plan.*coming soon/i });
+      const planButton = screen.getByRole('button', { name: /plan.*add dishes first/i });
       expect(planButton).toBeInTheDocument();
       expect(planButton).toBeDisabled();
+    });
+
+    it('renders Plan button (enabled when has dishes)', () => {
+      setupDishes([createTestDish({ type: 'entree' })]);
+      renderHomePage();
+
+      const planButton = screen.getByRole('button', { name: /plan a menu/i });
+      expect(planButton).toBeInTheDocument();
+      expect(planButton).not.toBeDisabled();
+    });
+
+    it('navigates to plan page when Plan clicked', async () => {
+      const user = userEvent.setup();
+      setupDishes([createTestDish({ type: 'entree' })]);
+      renderHomePage();
+
+      await user.click(screen.getByRole('button', { name: /plan a menu/i }));
+
+      expect(navigatedTo).toBe('/plan');
     });
 
     it('shows add entree message when no entrees', () => {

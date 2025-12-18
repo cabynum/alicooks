@@ -1,5 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { HomePage, AddDishPage, SuggestionPage } from '@/pages';
+import {
+  HomePage,
+  AddDishPage,
+  SuggestionPage,
+  PlanPage,
+  DayAssignmentPage,
+} from '@/pages';
 
 /**
  * App - Root component with routing configuration.
@@ -8,6 +14,9 @@ import { HomePage, AddDishPage, SuggestionPage } from '@/pages';
  * - "/" : HomePage (dish list and main actions)
  * - "/add" : AddDishPage (add new dish form)
  * - "/suggest" : SuggestionPage (get meal suggestions)
+ * - "/plan" : PlanPage (create new meal plan)
+ * - "/plan/:planId" : PlanPage (view/edit existing plan)
+ * - "/plan/:planId/:date" : DayAssignmentPage (assign dishes to a day)
  */
 function App() {
   return (
@@ -16,6 +25,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/add" element={<AddDishPage />} />
         <Route path="/suggest" element={<SuggestionPage />} />
+        <Route path="/plan" element={<PlanPage />} />
+        <Route path="/plan/:planId" element={<PlanPage />} />
+        <Route path="/plan/:planId/:date" element={<DayAssignmentPage />} />
       </Routes>
     </BrowserRouter>
   );
