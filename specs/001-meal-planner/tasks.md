@@ -258,39 +258,39 @@ First user story: users can add dishes to their collection.
 
 Second user story: users can see all dishes they've added.
 
-### 3.1 Build DishCard Component
+### 3.1 Build DishCard Component ✅
 
-- [ ] Create `components/meals/DishCard.tsx`
-- [ ] Display dish name and type badge
-- [ ] Implement `showType`, `selected`, `compact` props
-- [ ] Truncate long names with ellipsis
-- [ ] Ensure 44px minimum height
-- [ ] Add tap feedback
-- [ ] Write component tests
+- [x] Create `components/meals/DishCard.tsx`
+- [x] Display dish name and type badge
+- [x] Implement `showType`, `selected`, `compact` props
+- [x] Truncate long names with ellipsis
+- [x] Ensure 44px minimum height
+- [x] Add tap feedback
+- [x] Write component tests
 
 **Verify**: DishCard renders dish info, handles long names, shows type
 
 ---
 
-### 3.2 Build DishList Component
+### 3.2 Build DishList Component ✅
 
-- [ ] Create `components/meals/DishList.tsx`
-- [ ] Render list of DishCards
-- [ ] Handle empty state (no dishes)
-- [ ] Add "Add Dish" prompt in empty state
-- [ ] Write component tests
+- [x] Create `components/meals/DishList.tsx`
+- [x] Render list of DishCards
+- [x] Handle empty state (no dishes)
+- [x] Add "Add Dish" prompt in empty state
+- [x] Write component tests
 
 **Verify**: Shows list or empty state appropriately
 
 ---
 
-### 3.3 Build HomePage
+### 3.3 Build HomePage ✅
 
-- [ ] Create `pages/HomePage.tsx`
-- [ ] Display dish list from useDishes
-- [ ] Add "Add Dish" button/FAB
-- [ ] Add placeholders for "Suggest Meal" and "Plan Menu" (disabled for now)
-- [ ] Write page tests
+- [x] Create `pages/HomePage.tsx`
+- [x] Display dish list from useDishes
+- [x] Add "Add Dish" button/FAB
+- [x] Add placeholders for "Suggest Meal" and "Plan Menu" (disabled for now)
+- [x] Write page tests
 
 **Verify**: HomePage shows dishes and add button
 
@@ -306,12 +306,12 @@ Second user story: users can see all dishes they've added.
 
 ---
 
-### 3.5 Polish Home Page
+### 3.5 Polish Home Page ✅
 
-- [ ] Ensure empty state is friendly and encouraging
-- [ ] Verify layout works on mobile
-- [ ] Add subtle loading state
-- [ ] Meets SC-005 (no horizontal scrolling)
+- [x] Ensure empty state is friendly and encouraging
+- [x] Verify layout works on mobile
+- [x] Add subtle loading state
+- [x] Meets SC-005 (no horizontal scrolling)
 
 **Verify**: Home page feels complete and polished on mobile
 

@@ -38,60 +38,63 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2024-12-17  
+**Last Updated**: 2024-12-18  
 **Current Branch**: `001-meal-planner`  
-**Current Phase**: Phase 2 complete ✅ — Ready for Phase 3
+**Current Phase**: Phase 3 complete ✅ — Ready for Phase 4
 
 ### Completed This Session
 
-- ✅ **Bug resolved**: Dishes now display correctly after adding
-  - Root cause: Stale Vite cache (`node_modules/.vite`)
-  - Fix: Cleared cache and restarted dev server
-- ✅ Added `npm run dev:fresh` script to prevent future cache issues
-- ✅ Removed debug console.log statements (cleanup)
-- ✅ Updated `tasks.md` to mark Phase 1 & 2 tasks complete
-- ✅ Created **blog/part-4-first-feature.md** documenting Phase 2 and the cache debugging lesson
-- ✅ 196 tests passing
+- ✅ **Phase 3 complete**: View My Dishes feature working
+  - DishCard component with type badges (amber/emerald/stone)
+  - DishList component with empty state and plate icon
+  - HomePage rebuilt with DishList, FAB, and "coming soon" placeholders
+- ✅ Created `/alicooks.idea` command for capturing feature ideas
+- ✅ Created ideas backlog (`.specify/memory/ideas.md`)
+- ✅ 264 tests passing (68 new tests for Phase 3)
 
-### Phase 1 & 2 Summary
+### Phase Summary
 
-All code complete and working:
+| Phase                     | Tasks   | Status      |
+| ------------------------- | ------- | ----------- |
+| Phase 1 (Foundation)      | 1.1–1.9 | ✅ Complete |
+| Phase 2 (Add a Dish)      | 2.1–2.5 | ✅ Complete |
+| Phase 3 (View My Dishes)  | 3.1–3.5 | ✅ Complete |
 
-| Phase                | Tasks   | Status      |
-| -------------------- | ------- | ----------- |
-| Phase 1 (Foundation) | 1.1–1.9 | ✅ Complete |
-| Phase 2 (Add a Dish) | 2.1–2.5 | ✅ Complete |
+Full view dishes flow verified in browser:
 
-Full add dish flow verified in browser:
-
-- Navigate to `/add`
-- Enter dish name, select type
-- Submit → dish saved to localStorage
-- Navigate back to `/` → dish appears in list
+- Empty state shows plate icon and "Add a Dish" button
+- Dishes display with name and type badge
+- FAB appears when dishes exist
+- Dish count updates correctly
+- Clicking dish navigates to edit page (placeholder)
 
 ### Test Count
 
 | Layer            | Tests   |
 | ---------------- | ------- |
-| Storage Service  | 34      |
+| Storage Service  | 39      |
 | useDishes Hook   | 15      |
 | Button           | 26      |
 | Input            | 22      |
 | Card             | 18      |
 | EmptyState       | 14      |
 | DishTypeSelector | 18      |
+| DishCard         | 26      |
+| DishList         | 21      |
 | DishForm         | 28      |
 | AddDishPage      | 14      |
+| HomePage         | 21      |
 | App              | 2       |
-| **Total**        | **196** |
+| **Total**        | **264** |
 
 ### Recommended Next Steps
 
-1. **Begin Phase 3 — View My Dishes**
-   - 3.1 DishCard component (display dish with type badge)
-   - 3.2 DishList component (list of DishCards + empty state)
-   - 3.3 HomePage polish (integrate DishList, improve layout)
-2. Optional: Add dish type filtering (Task 3.4)
+1. **Begin Phase 4 — Get Meal Suggestions**
+   - 4.1 SuggestionService (random entree + sides pairing)
+   - 4.2 useSuggestion hook
+   - 4.3 SuggestionCard component
+   - 4.4 SuggestionPage
+2. Optional: Add dish type filtering (Task 3.4, deferred)
 
 ### Key Files
 
