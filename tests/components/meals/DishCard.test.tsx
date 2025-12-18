@@ -1,0 +1,258 @@
+/**
+ * DishCard Component Tests
+ *
+ * Tests for the card that displays a single dish with type badge.
+ */
+
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { DishCard } from '@/components/meals/DishCard';
+import { type Dish } from '@/types';
+
+/**
+ * Factory for creating test dishes
+ */
+function createTestDish(overrides: Partial<Dish> = {}): Dish {
+  return {
+    id: 'test-dish-1',
+    name: 'Grilled Chicken',
+    type: 'entree',
+    createdAt: '2024-12-15T10:30:00Z',
+    updatedAt: '2024-12-15T10:30:00Z',
+    ...overrides,
+  };
+}
+
+describe('DishCard', () => {
+  describe('rendering', () => {
+    it('renders the dish name', () => {
+      const dish = createTestDish({ name: 'Pasta Primavera' });
+      render(<DishCard dish={dish} />);
+
+      expect(screen.getByText('Pasta Primavera')).toBeInTheDocument();
+    });
+
+    it('renders the type badge by default', () => {
+      const dish = createTestDish({ type: 'entree' });
+      render(<DishCard dish={dish} />);
+
+      expect(screen.getByText('Entree')).toBeInTheDocument();
+    });
+
+    it('renders Side badge for side dishes', () => {
+      const dish = createTestDish({ type: 'side' });
+      render(<DishCard dish={dish} />);
+
+      expect(screen.getByText('Side')).toBeInTheDocument();
+    });
+
+    it('renders Other badge for other type', () => {
+      const dish = createTestDish({ type: 'other' });
+      render(<DishCard dish={dish} />);
+
+      expect(screen.getByText('Other')).toBeInTheDocument();
+    });
+
+    it('does not render badge when showType is false', () => {
+      const dish = createTestDish({ type: 'entree' });
+      render(<DishCard dish={dish} showType={false} />);
+
+      expect(screen.queryByText('Entree')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('badge styling', () => {
+    it('uses amber colors for entree badge', () => {
+      const dish = createTestDish({ type: 'entree' });
+      render(<DishCard dish={dish} />);
+
+      const badge = screen.getByText('Entree');
+      expect(badge).toHaveClass('bg-amber-100', 'text-amber-700');
+    });
+
+    it('uses emerald colors for side badge', () => {
+      const dish = createTestDish({ type: 'side' });
+      render(<DishCard dish={dish} />);
+
+      const badge = screen.getByText('Side');
+      expect(badge).toHaveClass('bg-emerald-100', 'text-emerald-700');
+    });
+
+    it('uses stone colors for other badge', () => {
+      const dish = createTestDish({ type: 'other' });
+      render(<DishCard dish={dish} />);
+
+      const badge = screen.getByText('Other');
+      expect(badge).toHaveClass('bg-stone-100', 'text-stone-600');
+    });
+  });
+
+  describe('interaction', () => {
+    it('renders as a button when onClick is provided', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} onClick={() => {}} />);
+
+      expect(screen.getByRole('button')).toBeInTheDocument();
+    });
+
+    it('renders as a div when onClick is not provided', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} />);
+
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('calls onClick when clicked', async () => {
+      const handleClick = vi.fn();
+      const user = userEvent.setup();
+      const dish = createTestDish();
+
+      render(<DishCard dish={dish} onClick={handleClick} />);
+
+      await user.click(screen.getByRole('button'));
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('has aria-label with dish name and type', () => {
+      const dish = createTestDish({ name: 'Roasted Vegetables', type: 'side' });
+      render(<DishCard dish={dish} onClick={() => {}} />);
+
+      expect(screen.getByRole('button')).toHaveAttribute(
+        'aria-label',
+        'Roasted Vegetables, Side'
+      );
+    });
+  });
+
+  describe('selected state', () => {
+    it('shows selected styling when selected is true', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} selected />);
+
+      const card = screen.getByText(dish.name).closest('div');
+      expect(card).toHaveClass('border-amber-500', 'ring-2');
+    });
+
+    it('shows default styling when selected is false', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} selected={false} />);
+
+      const card = screen.getByText(dish.name).closest('div');
+      expect(card).toHaveClass('border-stone-200');
+      expect(card).not.toHaveClass('border-amber-500');
+    });
+  });
+
+  describe('compact mode', () => {
+    it('uses smaller padding in compact mode', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} compact />);
+
+      const card = screen.getByText(dish.name).closest('div');
+      expect(card).toHaveClass('px-3', 'py-2');
+    });
+
+    it('uses larger padding in normal mode', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} compact={false} />);
+
+      const card = screen.getByText(dish.name).closest('div');
+      expect(card).toHaveClass('px-4', 'py-3');
+    });
+
+    it('uses smaller text in compact mode', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} compact />);
+
+      expect(screen.getByText(dish.name)).toHaveClass('text-sm');
+    });
+
+    it('uses base text in normal mode', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} compact={false} />);
+
+      expect(screen.getByText(dish.name)).toHaveClass('text-base');
+    });
+  });
+
+  describe('long name handling', () => {
+    it('has truncate class for text overflow', () => {
+      const dish = createTestDish({
+        name: 'This is a very long dish name that should be truncated with ellipsis',
+      });
+      render(<DishCard dish={dish} />);
+
+      expect(screen.getByText(dish.name)).toHaveClass('truncate');
+    });
+  });
+
+  describe('touch targets', () => {
+    it('has minimum 44px height for touch accessibility', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} onClick={() => {}} />);
+
+      expect(screen.getByRole('button')).toHaveClass('min-h-[44px]');
+    });
+
+    it('has minimum 44px height even in non-interactive mode', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} />);
+
+      const card = screen.getByText(dish.name).closest('div');
+      expect(card).toHaveClass('min-h-[44px]');
+    });
+  });
+
+  describe('accessibility', () => {
+    it('button has type="button" to prevent form submission', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} onClick={() => {}} />);
+
+      expect(screen.getByRole('button')).toHaveAttribute('type', 'button');
+    });
+
+    it('is keyboard accessible when interactive', async () => {
+      const handleClick = vi.fn();
+      const user = userEvent.setup();
+      const dish = createTestDish();
+
+      render(<DishCard dish={dish} onClick={handleClick} />);
+
+      await user.tab();
+      expect(screen.getByRole('button')).toHaveFocus();
+
+      await user.keyboard('{Enter}');
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('can be activated with Space key', async () => {
+      const handleClick = vi.fn();
+      const user = userEvent.setup();
+      const dish = createTestDish();
+
+      render(<DishCard dish={dish} onClick={handleClick} />);
+
+      await user.tab();
+      await user.keyboard(' ');
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('interactive styling', () => {
+    it('has cursor-pointer when interactive', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} onClick={() => {}} />);
+
+      expect(screen.getByRole('button')).toHaveClass('cursor-pointer');
+    });
+
+    it('has active scale for tap feedback', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} onClick={() => {}} />);
+
+      expect(screen.getByRole('button')).toHaveClass('active:scale-[0.98]');
+    });
+  });
+});
+

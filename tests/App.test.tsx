@@ -10,7 +10,7 @@ describe('App', () => {
 
   it('renders the tagline', () => {
     render(<App />)
-    expect(screen.getByText('Meal planning made simple')).toBeInTheDocument()
+    expect(screen.getByText('Your meal planning companion')).toBeInTheDocument()
   })
 })
 

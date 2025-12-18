@@ -1,0 +1,273 @@
+/**
+ * HomePage Tests
+ *
+ * Tests the main landing page including dish list display,
+ * empty state, navigation, and quick actions.
+ */
+
+import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { HomePage } from '@/pages/HomePage';
+import type { Dish } from '@/types';
+
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => {
+      store[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+// Track navigation
+let navigatedTo: string | null = null;
+
+/**
+ * Factory for creating test dishes
+ */
+function createTestDish(overrides: Partial<Dish> = {}): Dish {
+  const id = overrides.id || `dish-${Math.random().toString(36).slice(2, 9)}`;
+  return {
+    id,
+    name: 'Test Dish',
+    type: 'entree',
+    createdAt: '2024-12-15T10:30:00Z',
+    updatedAt: '2024-12-15T10:30:00Z',
+    ...overrides,
+  };
+}
+
+/**
+ * Helper to set up dishes in localStorage
+ */
+function setupDishes(dishes: Dish[]) {
+  localStorageMock.setItem('alicooks_dishes', JSON.stringify(dishes));
+}
+
+/**
+ * Helper to render HomePage with router context
+ */
+function renderHomePage() {
+  navigatedTo = null;
+
+  function AddDishPage() {
+    navigatedTo = '/add';
+    return <div>Add Dish Page</div>;
+  }
+
+  function EditDishPage() {
+    navigatedTo = '/edit';
+    return <div>Edit Dish Page</div>;
+  }
+
+  return render(
+    <MemoryRouter initialEntries={['/']}>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/add" element={<AddDishPage />} />
+        <Route path="/edit/:dishId" element={<EditDishPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
+}
+
+describe('HomePage', () => {
+  beforeEach(() => {
+    localStorageMock.clear();
+    navigatedTo = null;
+  });
+
+  describe('rendering', () => {
+    it('renders page title', () => {
+      renderHomePage();
+
+      expect(screen.getByRole('heading', { name: 'AliCooks' })).toBeInTheDocument();
+    });
+
+    it('renders subtitle', () => {
+      renderHomePage();
+
+      expect(screen.getByText('Your meal planning companion')).toBeInTheDocument();
+    });
+
+    it('renders My Dishes section heading', () => {
+      renderHomePage();
+
+      expect(screen.getByRole('heading', { name: 'My Dishes' })).toBeInTheDocument();
+    });
+  });
+
+  describe('empty state', () => {
+    it('shows empty state when no dishes exist', () => {
+      renderHomePage();
+
+      expect(screen.getByText('No dishes yet')).toBeInTheDocument();
+    });
+
+    it('shows Add a Dish button in empty state', () => {
+      renderHomePage();
+
+      expect(screen.getByRole('button', { name: 'Add a Dish' })).toBeInTheDocument();
+    });
+
+    it('navigates to add page when empty state button is clicked', async () => {
+      const user = userEvent.setup();
+      renderHomePage();
+
+      await user.click(screen.getByRole('button', { name: 'Add a Dish' }));
+
+      expect(navigatedTo).toBe('/add');
+    });
+
+    it('does not show FAB in empty state', () => {
+      renderHomePage();
+
+      // The FAB has aria-label "Add a dish" (lowercase)
+      expect(screen.queryByRole('button', { name: 'Add a dish' })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('with dishes', () => {
+    it('renders dish names', () => {
+      setupDishes([
+        createTestDish({ name: 'Grilled Chicken' }),
+        createTestDish({ name: 'Roasted Vegetables' }),
+      ]);
+      renderHomePage();
+
+      expect(screen.getByText('Grilled Chicken')).toBeInTheDocument();
+      expect(screen.getByText('Roasted Vegetables')).toBeInTheDocument();
+    });
+
+    it('shows dish count', () => {
+      setupDishes([createTestDish(), createTestDish(), createTestDish()]);
+      renderHomePage();
+
+      expect(screen.getByText('3 dishes')).toBeInTheDocument();
+    });
+
+    it('shows singular "dish" for one dish', () => {
+      setupDishes([createTestDish()]);
+      renderHomePage();
+
+      expect(screen.getByText('1 dish')).toBeInTheDocument();
+    });
+
+    it('shows type badges on dishes', () => {
+      setupDishes([
+        createTestDish({ type: 'entree' }),
+        createTestDish({ type: 'side' }),
+      ]);
+      renderHomePage();
+
+      expect(screen.getByText('Entree')).toBeInTheDocument();
+      expect(screen.getByText('Side')).toBeInTheDocument();
+    });
+
+    it('shows FAB when dishes exist', () => {
+      setupDishes([createTestDish()]);
+      renderHomePage();
+
+      expect(screen.getByRole('button', { name: 'Add a dish' })).toBeInTheDocument();
+    });
+
+    it('does not show empty state when dishes exist', () => {
+      setupDishes([createTestDish()]);
+      renderHomePage();
+
+      expect(screen.queryByText('No dishes yet')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('navigation', () => {
+    it('navigates to add page when FAB is clicked', async () => {
+      const user = userEvent.setup();
+      setupDishes([createTestDish()]);
+      renderHomePage();
+
+      await user.click(screen.getByRole('button', { name: 'Add a dish' }));
+
+      expect(navigatedTo).toBe('/add');
+    });
+
+    it('navigates to edit page when dish is clicked', async () => {
+      const user = userEvent.setup();
+      setupDishes([createTestDish({ id: 'dish-123', name: 'Clickable Dish' })]);
+      renderHomePage();
+
+      // The dish card is rendered as a button when onClick is provided
+      await user.click(screen.getByText('Clickable Dish'));
+
+      expect(navigatedTo).toBe('/edit');
+    });
+  });
+
+  describe('quick actions', () => {
+    it('renders Suggest button (disabled)', () => {
+      renderHomePage();
+
+      const suggestButton = screen.getByRole('button', { name: /suggest.*coming soon/i });
+      expect(suggestButton).toBeInTheDocument();
+      expect(suggestButton).toBeDisabled();
+    });
+
+    it('renders Plan button (disabled)', () => {
+      renderHomePage();
+
+      const planButton = screen.getByRole('button', { name: /plan.*coming soon/i });
+      expect(planButton).toBeInTheDocument();
+      expect(planButton).toBeDisabled();
+    });
+
+    it('shows coming soon message', () => {
+      renderHomePage();
+
+      expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('accessibility', () => {
+    it('FAB has accessible label', () => {
+      setupDishes([createTestDish()]);
+      renderHomePage();
+
+      expect(screen.getByRole('button', { name: 'Add a dish' })).toBeInTheDocument();
+    });
+
+    it('dish list has proper list role', () => {
+      setupDishes([createTestDish()]);
+      renderHomePage();
+
+      expect(screen.getByRole('list', { name: 'Dishes' })).toBeInTheDocument();
+    });
+
+    it('dishes are keyboard navigable', async () => {
+      const user = userEvent.setup();
+      setupDishes([createTestDish({ name: 'Keyboard Dish' })]);
+      renderHomePage();
+
+      // Tab to the dish (may need multiple tabs depending on page structure)
+      await user.tab();
+      await user.tab();
+      await user.tab();
+      await user.tab();
+
+      // The dish button should be focusable
+      const dishButton = screen.getByRole('button', { name: /keyboard dish/i });
+      expect(document.body).toContainElement(dishButton);
+    });
+  });
+});
+

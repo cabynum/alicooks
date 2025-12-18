@@ -7,6 +7,7 @@ Quick reference for starting and ending AI pair programming sessions.
 | Command           | Purpose                                        |
 | ----------------- | ---------------------------------------------- |
 | `/alicooks.start` | Start a new session (loads context)            |
+| `/alicooks.idea`  | Capture a feature idea to the backlog          |
 | `/alicooks.lint`  | Check all markdown files for linting errors    |
 | `/alicooks.save`  | End a session (saves context, suggests commit) |
 
@@ -97,6 +98,7 @@ Full add dish flow verified in browser:
 | Purpose             | Path                                                |
 | ------------------- | --------------------------------------------------- |
 | Constitution        | `.specify/memory/constitution.md`                   |
+| **Ideas Backlog**   | `.specify/memory/ideas.md`                          |
 | Feature Spec        | `specs/001-meal-planner/spec.md`                    |
 | Implementation Plan | `specs/001-meal-planner/plan.md`                    |
 | **Task Breakdown**  | `specs/001-meal-planner/tasks.md`                   |
