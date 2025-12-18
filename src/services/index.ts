@@ -23,3 +23,6 @@ export {
   importData,
   clearAllData,
 } from './storage';
+
+// Suggestion service for meal recommendations
+export { suggest, suggestMany } from './suggestion';

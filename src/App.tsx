@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { HomePage, AddDishPage } from '@/pages';
+import { HomePage, AddDishPage, SuggestionPage } from '@/pages';
 
 /**
  * App - Root component with routing configuration.
@@ -7,6 +7,7 @@ import { HomePage, AddDishPage } from '@/pages';
  * Routes:
  * - "/" : HomePage (dish list and main actions)
  * - "/add" : AddDishPage (add new dish form)
+ * - "/suggest" : SuggestionPage (get meal suggestions)
  */
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/add" element={<AddDishPage />} />
+        <Route path="/suggest" element={<SuggestionPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -68,3 +68,26 @@ export interface UpdateDishInput {
   type?: DishType;
 }
 
+/**
+ * A suggested meal combination: one entree paired with side dishes.
+ * This is the core output of the suggestion feature.
+ *
+ * @example
+ * ```ts
+ * const suggestion: MealSuggestion = {
+ *   entree: { id: '1', name: 'Grilled Chicken', type: 'entree', ... },
+ *   sides: [
+ *     { id: '2', name: 'Roasted Vegetables', type: 'side', ... },
+ *     { id: '3', name: 'Rice', type: 'side', ... },
+ *   ],
+ * };
+ * ```
+ */
+export interface MealSuggestion {
+  /** The main course dish */
+  entree: Dish;
+
+  /** Side dishes to accompany the entree (0-2 sides) */
+  sides: Dish[];
+}
+

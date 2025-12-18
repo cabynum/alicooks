@@ -10,7 +10,13 @@
  */
 
 // Dish types
-export type { Dish, DishType, CreateDishInput, UpdateDishInput } from './dish';
+export type {
+  Dish,
+  DishType,
+  CreateDishInput,
+  UpdateDishInput,
+  MealSuggestion,
+} from './dish';
 
 // Plan types
 export type {

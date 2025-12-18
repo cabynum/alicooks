@@ -6,3 +6,6 @@
 
 export { useDishes } from './useDishes';
 export type { UseDishesReturn } from './useDishes';
+
+export { useSuggestion } from './useSuggestion';
+export type { UseSuggestionReturn } from './useSuggestion';

@@ -72,12 +72,18 @@ function renderHomePage() {
     return <div>Edit Dish Page</div>;
   }
 
+  function SuggestPage() {
+    navigatedTo = '/suggest';
+    return <div>Suggest Page</div>;
+  }
+
   return render(
     <MemoryRouter initialEntries={['/']}>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/add" element={<AddDishPage />} />
         <Route path="/edit/:dishId" element={<EditDishPage />} />
+        <Route path="/suggest" element={<SuggestPage />} />
       </Routes>
     </MemoryRouter>
   );
@@ -215,12 +221,31 @@ describe('HomePage', () => {
   });
 
   describe('quick actions', () => {
-    it('renders Suggest button (disabled)', () => {
+    it('renders Suggest button (disabled when no entrees)', () => {
       renderHomePage();
 
-      const suggestButton = screen.getByRole('button', { name: /suggest.*coming soon/i });
+      const suggestButton = screen.getByRole('button', { name: /suggest.*add entrees first/i });
       expect(suggestButton).toBeInTheDocument();
       expect(suggestButton).toBeDisabled();
+    });
+
+    it('renders Suggest button (enabled when has entrees)', async () => {
+      setupDishes([createTestDish({ type: 'entree' })]);
+      renderHomePage();
+
+      const suggestButton = screen.getByRole('button', { name: /get meal suggestion/i });
+      expect(suggestButton).toBeInTheDocument();
+      expect(suggestButton).not.toBeDisabled();
+    });
+
+    it('navigates to suggest page when Suggest clicked', async () => {
+      const user = userEvent.setup();
+      setupDishes([createTestDish({ type: 'entree' })]);
+      renderHomePage();
+
+      await user.click(screen.getByRole('button', { name: /get meal suggestion/i }));
+
+      expect(navigatedTo).toBe('/suggest');
     });
 
     it('renders Plan button (disabled)', () => {
@@ -231,10 +256,17 @@ describe('HomePage', () => {
       expect(planButton).toBeDisabled();
     });
 
-    it('shows coming soon message', () => {
+    it('shows add entree message when no entrees', () => {
       renderHomePage();
 
-      expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
+      expect(screen.getByText(/add an entree to start getting suggestions/i)).toBeInTheDocument();
+    });
+
+    it('does not show entree message when has entrees', () => {
+      setupDishes([createTestDish({ type: 'entree' })]);
+      renderHomePage();
+
+      expect(screen.queryByText(/add an entree to start getting suggestions/i)).not.toBeInTheDocument();
     });
   });
 

@@ -317,78 +317,78 @@ Second user story: users can see all dishes they've added.
 
 ---
 
-## Phase 4: P3 - Get Meal Suggestions
+## Phase 4: P3 - Get Meal Suggestions ✅
 
 Third user story: app suggests meal combinations.
 
-### 4.1 Implement SuggestionService
+### 4.1 Implement SuggestionService ✅
 
-- [ ] Create `services/suggestion.ts`
-- [ ] Implement `suggest(dishes)` - returns random entree + sides
-- [ ] Handle edge case: no entrees available
-- [ ] Handle edge case: no sides available
-- [ ] Implement `suggestMany(dishes, count)` for variety
-- [ ] Write unit tests
+- [x] Create `services/suggestion.ts`
+- [x] Implement `suggest(dishes)` - returns random entree + sides
+- [x] Handle edge case: no entrees available
+- [x] Handle edge case: no sides available
+- [x] Implement `suggestMany(dishes, count)` for variety
+- [x] Write unit tests
 
 **Verify**: Service returns sensible combinations or null when not possible
 
 ---
 
-### 4.2 Create useSuggestion Hook
+### 4.2 Create useSuggestion Hook ✅
 
-- [ ] Create `hooks/useSuggestion.ts`
-- [ ] Implement `suggestion` state
-- [ ] Implement `generate()` function
-- [ ] Implement `isAvailable` check (enough dishes?)
-- [ ] Provide helpful `message` when unavailable
+- [x] Create `hooks/useSuggestion.ts`
+- [x] Implement `suggestion` state
+- [x] Implement `generate()` function
+- [x] Implement `isAvailable` check (enough dishes?)
+- [x] Provide helpful `message` when unavailable
 
 **Verify**: Hook generates suggestions and handles edge cases
 
 ---
 
-### 4.3 Build SuggestionCard Component
+### 4.3 Build SuggestionCard Component ✅
 
-- [ ] Create `components/meals/SuggestionCard.tsx`
-- [ ] Display entree prominently
-- [ ] List side dishes below
-- [ ] Add "Accept" and "Try Another" buttons
-- [ ] Make it visually delightful (this is the magic moment!)
-- [ ] Write component tests
+- [x] Create `components/meals/SuggestionCard.tsx`
+- [x] Display entree prominently
+- [x] List side dishes below
+- [x] Add "Accept" and "Try Another" buttons
+- [x] Make it visually delightful (this is the magic moment!)
+- [x] Write component tests
 
 **Verify**: Card looks great and buttons work
 
 ---
 
-### 4.4 Build SuggestionPage
+### 4.4 Build SuggestionPage ✅
 
-- [ ] Create `pages/SuggestionPage.tsx`
-- [ ] Generate suggestion on load
-- [ ] Display SuggestionCard or helpful message
-- [ ] Implement "Try Another" functionality
-- [ ] Add back navigation
-- [ ] Write page tests
+- [x] Create `pages/SuggestionPage.tsx`
+- [x] Generate suggestion on load
+- [x] Display SuggestionCard or helpful message
+- [x] Implement "Try Another" functionality
+- [x] Add back navigation
+- [x] Write page tests
 
 **Verify**: Page shows suggestion, "Try Another" works
 
 ---
 
-### 4.5 Connect Suggestion Flow
+### 4.5 Connect Suggestion Flow ✅
 
-- [ ] Add `/suggest` route
-- [ ] Enable "Suggest Meal" button on HomePage
-- [ ] Verify full flow works end-to-end
-- [ ] Verify meets SC-002 (<3s for suggestion)
+- [x] Add `/suggest` route
+- [x] Enable "Suggest Meal" button on HomePage
+- [x] Verify full flow works end-to-end
+- [x] Verify meets SC-002 (<3s for suggestion)
 
 **Verify**: User can navigate to suggestions and get combinations
 
 ---
 
-### 4.6 Polish Suggestion Experience
+### 4.6 Polish Suggestion Experience ✅
 
-- [ ] Add animation when new suggestion appears
-- [ ] Ensure delightful visual design
-- [ ] Handle not-enough-dishes gracefully with encouragement
-- [ ] Test on mobile
+- [x] Add animation when new suggestion appears
+- [x] Ensure delightful visual design
+- [x] Handle not-enough-dishes gracefully with encouragement
+- [x] Test on mobile
 
 **Verify**: Suggestion feature feels magical and polished
 

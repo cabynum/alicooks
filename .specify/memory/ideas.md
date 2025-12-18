@@ -73,7 +73,34 @@ No ideas yet.
 
 Ideas for making the app more intelligent.
 
-No ideas yet. Things like "don't suggest the same meal twice in a week" could go here.
+### Smart Meal Pairing
+
+**Added**: 2024-12-18
+
+The current suggestion feature pairs entrees with random sides. Future versions should make
+smarter pairings. Several approaches to explore:
+
+1. **User-defined pairings** — Let users connect sides to entrees they think go well together.
+   When suggesting, prefer these known-good combinations over random picks.
+
+2. **AI-inferred pairings** — Use an LLM to analyze the user's dish list and infer which sides
+   complement which entrees based on cuisine, flavor profiles, cooking methods, etc.
+
+3. **AI-suggested new dishes** — Go beyond the user's list. "You have Grilled Chicken — have
+   you considered adding Caesar Salad or Garlic Bread as sides?" Could help users expand their
+   repertoire with complementary dishes they haven't thought of.
+
+*Consideration*: Start with user-defined pairings (no AI dependency, user stays in control).
+AI features could be opt-in enhancements later. The constitution emphasizes offline-first and
+no account requirements, so AI features would need careful design (on-device models? optional
+cloud calls?).
+
+### Suggestion History & Variety
+
+**Added**: 2024-12-18
+
+Don't suggest the same meal twice in a week. Track what's been suggested recently and weight
+randomness toward variety.
 
 ---
 

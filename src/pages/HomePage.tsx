@@ -48,6 +48,13 @@ export function HomePage() {
     navigate(`/edit/${dish.id}`);
   };
 
+  const handleSuggestClick = () => {
+    navigate('/suggest');
+  };
+
+  // Check if we have enough dishes to suggest (at least one entree)
+  const hasEntrees = dishes.some((d) => d.type === 'entree');
+
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Header */}
@@ -60,14 +67,15 @@ export function HomePage() {
 
       {/* Main content */}
       <main className="max-w-lg mx-auto px-4 py-6 pb-24">
-        {/* Quick Actions - Coming Soon placeholders */}
+        {/* Quick Actions */}
         <section className="mb-6">
           <div className="flex gap-3">
             <Button
-              variant="secondary"
-              disabled
-              className="flex-1 opacity-50"
-              aria-label="Suggest a meal - coming soon"
+              variant={hasEntrees ? 'primary' : 'secondary'}
+              disabled={!hasEntrees}
+              className={`flex-1 ${!hasEntrees ? 'opacity-50' : ''}`}
+              onClick={handleSuggestClick}
+              aria-label={hasEntrees ? 'Get meal suggestion' : 'Suggest a meal - add entrees first'}
             >
               <span className="flex items-center gap-2">
                 <span>🎲</span>
@@ -86,9 +94,11 @@ export function HomePage() {
               </span>
             </Button>
           </div>
-          <p className="text-xs text-stone-400 text-center mt-2">
-            Coming soon — add some dishes first!
-          </p>
+          {!hasEntrees && (
+            <p className="text-xs text-stone-400 text-center mt-2">
+              Add an entree to start getting suggestions!
+            </p>
+          )}
         </section>
 
         {/* Dishes Section */}

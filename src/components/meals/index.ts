@@ -13,3 +13,6 @@ export type { DishTypeSelectorProps } from './DishTypeSelector';
 export { DishForm } from './DishForm';
 export type { DishFormProps, DishFormValues } from './DishForm';
 
+export { SuggestionCard } from './SuggestionCard';
+export type { SuggestionCardProps } from './SuggestionCard';
+
