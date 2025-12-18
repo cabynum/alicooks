@@ -482,29 +482,29 @@ Fourth user story: users can plan meals for multiple days.
 
 ---
 
-## Phase 6: Edit & Delete Dishes
+## Phase 6: Edit & Delete Dishes ✅
 
 Completing FR-003: Edit or delete dishes from collection.
 
-### 6.1 Build EditDishPage
+### 6.1 Build EditDishPage ✅
 
-- [ ] Create `pages/EditDishPage.tsx`
-- [ ] Load existing dish data by ID
-- [ ] Render DishForm with initial values
-- [ ] Update dish on save
-- [ ] Add delete action with confirmation
-- [ ] Navigate back on success
-- [ ] Write page tests
+- [x] Create `pages/EditDishPage.tsx`
+- [x] Load existing dish data by ID
+- [x] Render DishForm with initial values
+- [x] Update dish on save
+- [x] Add delete action with confirmation
+- [x] Navigate back on success
+- [x] Write page tests (26 tests)
 
 **Verify**: Can edit dish name/type and delete dishes
 
 ---
 
-### 6.2 Connect Edit Flow
+### 6.2 Connect Edit Flow ✅
 
-- [ ] Add `/edit/:dishId` route
-- [ ] Add edit action to DishCard or dish detail
-- [ ] Verify full edit flow works
+- [x] Add `/edit/:dishId` route
+- [x] Add edit action to DishCard or dish detail
+- [x] Verify full edit flow works
 
 **Verify**: User can tap a dish, edit it, and save changes
 
@@ -586,18 +586,18 @@ Refinements for production readiness.
 
 ## Summary
 
-| Phase | Tasks | Focus |
-| --------- | ------ | -------------------------------------------------- |
-| 0 | 6 | Project setup (Vite, Tailwind, testing, routing) |
-| 1 | 9 | Foundation (types, storage, hooks, UI primitives) |
-| 2 | 5 | P1 - Add a Dish |
-| 3 | 5 | P2 - View My Dishes |
-| 4 | 6 | P3 - Get Meal Suggestions |
-| 5 | 7 | P4 - Plan a Menu |
-| 6 | 2 | Edit & Delete Dishes |
-| 7 | 2 | Data Export |
-| 8 | 5 | Final Polish |
-| **Total** | **47** | |
+| Phase | Tasks | Focus | Status |
+| --------- | ------ | -------------------------------------------------- | ------ |
+| 0 | 6 | Project setup (Vite, Tailwind, testing, routing) | ✅ |
+| 1 | 9 | Foundation (types, storage, hooks, UI primitives) | ✅ |
+| 2 | 5 | P1 - Add a Dish | ✅ |
+| 3 | 5 | P2 - View My Dishes | ✅ |
+| 4 | 6 | P3 - Get Meal Suggestions | ✅ |
+| 5 | 7 | P4 - Plan a Menu | ✅ |
+| 6 | 2 | Edit & Delete Dishes | ✅ |
+| 7 | 2 | Data Export | |
+| 8 | 5 | Final Polish | |
+| **Total** | **47** | | |
 
 **Recommended approach**: Complete phases sequentially. Each phase delivers testable, working
 functionality before moving to the next. This aligns with the constitution's "work incrementally"

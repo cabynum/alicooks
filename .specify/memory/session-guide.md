@@ -40,19 +40,17 @@ Before we end, please:
 
 **Last Updated**: 2024-12-18  
 **Current Branch**: `001-meal-planner`  
-**Current Phase**: Phase 5 complete ✅ — Ready for Phase 6
+**Current Phase**: Phase 6 complete ✅ — Ready for Phase 7
 
 ### Completed This Session
 
-- ✅ **Phase 5 complete**: Plan a Menu feature working
-  - `usePlans` hook for plan state management
-  - `DaySlot` component with staggered fade-in animations
-  - `PlanPage` for creating plans (3/5/7/14 days) and viewing week
-  - `DayAssignmentPage` for adding/removing dishes per day
-  - Routes: `/plan`, `/plan/:planId`, `/plan/:planId/:date`
-  - Enabled "Plan" button on HomePage (only when dishes exist)
-  - Suggestion integration on day assignment page
-- ✅ 428 tests passing (91 new tests for Phase 5)
+- ✅ **Phase 6 complete**: Edit & Delete Dishes working
+  - `EditDishPage` for modifying existing dishes
+  - Delete confirmation modal with warning about meal plan removal
+  - Cascade delete: removes dish from all meal plans automatically
+  - Route: `/edit/:dishId`
+  - Dishes are tappable from HomePage to edit
+- ✅ 454 tests passing (26 new tests for Phase 6)
 
 ### Phase Summary
 
@@ -63,17 +61,15 @@ Before we end, please:
 | Phase 3 (View My Dishes) | 3.1–3.5 | ✅ Complete |
 | Phase 4 (Meal Suggestions) | 4.1–4.6 | ✅ Complete |
 | Phase 5 (Plan a Menu) | 5.1–5.7 | ✅ Complete |
+| Phase 6 (Edit & Delete) | 6.1–6.2 | ✅ Complete |
 
-Full plan flow ready:
+Full CRUD for dishes complete:
 
-- "Plan" button disabled when no dishes exist
-- "Plan" button enabled when dishes exist
-- Create plan with selectable day count (3, 5, 7, or 14 days)
-- Week view shows all days with assigned dishes
-- Day assignment page shows current meal + available dishes
-- Add/remove dishes with single tap
-- Suggestion integration for quick meal ideas
-- Staggered animations on day slots
+- Add dishes with name and type
+- View all dishes on HomePage (tappable to edit)
+- Edit dish name and type
+- Delete dishes with confirmation modal
+- Cascade delete from meal plans
 
 ### Test Count
 
@@ -95,20 +91,21 @@ Full plan flow ready:
 | DaySlot | 22 |
 | DishForm | 28 |
 | AddDishPage | 14 |
+| EditDishPage | 26 |
 | SuggestionPage | 16 |
 | PlanPage | 20 |
 | DayAssignmentPage | 22 |
 | HomePage | 24 |
 | App | 2 |
-| **Total** | **428** |
+| **Total** | **454** |
 
 ### Recommended Next Steps
 
-1. **Begin Phase 6 — Edit & Delete Dishes**
-   - 6.1 EditDishPage for modifying existing dishes
-   - 6.2 Delete confirmation modal
-   - 6.3 Cascade delete from plans
+1. **Begin Phase 7 — Data Export**
+   - 7.1 Create useExport hook (exportToFile, importFromFile)
+   - 7.2 Add export UI (settings/menu with export option)
 2. Optional: Add dish type filtering (Task 3.4, deferred)
+3. Optional: Begin Phase 8 — Final Polish
 
 ### Key Files
 

@@ -3,6 +3,7 @@
 
 export { AddDishPage } from './AddDishPage';
 export { DayAssignmentPage } from './DayAssignmentPage';
+export { EditDishPage } from './EditDishPage';
 export { HomePage } from './HomePage';
 export { PlanPage } from './PlanPage';
 export { SuggestionPage } from './SuggestionPage';
