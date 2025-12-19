@@ -49,6 +49,14 @@ Before we end, please:
 - ✅ **Deployed to Vercel**: https://alicooks.vercel.app
   - Auto-deploys on push to master
   - Verified all features work in production
+- ✅ **Custom app icon**: Designed and implemented new cooking pot icon
+  - Explored multiple concepts (bowl, plates, pot, shakers)
+  - Created SVG with warm orange gradient, depth, and polish
+  - Generated PNG icons for PWA manifest (192px, 512px, maskable)
+  - Added `scripts/generate-icons.mjs` for regenerating from SVG
+  - Icon concepts saved in `icon-concepts/` for reference
+- ✅ **Updated README**: Added icon to header with centered layout
+  - Live App link, Features, Getting Started quick nav
 - ✅ **Code cleanup**: Removed unused `dishes` prop from PlanCard
 - ✅ 554 tests passing
 
@@ -127,7 +135,10 @@ Core features:
 | Data Model | `specs/001-meal-planner/data-model.md` |
 | Component Contracts | `specs/001-meal-planner/contracts/components.md` |
 | Quality Checklist | `specs/001-meal-planner/checklists/requirements.md` |
-| Blog Posts | `blog/` (Part 1 & Part 2) |
+| Blog Posts | `blog/` (Part 1–8) |
+| **App Icon SVG** | `public/icons/icon-512.svg` |
+| Icon Generation | `scripts/generate-icons.mjs` |
+| Icon Concepts | `icon-concepts/` |
 | Markdown Rules | `.cursor/rules/markdown-linting.mdc` |
 | This Guide | `.specify/memory/session-guide.md` |
 
