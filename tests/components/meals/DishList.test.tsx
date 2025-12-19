@@ -219,5 +219,171 @@ describe('DishList', () => {
       expect(screen.getByText('Third Dish')).toBeInTheDocument();
     });
   });
+
+  describe('showFilters prop', () => {
+    const mixedDishes = [
+      createTestDish({ id: 'dish-1', name: 'Chicken', type: 'entree' }),
+      createTestDish({ id: 'dish-2', name: 'Pasta', type: 'entree' }),
+      createTestDish({ id: 'dish-3', name: 'Rice', type: 'side' }),
+      createTestDish({ id: 'dish-4', name: 'Salad', type: 'side' }),
+      createTestDish({ id: 'dish-5', name: 'Dessert', type: 'other' }),
+    ];
+
+    it('does not show filters by default', () => {
+      render(<DishList dishes={mixedDishes} />);
+
+      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+    });
+
+    it('shows filter pills when showFilters is true', () => {
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      expect(screen.getByRole('tablist', { name: 'Filter dishes by type' })).toBeInTheDocument();
+    });
+
+    it('shows All filter with total count', () => {
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      const allTab = screen.getByRole('tab', { name: /All/i });
+      expect(allTab).toBeInTheDocument();
+      expect(allTab).toHaveTextContent('5');
+    });
+
+    it('shows Entrees filter with count', () => {
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      const entreesTab = screen.getByRole('tab', { name: /Entrees/i });
+      expect(entreesTab).toBeInTheDocument();
+      expect(entreesTab).toHaveTextContent('2');
+    });
+
+    it('shows Sides filter with count', () => {
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      const sidesTab = screen.getByRole('tab', { name: /Sides/i });
+      expect(sidesTab).toBeInTheDocument();
+      expect(sidesTab).toHaveTextContent('2');
+    });
+
+    it('shows Other filter with count', () => {
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      const otherTab = screen.getByRole('tab', { name: /Other/i });
+      expect(otherTab).toBeInTheDocument();
+      expect(otherTab).toHaveTextContent('1');
+    });
+
+    it('hides filter options with zero dishes (except All)', () => {
+      const entreesOnly = [
+        createTestDish({ id: 'dish-1', name: 'Chicken', type: 'entree' }),
+        createTestDish({ id: 'dish-2', name: 'Pasta', type: 'entree' }),
+      ];
+
+      render(<DishList dishes={entreesOnly} showFilters />);
+
+      expect(screen.getByRole('tab', { name: /All/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /Entrees/i })).toBeInTheDocument();
+      expect(screen.queryByRole('tab', { name: /Sides/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('tab', { name: /Other/i })).not.toBeInTheDocument();
+    });
+
+    it('All filter is active by default', () => {
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      const allTab = screen.getByRole('tab', { name: /All/i });
+      expect(allTab).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('shows all dishes when All is selected', () => {
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      expect(screen.getByText('Chicken')).toBeInTheDocument();
+      expect(screen.getByText('Pasta')).toBeInTheDocument();
+      expect(screen.getByText('Rice')).toBeInTheDocument();
+      expect(screen.getByText('Salad')).toBeInTheDocument();
+      expect(screen.getByText('Dessert')).toBeInTheDocument();
+    });
+
+    it('filters to show only entrees when Entrees is clicked', async () => {
+      const user = userEvent.setup();
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      await user.click(screen.getByRole('tab', { name: /Entrees/i }));
+
+      expect(screen.getByText('Chicken')).toBeInTheDocument();
+      expect(screen.getByText('Pasta')).toBeInTheDocument();
+      expect(screen.queryByText('Rice')).not.toBeInTheDocument();
+      expect(screen.queryByText('Salad')).not.toBeInTheDocument();
+      expect(screen.queryByText('Dessert')).not.toBeInTheDocument();
+    });
+
+    it('filters to show only sides when Sides is clicked', async () => {
+      const user = userEvent.setup();
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      await user.click(screen.getByRole('tab', { name: /Sides/i }));
+
+      expect(screen.queryByText('Chicken')).not.toBeInTheDocument();
+      expect(screen.queryByText('Pasta')).not.toBeInTheDocument();
+      expect(screen.getByText('Rice')).toBeInTheDocument();
+      expect(screen.getByText('Salad')).toBeInTheDocument();
+      expect(screen.queryByText('Dessert')).not.toBeInTheDocument();
+    });
+
+    it('filters to show only other when Other is clicked', async () => {
+      const user = userEvent.setup();
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      await user.click(screen.getByRole('tab', { name: /Other/i }));
+
+      expect(screen.queryByText('Chicken')).not.toBeInTheDocument();
+      expect(screen.queryByText('Pasta')).not.toBeInTheDocument();
+      expect(screen.queryByText('Rice')).not.toBeInTheDocument();
+      expect(screen.queryByText('Salad')).not.toBeInTheDocument();
+      expect(screen.getByText('Dessert')).toBeInTheDocument();
+    });
+
+    it('updates active filter styling when clicked', async () => {
+      const user = userEvent.setup();
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      const entreesTab = screen.getByRole('tab', { name: /Entrees/i });
+      await user.click(entreesTab);
+
+      expect(entreesTab).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByRole('tab', { name: /All/i })).toHaveAttribute('aria-selected', 'false');
+    });
+
+    it('can switch back to All after filtering', async () => {
+      const user = userEvent.setup();
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      // Filter to entrees
+      await user.click(screen.getByRole('tab', { name: /Entrees/i }));
+      expect(screen.queryByText('Rice')).not.toBeInTheDocument();
+
+      // Switch back to all
+      await user.click(screen.getByRole('tab', { name: /All/i }));
+      expect(screen.getByText('Rice')).toBeInTheDocument();
+      expect(screen.getByText('Chicken')).toBeInTheDocument();
+    });
+
+    it('active filter has amber styling', async () => {
+      const user = userEvent.setup();
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      const entreesTab = screen.getByRole('tab', { name: /Entrees/i });
+      await user.click(entreesTab);
+
+      expect(entreesTab).toHaveClass('bg-amber-500', 'text-white');
+    });
+
+    it('inactive filters have stone styling', () => {
+      render(<DishList dishes={mixedDishes} showFilters />);
+
+      const entreesTab = screen.getByRole('tab', { name: /Entrees/i });
+      expect(entreesTab).toHaveClass('bg-stone-100', 'text-stone-600');
+    });
+  });
 });
 

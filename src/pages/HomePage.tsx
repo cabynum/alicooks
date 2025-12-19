@@ -265,6 +265,7 @@ export function HomePage() {
               dishes={dishes}
               onDishClick={handleDishClick}
               onAddClick={handleAddClick}
+              showFilters={dishes.length > 3}
             />
           )}
         </section>
