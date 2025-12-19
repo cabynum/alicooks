@@ -46,15 +46,9 @@ Before we end, please:
 
 ### Completed This Session
 
-- ✅ **Extended Dish Details**: Recipe links and cook time
-  - New `recipeUrls` and `cookTimeMinutes` fields on Dish type
-  - CookTimePicker component (hours/minutes dropdowns)
-  - UrlInput component (multiple URLs with validation)
-  - Domain-specific icons (Instagram, YouTube, TikTok, Pinterest)
-  - Expandable "More details" section in DishForm
-  - Recipe icons on DishCard - tap to open URL
-- ✅ **Cleanup**: Removed icon-concepts/ and unused Vite template files
-- ✅ 627 tests passing (+73 new tests)
+- ✅ **UX Polish**: Two small fixes based on testing
+  - Dish names always left-aligned (was centering when no icons)
+  - "Add more details" section starts collapsed when editing (cleaner look)
 
 ### Phase Summary
 
