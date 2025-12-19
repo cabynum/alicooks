@@ -138,7 +138,6 @@ Core features:
 | Blog Posts | `blog/` (Part 1–8) |
 | **App Icon SVG** | `public/icons/icon-512.svg` |
 | Icon Generation | `scripts/generate-icons.mjs` |
-| Icon Concepts | `icon-concepts/` |
 | Markdown Rules | `.cursor/rules/markdown-linting.mdc` |
 | This Guide | `.specify/memory/session-guide.md` |
 
