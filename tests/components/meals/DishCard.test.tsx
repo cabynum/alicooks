@@ -254,5 +254,77 @@ describe('DishCard', () => {
       expect(screen.getByRole('button')).toHaveClass('active:scale-[0.98]');
     });
   });
+
+  describe('recipe URL icons', () => {
+    it('does not render icons when dish has no recipe URLs', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} />);
+
+      expect(screen.queryByRole('button', { name: /Open recipe/i })).not.toBeInTheDocument();
+    });
+
+    it('renders icon for each recipe URL', () => {
+      const dish = createTestDish({
+        recipeUrls: ['https://instagram.com/post/123', 'https://youtube.com/watch?v=abc'],
+      });
+      render(<DishCard dish={dish} />);
+
+      expect(screen.getByRole('button', { name: 'Open recipe on instagram.com' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Open recipe on youtube.com' })).toBeInTheDocument();
+    });
+
+    it('opens URL in new tab when icon is clicked', async () => {
+      const user = userEvent.setup();
+      const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      
+      const dish = createTestDish({
+        recipeUrls: ['https://instagram.com/post/123'],
+      });
+      render(<DishCard dish={dish} onClick={() => {}} />);
+
+      await user.click(screen.getByRole('button', { name: 'Open recipe on instagram.com' }));
+
+      expect(windowOpenSpy).toHaveBeenCalledWith(
+        'https://instagram.com/post/123',
+        '_blank',
+        'noopener,noreferrer'
+      );
+      
+      windowOpenSpy.mockRestore();
+    });
+
+    it('does not trigger card onClick when icon is clicked', async () => {
+      const user = userEvent.setup();
+      const handleCardClick = vi.fn();
+      vi.spyOn(window, 'open').mockImplementation(() => null);
+      
+      const dish = createTestDish({
+        recipeUrls: ['https://instagram.com/post/123'],
+      });
+      render(<DishCard dish={dish} onClick={handleCardClick} />);
+
+      await user.click(screen.getByRole('button', { name: 'Open recipe on instagram.com' }));
+
+      expect(handleCardClick).not.toHaveBeenCalled();
+    });
+
+    it('hides icons when showRecipeIcons is false', () => {
+      const dish = createTestDish({
+        recipeUrls: ['https://instagram.com/post/123'],
+      });
+      render(<DishCard dish={dish} showRecipeIcons={false} />);
+
+      expect(screen.queryByRole('button', { name: /Open recipe/i })).not.toBeInTheDocument();
+    });
+
+    it('shows icons by default when showRecipeIcons is not specified', () => {
+      const dish = createTestDish({
+        recipeUrls: ['https://instagram.com/post/123'],
+      });
+      render(<DishCard dish={dish} />);
+
+      expect(screen.getByRole('button', { name: 'Open recipe on instagram.com' })).toBeInTheDocument();
+    });
+  });
 });
 

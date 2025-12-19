@@ -355,5 +355,147 @@ describe('DishForm', () => {
       expect(input).toHaveAttribute('aria-describedby');
     });
   });
+
+  describe('extended details section', () => {
+    it('renders "Add more details" toggle button', () => {
+      render(<DishForm {...defaultProps} />);
+
+      expect(screen.getByRole('button', { name: /Add more details/i })).toBeInTheDocument();
+    });
+
+    it('hides details section by default', () => {
+      render(<DishForm {...defaultProps} />);
+
+      expect(screen.queryByLabelText('Cook Time')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Recipe Links')).not.toBeInTheDocument();
+    });
+
+    it('shows details section when toggle is clicked', async () => {
+      const user = userEvent.setup();
+      render(<DishForm {...defaultProps} />);
+
+      await user.click(screen.getByRole('button', { name: /Add more details/i }));
+
+      expect(screen.getByText('Cook Time')).toBeInTheDocument();
+      expect(screen.getByText('Recipe Links')).toBeInTheDocument();
+    });
+
+    it('hides details section when toggle is clicked again', async () => {
+      const user = userEvent.setup();
+      render(<DishForm {...defaultProps} />);
+
+      await user.click(screen.getByRole('button', { name: /Add more details/i }));
+      await user.click(screen.getByRole('button', { name: /Add more details/i }));
+
+      expect(screen.queryByText('Cook Time')).not.toBeInTheDocument();
+    });
+
+    it('auto-expands section when initial values include cook time', () => {
+      render(
+        <DishForm
+          {...defaultProps}
+          initialValues={{ name: 'Pasta', cookTimeMinutes: 30 }}
+        />
+      );
+
+      expect(screen.getByText('Cook Time')).toBeInTheDocument();
+    });
+
+    it('auto-expands section when initial values include recipe URLs', () => {
+      render(
+        <DishForm
+          {...defaultProps}
+          initialValues={{ name: 'Pasta', recipeUrls: ['https://example.com'] }}
+        />
+      );
+
+      expect(screen.getByText('Recipe Links')).toBeInTheDocument();
+    });
+
+    it('shows summary of added details in toggle button', async () => {
+      const user = userEvent.setup();
+      render(<DishForm {...defaultProps} />);
+
+      // Expand and add cook time
+      await user.click(screen.getByRole('button', { name: /Add more details/i }));
+      await user.selectOptions(screen.getByLabelText('Hours'), '1');
+
+      expect(screen.getByText(/cook time/)).toBeInTheDocument();
+    });
+
+    it('includes cook time in form submission', async () => {
+      const handleSubmit = vi.fn();
+      const user = userEvent.setup();
+      render(<DishForm {...defaultProps} onSubmit={handleSubmit} />);
+
+      await user.type(screen.getByLabelText('Dish Name'), 'Pasta');
+      await user.click(screen.getByRole('button', { name: /Add more details/i }));
+      await user.selectOptions(screen.getByLabelText('Hours'), '1');
+      await user.selectOptions(screen.getByLabelText('Minutes'), '30');
+      await user.click(screen.getByRole('button', { name: 'Save' }));
+
+      expect(handleSubmit).toHaveBeenCalledWith({
+        name: 'Pasta',
+        type: 'entree',
+        cookTimeMinutes: 90,
+      });
+    });
+
+    it('includes recipe URLs in form submission', async () => {
+      const handleSubmit = vi.fn();
+      const user = userEvent.setup();
+      render(<DishForm {...defaultProps} onSubmit={handleSubmit} />);
+
+      await user.type(screen.getByLabelText('Dish Name'), 'Pasta');
+      await user.click(screen.getByRole('button', { name: /Add more details/i }));
+
+      // Add a URL
+      const urlInput = screen.getByRole('textbox', { name: /recipe links/i });
+      await user.type(urlInput, 'https://instagram.com/post/123');
+      await user.click(screen.getByRole('button', { name: 'Add' }));
+
+      await user.click(screen.getByRole('button', { name: 'Save' }));
+
+      expect(handleSubmit).toHaveBeenCalledWith({
+        name: 'Pasta',
+        type: 'entree',
+        recipeUrls: ['https://instagram.com/post/123'],
+      });
+    });
+
+    it('does not include empty optional fields in submission', async () => {
+      const handleSubmit = vi.fn();
+      const user = userEvent.setup();
+      render(<DishForm {...defaultProps} onSubmit={handleSubmit} />);
+
+      await user.type(screen.getByLabelText('Dish Name'), 'Pasta');
+      await user.click(screen.getByRole('button', { name: 'Save' }));
+
+      expect(handleSubmit).toHaveBeenCalledWith({
+        name: 'Pasta',
+        type: 'entree',
+      });
+      expect(handleSubmit.mock.calls[0][0]).not.toHaveProperty('cookTimeMinutes');
+      expect(handleSubmit.mock.calls[0][0]).not.toHaveProperty('recipeUrls');
+    });
+
+    it('preserves initial extended details values', () => {
+      render(
+        <DishForm
+          {...defaultProps}
+          initialValues={{
+            name: 'Pasta',
+            cookTimeMinutes: 45,
+            recipeUrls: ['https://youtube.com/watch?v=123'],
+          }}
+        />
+      );
+
+      // Section should be expanded
+      expect(screen.getByLabelText('Hours')).toHaveValue('0');
+      expect(screen.getByLabelText('Minutes')).toHaveValue('45');
+      expect(screen.getByText('youtube.com')).toBeInTheDocument();
+    });
+  });
 });
 

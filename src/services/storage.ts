@@ -106,6 +106,9 @@ export function saveDish(input: CreateDishInput): Dish {
     type: input.type ?? 'entree',
     createdAt: now(),
     updatedAt: now(),
+    // Optional extended details
+    ...(input.recipeUrls && input.recipeUrls.length > 0 && { recipeUrls: input.recipeUrls }),
+    ...(input.cookTimeMinutes !== undefined && { cookTimeMinutes: input.cookTimeMinutes }),
   };
 
   dishes.push(newDish);
@@ -137,6 +140,9 @@ export function updateDish(
     name: input.name !== undefined ? toTitleCase(input.name.trim()) : existing.name,
     type: input.type !== undefined ? input.type : existing.type,
     updatedAt: now(),
+    // Optional extended details - only update if explicitly provided
+    ...(input.recipeUrls !== undefined && { recipeUrls: input.recipeUrls.length > 0 ? input.recipeUrls : undefined }),
+    ...(input.cookTimeMinutes !== undefined && { cookTimeMinutes: input.cookTimeMinutes || undefined }),
   };
 
   dishes[index] = updated;

@@ -42,6 +42,14 @@ export interface Dish {
 
   /** ISO 8601 timestamp when the dish was last modified */
   updatedAt: string;
+
+  // --- Optional extended details ---
+
+  /** Recipe source URLs (e.g., Instagram, YouTube, blog links) */
+  recipeUrls?: string[];
+
+  /** Cook time in minutes (e.g., 90 = 1h 30m) */
+  cookTimeMinutes?: number;
 }
 
 /**
@@ -54,6 +62,12 @@ export interface CreateDishInput {
 
   /** Category of dish (optional, defaults to 'entree') */
   type?: DishType;
+
+  /** Recipe source URLs (optional) */
+  recipeUrls?: string[];
+
+  /** Cook time in minutes (optional) */
+  cookTimeMinutes?: number;
 }
 
 /**
@@ -66,6 +80,12 @@ export interface UpdateDishInput {
 
   /** New type for the dish */
   type?: DishType;
+
+  /** Recipe source URLs */
+  recipeUrls?: string[];
+
+  /** Cook time in minutes */
+  cookTimeMinutes?: number;
 }
 
 /**

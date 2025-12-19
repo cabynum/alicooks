@@ -138,6 +138,44 @@ describe('Storage Service - Dishes', () => {
 
       expect(getDishes()).toHaveLength(2);
     });
+
+    it('saves dish with recipe URLs', () => {
+      const dish = saveDish({
+        name: 'Pasta',
+        recipeUrls: ['https://instagram.com/post/123', 'https://youtube.com/watch?v=abc'],
+      });
+
+      expect(dish.recipeUrls).toEqual([
+        'https://instagram.com/post/123',
+        'https://youtube.com/watch?v=abc',
+      ]);
+    });
+
+    it('saves dish with cook time', () => {
+      const dish = saveDish({
+        name: 'Pasta',
+        cookTimeMinutes: 45,
+      });
+
+      expect(dish.cookTimeMinutes).toBe(45);
+    });
+
+    it('does not include recipeUrls if empty array', () => {
+      const dish = saveDish({
+        name: 'Pasta',
+        recipeUrls: [],
+      });
+
+      expect(dish.recipeUrls).toBeUndefined();
+    });
+
+    it('does not include cookTimeMinutes if undefined', () => {
+      const dish = saveDish({
+        name: 'Pasta',
+      });
+
+      expect(dish.cookTimeMinutes).toBeUndefined();
+    });
   });
 
   describe('updateDish', () => {
@@ -185,6 +223,42 @@ describe('Storage Service - Dishes', () => {
       const updated = updateDish(dish.id, { name: '  Trimmed  ' });
 
       expect(updated?.name).toBe('Trimmed');
+    });
+
+    it('updates recipe URLs', () => {
+      const dish = saveDish({ name: 'Pasta' });
+      const updated = updateDish(dish.id, {
+        recipeUrls: ['https://instagram.com/post/123'],
+      });
+
+      expect(updated?.recipeUrls).toEqual(['https://instagram.com/post/123']);
+    });
+
+    it('updates cook time', () => {
+      const dish = saveDish({ name: 'Pasta' });
+      const updated = updateDish(dish.id, { cookTimeMinutes: 60 });
+
+      expect(updated?.cookTimeMinutes).toBe(60);
+    });
+
+    it('removes recipe URLs when set to empty array', () => {
+      const dish = saveDish({
+        name: 'Pasta',
+        recipeUrls: ['https://instagram.com/post/123'],
+      });
+      const updated = updateDish(dish.id, { recipeUrls: [] });
+
+      expect(updated?.recipeUrls).toBeUndefined();
+    });
+
+    it('removes cook time when set to 0', () => {
+      const dish = saveDish({
+        name: 'Pasta',
+        cookTimeMinutes: 45,
+      });
+      const updated = updateDish(dish.id, { cookTimeMinutes: 0 });
+
+      expect(updated?.cookTimeMinutes).toBeUndefined();
     });
   });
 

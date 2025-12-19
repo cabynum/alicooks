@@ -2,12 +2,13 @@
  * DishForm Component
  *
  * A form for creating or editing a dish.
- * Includes name input and type selector with validation.
+ * Includes name input, type selector, and optional extended details
+ * (cook time, recipe URLs) in a collapsible section.
  */
 
 import { useState } from 'react';
 import { type DishType } from '@/types';
-import { Button, Input } from '@/components/ui';
+import { Button, Input, CookTimePicker, UrlInput } from '@/components/ui';
 import { DishTypeSelector } from './DishTypeSelector';
 
 export interface DishFormValues {
@@ -15,6 +16,10 @@ export interface DishFormValues {
   name: string;
   /** Dish type */
   type: DishType;
+  /** Recipe source URLs (optional) */
+  recipeUrls?: string[];
+  /** Cook time in minutes (optional) */
+  cookTimeMinutes?: number;
 }
 
 export interface DishFormProps {
@@ -36,11 +41,36 @@ export interface DishFormProps {
 }
 
 /**
+ * Chevron icon for the expandable section toggle.
+ */
+function ChevronIcon({ isOpen }: { isOpen: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className={[
+        'w-5 h-5 transition-transform duration-200',
+        isOpen ? 'rotate-180' : '',
+      ].join(' ')}
+    >
+      <path
+        fillRule="evenodd"
+        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+/**
  * Form for creating or editing a dish.
  *
  * Features:
  * - Name input with validation (required, non-empty)
  * - Dish type selector (entree, side, other)
+ * - Expandable "More details" section with:
+ *   - Cook time picker (hours/minutes)
+ *   - Recipe URL input (multiple URLs with domain icons)
  * - Inline error display
  * - Submit and cancel actions
  *
@@ -52,9 +82,14 @@ export interface DishFormProps {
  * />
  *
  * @example
- * // Edit existing dish
+ * // Edit existing dish with details
  * <DishForm
- *   initialValues={{ name: 'Pasta', type: 'entree' }}
+ *   initialValues={{ 
+ *     name: 'Pasta', 
+ *     type: 'entree',
+ *     cookTimeMinutes: 30,
+ *     recipeUrls: ['https://youtube.com/...']
+ *   }}
  *   onSubmit={(values) => updateDish(id, values)}
  *   onCancel={() => navigate(-1)}
  *   submitLabel="Update"
@@ -68,11 +103,26 @@ export function DishForm({
   isSubmitting = false,
   existingNames = [],
 }: DishFormProps) {
-  // Form state
+  // Core form state
   const [name, setName] = useState(initialValues?.name ?? '');
   const [type, setType] = useState<DishType>(initialValues?.type ?? 'entree');
   const [error, setError] = useState<string | undefined>(undefined);
   const [touched, setTouched] = useState(false);
+
+  // Extended details state
+  const [cookTimeMinutes, setCookTimeMinutes] = useState<number | undefined>(
+    initialValues?.cookTimeMinutes
+  );
+  const [recipeUrls, setRecipeUrls] = useState<string[]>(
+    initialValues?.recipeUrls ?? []
+  );
+
+  // Expandable section state - auto-expand if editing with existing details
+  const hasExistingDetails = Boolean(
+    initialValues?.cookTimeMinutes || 
+    (initialValues?.recipeUrls && initialValues.recipeUrls.length > 0)
+  );
+  const [showDetails, setShowDetails] = useState(hasExistingDetails);
 
   /**
    * Validate the form and return error message if invalid.
@@ -130,10 +180,13 @@ export function DishForm({
       return;
     }
 
-    // Submit the form
+    // Submit the form with all values
     onSubmit({
       name: name.trim(),
       type,
+      // Only include optional fields if they have values
+      ...(recipeUrls.length > 0 && { recipeUrls }),
+      ...(cookTimeMinutes !== undefined && { cookTimeMinutes }),
     });
   };
 
@@ -156,6 +209,70 @@ export function DishForm({
         onChange={setType}
         disabled={isSubmitting}
       />
+
+      {/* Expandable details section */}
+      <div className="border border-stone-200 rounded-lg overflow-hidden">
+        {/* Toggle button */}
+        <button
+          type="button"
+          onClick={() => setShowDetails(!showDetails)}
+          className={[
+            'w-full flex items-center justify-between',
+            'px-4 py-3',
+            'text-left text-sm font-medium text-stone-700',
+            'bg-stone-50 hover:bg-stone-100',
+            'transition-colors duration-150',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500',
+          ].join(' ')}
+          aria-expanded={showDetails}
+        >
+          <span className="flex items-center gap-2">
+            <svg
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-4 h-4 text-stone-500"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Add more details
+            {(cookTimeMinutes || recipeUrls.length > 0) && (
+              <span className="text-xs text-amber-600 font-normal">
+                ({[
+                  cookTimeMinutes ? 'cook time' : '',
+                  recipeUrls.length > 0 ? `${recipeUrls.length} link${recipeUrls.length > 1 ? 's' : ''}` : '',
+                ].filter(Boolean).join(', ')})
+              </span>
+            )}
+          </span>
+          <ChevronIcon isOpen={showDetails} />
+        </button>
+
+        {/* Collapsible content */}
+        {showDetails && (
+          <div className="px-4 py-4 space-y-5 bg-white border-t border-stone-200">
+            {/* Cook time picker */}
+            <CookTimePicker
+              label="Cook Time"
+              value={cookTimeMinutes}
+              onChange={setCookTimeMinutes}
+              disabled={isSubmitting}
+            />
+
+            {/* Recipe URLs */}
+            <UrlInput
+              label="Recipe Links"
+              value={recipeUrls}
+              onChange={setRecipeUrls}
+              placeholder="https://instagram.com/..."
+              disabled={isSubmitting}
+            />
+          </div>
+        )}
+      </div>
 
       {/* Action buttons */}
       <div className="flex gap-3 pt-2">
@@ -180,4 +297,3 @@ export function DishForm({
     </form>
   );
 }
-

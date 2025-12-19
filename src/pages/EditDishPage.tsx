@@ -134,7 +134,12 @@ export function EditDishPage() {
         {/* Form in a card */}
         <Card padding="lg">
           <DishForm
-            initialValues={{ name: dish.name, type: dish.type }}
+            initialValues={{
+              name: dish.name,
+              type: dish.type,
+              recipeUrls: dish.recipeUrls,
+              cookTimeMinutes: dish.cookTimeMinutes,
+            }}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             submitLabel="Save Changes"
