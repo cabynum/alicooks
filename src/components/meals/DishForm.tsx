@@ -117,12 +117,8 @@ export function DishForm({
     initialValues?.recipeUrls ?? []
   );
 
-  // Expandable section state - auto-expand if editing with existing details
-  const hasExistingDetails = Boolean(
-    initialValues?.cookTimeMinutes || 
-    (initialValues?.recipeUrls && initialValues.recipeUrls.length > 0)
-  );
-  const [showDetails, setShowDetails] = useState(hasExistingDetails);
+  // Expandable section state - always start collapsed for cleaner UI
+  const [showDetails, setShowDetails] = useState(false);
 
   /**
    * Validate the form and return error message if invalid.
