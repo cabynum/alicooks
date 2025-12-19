@@ -158,7 +158,7 @@ export function DishCard({
         {/* Dish name - truncates on overflow */}
         <span
           className={[
-            'truncate flex-1',
+            'truncate flex-1 text-left',
             'font-medium',
             compact ? 'text-sm' : 'text-base',
             'text-stone-800',
@@ -216,7 +216,7 @@ export function DishCard({
       {/* Dish name - truncates on overflow */}
       <span
         className={[
-          'truncate flex-1',
+          'truncate flex-1 text-left',
           'font-medium',
           compact ? 'text-sm' : 'text-base',
           'text-stone-800',
