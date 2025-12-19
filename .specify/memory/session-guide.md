@@ -39,22 +39,25 @@ Before we end, please:
 ## Current Status
 
 **Last Updated**: 2024-12-19  
-**Current Branch**: `001-meal-planner`  
-**Current Phase**: Phase 8 complete ✅ — Post-testing polish
+**Current Branch**: `master` (merged!)  
+**Repository**: https://github.com/cabynum/alicooks  
+**Current Phase**: Feature complete ✅ — Ready for deployment
 
 ### Completed This Session
 
-- ✅ **Duplicate dish detection**: Prevent users from adding the same dish twice
-  - Case-insensitive matching ("Tacos" = "tacos")
-  - Friendly inline error: "You already have a dish called 'Tacos'"
-  - Works on both Add and Edit pages
-  - 6 new tests for DishForm validation
-- ✅ **Title case normalization**: Dish names automatically capitalized
-  - "chicken tacos" → "Chicken Tacos"
-  - Applied on save and update
-  - 3 new tests for storage service
-- ✅ **Backlog idea captured**: Household favorites tagging
-- ✅ 513 tests passing (8 new tests this session)
+- ✅ **My Plans section on homepage**: Saved plans now visible and accessible
+  - New PlanCard component with date range, progress, dish counts
+  - Active plan badge for plans including today
+  - "+ New" button for quick plan creation
+  - Plan button navigates to active plan if one exists
+  - 25 new tests for PlanCard
+- ✅ **Dish type filtering**: Filter dishes by type (Entrees, Sides, Other)
+  - Filter pills with counts appear when 4+ dishes exist
+  - Filters dynamically hide types with zero dishes
+  - 16 new tests for filtering
+- ✅ **Merged to master**: Feature branch complete and merged
+- ✅ **Pushed to GitHub**: https://github.com/cabynum/alicooks
+- ✅ 554 tests passing (41 new tests this session)
 
 ### Phase Summary
 
@@ -97,10 +100,11 @@ Core features:
 | ErrorBoundary | 14 |
 | DishTypeSelector | 18 |
 | DishCard | 26 |
-| DishList | 21 |
+| DishList | 37 |
 | SuggestionCard | 17 |
 | DaySlot | 22 |
 | DishForm | 33 |
+| PlanCard | 25 |
 | AddDishPage | 14 |
 | EditDishPage | 26 |
 | SettingsPage | 23 |
@@ -109,13 +113,13 @@ Core features:
 | DayAssignmentPage | 22 |
 | HomePage | 26 |
 | App | 2 |
-| **Total** | **513** |
+| **Total** | **554** |
 
 ### Recommended Next Steps
 
-1. **Merge to main** — Feature branch is complete and polished
-2. Optional: Add dish type filtering (Task 3.4, deferred)
-3. Optional: Deploy to production (Vercel, Netlify, etc.)
+1. **Deploy to production** — Vercel, Netlify, or similar (code is ready!)
+2. Optional: Add more polish based on real usage feedback
+3. Optional: Start next feature from ideas backlog
 
 ### Key Files
 
@@ -135,7 +139,7 @@ Core features:
 
 ### Open Decisions
 
-- None — ready to merge!
+- None — merged and pushed to GitHub!
 
 ### Notes
 
