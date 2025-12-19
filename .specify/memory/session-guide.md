@@ -39,25 +39,18 @@ Before we end, please:
 ## Current Status
 
 **Last Updated**: 2024-12-19  
-**Current Branch**: `master` (merged!)  
+**Current Branch**: `master`  
 **Repository**: https://github.com/cabynum/alicooks  
-**Current Phase**: Feature complete ✅ — Ready for deployment
+**Live URL**: https://alicooks.vercel.app  
+**Current Phase**: Deployed to production ✅
 
 ### Completed This Session
 
-- ✅ **My Plans section on homepage**: Saved plans now visible and accessible
-  - New PlanCard component with date range, progress, dish counts
-  - Active plan badge for plans including today
-  - "+ New" button for quick plan creation
-  - Plan button navigates to active plan if one exists
-  - 25 new tests for PlanCard
-- ✅ **Dish type filtering**: Filter dishes by type (Entrees, Sides, Other)
-  - Filter pills with counts appear when 4+ dishes exist
-  - Filters dynamically hide types with zero dishes
-  - 16 new tests for filtering
-- ✅ **Merged to master**: Feature branch complete and merged
-- ✅ **Pushed to GitHub**: https://github.com/cabynum/alicooks
-- ✅ 554 tests passing (41 new tests this session)
+- ✅ **Deployed to Vercel**: https://alicooks.vercel.app
+  - Auto-deploys on push to master
+  - Verified all features work in production
+- ✅ **Code cleanup**: Removed unused `dishes` prop from PlanCard
+- ✅ 554 tests passing
 
 ### Phase Summary
 
@@ -117,9 +110,10 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Deploy to production** — Vercel, Netlify, or similar (code is ready!)
-2. Optional: Add more polish based on real usage feedback
-3. Optional: Start next feature from ideas backlog
+1. **Use the app!** — Add real dishes and try the meal planning flow
+2. **Share with Aliya** — Get feedback from the primary user
+3. Optional: Add polish based on real usage feedback
+4. Optional: Start next feature from ideas backlog (see `.specify/memory/ideas.md`)
 
 ### Key Files
 
