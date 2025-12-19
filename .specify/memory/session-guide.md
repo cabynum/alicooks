@@ -46,19 +46,15 @@ Before we end, please:
 
 ### Completed This Session
 
-- ✅ **Deployed to Vercel**: https://alicooks.vercel.app
-  - Auto-deploys on push to master
-  - Verified all features work in production
-- ✅ **Custom app icon**: Designed and implemented new cooking pot icon
-  - Explored multiple concepts (bowl, plates, pot, shakers)
-  - Created SVG with warm orange gradient, depth, and polish
-  - Generated PNG icons for PWA manifest (192px, 512px, maskable)
-  - Added `scripts/generate-icons.mjs` for regenerating from SVG
-  - Icon concepts saved in `icon-concepts/` for reference
-- ✅ **Updated README**: Added icon to header with centered layout
-  - Live App link, Features, Getting Started quick nav
-- ✅ **Code cleanup**: Removed unused `dishes` prop from PlanCard
-- ✅ 554 tests passing
+- ✅ **Extended Dish Details**: Recipe links and cook time
+  - New `recipeUrls` and `cookTimeMinutes` fields on Dish type
+  - CookTimePicker component (hours/minutes dropdowns)
+  - UrlInput component (multiple URLs with validation)
+  - Domain-specific icons (Instagram, YouTube, TikTok, Pinterest)
+  - Expandable "More details" section in DishForm
+  - Recipe icons on DishCard - tap to open URL
+- ✅ **Cleanup**: Removed icon-concepts/ and unused Vite template files
+- ✅ 627 tests passing (+73 new tests)
 
 ### Phase Summary
 
@@ -88,7 +84,7 @@ Core features:
 
 | Layer | Tests |
 | ------------------ | ------- |
-| Storage Service | 42 |
+| Storage Service | 50 |
 | Suggestion Service | 20 |
 | useDishes Hook | 15 |
 | useSuggestion Hook | 17 |
@@ -97,14 +93,16 @@ Core features:
 | Button | 26 |
 | Input | 22 |
 | Card | 18 |
+| CookTimePicker | 17 |
+| UrlInput | 31 |
 | EmptyState | 14 |
 | ErrorBoundary | 14 |
 | DishTypeSelector | 18 |
-| DishCard | 26 |
+| DishCard | 32 |
 | DishList | 37 |
 | SuggestionCard | 17 |
 | DaySlot | 22 |
-| DishForm | 33 |
+| DishForm | 44 |
 | PlanCard | 25 |
 | AddDishPage | 14 |
 | EditDishPage | 26 |
@@ -114,7 +112,7 @@ Core features:
 | DayAssignmentPage | 22 |
 | HomePage | 26 |
 | App | 2 |
-| **Total** | **554** |
+| **Total** | **627** |
 
 ### Recommended Next Steps
 

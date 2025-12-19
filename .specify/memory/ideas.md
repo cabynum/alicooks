@@ -15,22 +15,24 @@ not commitment. Ideas here may or may not make it into the product.
 
 Ideas for enriching the dish data model beyond name + type.
 
-### Extended Dish Details
+### Extended Dish Details (Partial ✅)
 
-**Added**: 2024-12-18
+**Added**: 2024-12-18  
+**Cook Time implemented**: 2024-12-19
 
 Allow users to optionally add more context to dishes:
 
-- **Cook Time** — How long does this take? (e.g., "30 min", "1 hour")
-- **Difficulty** — Quick weeknight vs. weekend project
-- **Notes** — Free-form personal notes ("Dad's favorite", "needs cast iron")
+- ✅ **Cook Time** — Hours/minutes picker, stored as total minutes
+- **Difficulty** — Quick weeknight vs. weekend project (not yet)
+- **Notes** — Free-form personal notes (not yet)
 
 *Consideration*: Keep these optional. The constitution says first-run must work without
 configuration — adding a dish should still be fast and friction-free.
 
-### Recipe Links
+### Recipe Links ✅ IMPLEMENTED
 
-**Added**: 2024-12-18
+**Added**: 2024-12-18  
+**Implemented**: 2024-12-19
 
 Link a dish to an external recipe source:
 
@@ -39,8 +41,9 @@ Link a dish to an external recipe source:
 - Blog post or website URL
 - Maybe even a TikTok
 
-*Consideration*: This is about reference, not storage. AliCooks isn't a recipe manager
-(out of scope per constitution), but linking to where Aliya learned a dish could be helpful.
+**Implementation notes**: Added `recipeUrls` array to Dish type. Multiple URLs per dish.
+Domain-specific icons (Instagram, YouTube, TikTok, Pinterest). Tap icon on DishCard to
+open URL. Also added `cookTimeMinutes` as bonus. All in expandable "More details" section.
 
 ### Household Favorites Tagging
 
