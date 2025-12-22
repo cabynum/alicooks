@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AliCooks Logo — Typography First</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Nunito:wght@300;400;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Pacifico&family=Lobster&family=Satisfy&family=Caveat:wght@400;500;600;700&family=Kalam:wght@300;400;700&family=Dancing+Script:wght@400;500;600;700&family=Comfortaa:wght@300;400;500;600;700&family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --yellow: #FFB800;
+      --gray-100: #F5F5F5;
+      --gray-200: #E5E5E5;
+      --gray-500: #737373;
+      --gray-900: #171717;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--gray-100);
+      min-height: 100vh;
+      padding: 48px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: var(--gray-500);
+      font-size: 15px;
+    }
+
+    /* Grid */
+    .logo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .logo-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 48px 32px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .logo-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .logo-card.selected {
+      border-color: var(--yellow);
+    }
+
+    .logo-card h3 {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 32px;
+    }
+
+    .logo-display {
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-notes {
+      font-size: 13px;
+      color: var(--gray-500);
+      margin-top: 32px;
+      line-height: 1.5;
+    }
+
+    /* ============================================
+       LOGO STYLES - Each is a unique treatment
+       ============================================ */
+
+    /* A: Stacked with weight contrast (Outfit) */
+    .logo-a {
+      font-family: 'Outfit', sans-serif;
+      line-height: 0.85;
+    }
+    .logo-a .top {
+      font-size: 72px;
+      font-weight: 800;
+      color: var(--black);
+      letter-spacing: -2px;
+      display: block;
+    }
+    .logo-a .bottom {
+      font-size: 72px;
+      font-weight: 300;
+      color: var(--black);
+      letter-spacing: 8px;
+      display: block;
+    }
+
+    /* B: Inline with dot separator */
+    .logo-b {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--black);
+      letter-spacing: -1px;
+    }
+    .logo-b .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: var(--yellow);
+      border-radius: 50%;
+      margin: 0 4px;
+      vertical-align: middle;
+    }
+
+    /* C: Lowercase connected script-feel */
+    .logo-c {
+      font-family: 'Sora', sans-serif;
+      font-size: 56px;
+      font-weight: 600;
+      color: var(--black);
+      letter-spacing: -1px;
+    }
+    .logo-c .highlight {
+      color: var(--yellow);
+    }
+
+    /* D: Stacked with yellow accent bar */
+    .logo-d {
+      font-family: 'Nunito', sans-serif;
+      position: relative;
+      display: inline-block;
+    }
+    .logo-d .top {
+      font-size: 64px;
+      font-weight: 900;
+      color: var(--black);
+      letter-spacing: -1px;
+      display: block;
+      line-height: 1;
+    }
+    .logo-d .bar {
+      height: 6px;
+      background: var(--yellow);
+      border-radius: 3px;
+      margin: 8px 0;
+    }
+    .logo-d .bottom {
+      font-size: 64px;
+      font-weight: 400;
+      color: var(--black);
+      letter-spacing: 6px;
+      display: block;
+      line-height: 1;
+    }
+
+    /* E: Bold with inline yellow "i" dot */
+    .logo-e {
+      font-family: 'Poppins', sans-serif;
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--black);
+      letter-spacing: -1px;
+      position: relative;
+    }
+    .logo-e .i-dot {
+      position: relative;
+    }
+    .logo-e .i-dot::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 12px;
+      background: var(--yellow);
+      border-radius: 50%;
+    }
+
+    /* F: Uppercase bold mono-width */
+    .logo-f {
+      font-family: 'Outfit', sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--black);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+    }
+
+    /* G: Stacked tight with yellow underline on "ali" */
+    .logo-g {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: inline-block;
+      text-align: left;
+    }
+    .logo-g .top {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--black);
+      letter-spacing: -1px;
+      display: block;
+      line-height: 1;
+      border-bottom: 5px solid var(--yellow);
+      padding-bottom: 4px;
+    }
+    .logo-g .bottom {
+      font-size: 56px;
+      font-weight: 300;
+      color: var(--black);
+      letter-spacing: 4px;
+      display: block;
+      line-height: 1.2;
+    }
+
+    /* H: Circle badge with initials */
+    .logo-h {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-h .badge {
+      width: 72px;
+      height: 72px;
+      background: var(--black);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-h .badge span {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--white);
+    }
+    .logo-h .text {
+      font-family: 'Outfit', sans-serif;
+      text-align: left;
+      line-height: 0.9;
+    }
+    .logo-h .text .top {
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--black);
+      display: block;
+    }
+    .logo-h .text .bottom {
+      font-size: 40px;
+      font-weight: 300;
+      color: var(--black);
+      letter-spacing: 3px;
+      display: block;
+    }
+
+    /* I: Minimal with period */
+    .logo-i {
+      font-family: 'Sora', sans-serif;
+      font-size: 56px;
+      font-weight: 500;
+      color: var(--black);
+      letter-spacing: -1px;
+    }
+    .logo-i .period {
+      color: var(--yellow);
+      font-weight: 700;
+    }
+
+    /* ============================================
+       SCRIPT / HANDWRITTEN OPTIONS
+       ============================================ */
+
+    /* J: Pacifico - Classic script */
+    .logo-j {
+      font-family: 'Pacifico', cursive;
+      font-size: 56px;
+      color: var(--black);
+    }
+
+    /* K: Lobster - Bold script */
+    .logo-k {
+      font-family: 'Lobster', cursive;
+      font-size: 64px;
+      color: var(--black);
+    }
+
+    /* L: Satisfy - Elegant script */
+    .logo-l {
+      font-family: 'Satisfy', cursive;
+      font-size: 64px;
+      color: var(--black);
+    }
+
+    /* M: Caveat - Casual handwriting */
+    .logo-m {
+      font-family: 'Caveat', cursive;
+      font-size: 72px;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    /* N: Dancing Script - Flowing */
+    .logo-n {
+      font-family: 'Dancing Script', cursive;
+      font-size: 60px;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    /* O: Kalam - Handwritten with character */
+    .logo-o {
+      font-family: 'Kalam', cursive;
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    /* P: Comfortaa - Rounded geometric (script-like) */
+    .logo-p {
+      font-family: 'Comfortaa', sans-serif;
+      font-size: 52px;
+      font-weight: 600;
+      color: var(--black);
+      letter-spacing: 2px;
+    }
+
+    /* Q: Baloo 2 - Bubbly rounded */
+    .logo-q {
+      font-family: 'Baloo 2', cursive;
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    /* R: Script + Sans combo */
+    .logo-r {
+      display: inline-block;
+      text-align: left;
+    }
+    .logo-r .top {
+      font-family: 'Pacifico', cursive;
+      font-size: 52px;
+      color: var(--black);
+      display: block;
+      line-height: 1.1;
+    }
+    .logo-r .bottom {
+      font-family: 'Outfit', sans-serif;
+      font-size: 36px;
+      font-weight: 300;
+      color: var(--black);
+      letter-spacing: 8px;
+      display: block;
+    }
+
+    /* S: Script with yellow swash/underline */
+    .logo-s {
+      font-family: 'Lobster', cursive;
+      font-size: 60px;
+      color: var(--black);
+      position: relative;
+      display: inline-block;
+    }
+    .logo-s::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: var(--yellow);
+      border-radius: 4px;
+      z-index: -1;
+    }
+
+    /* ============================================
+       DARK PREVIEW SECTION
+       ============================================ */
+    .dark-section {
+      background: var(--gray-900);
+      border-radius: 20px;
+      padding: 48px;
+      margin-top: 48px;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .dark-section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .dark-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 64px;
+      flex-wrap: wrap;
+    }
+
+    .dark-logo {
+      padding: 24px;
+    }
+
+    /* Dark versions */
+    .logo-a.dark .top,
+    .logo-a.dark .bottom {
+      color: var(--white);
+    }
+
+    .logo-d.dark .top,
+    .logo-d.dark .bottom {
+      color: var(--white);
+    }
+
+    .logo-g.dark .top,
+    .logo-g.dark .bottom {
+      color: var(--white);
+    }
+
+    /* ============================================
+       SIZE TESTS
+       ============================================ */
+    .size-section {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 48px;
+      margin-top: 48px;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .size-section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .size-row {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .size-item {
+      text-align: center;
+    }
+
+    .size-item p {
+      font-size: 11px;
+      color: var(--gray-500);
+      margin-top: 12px;
+    }
+
+    /* Scaled versions */
+    .logo-a.scale-md {
+      transform: scale(0.5);
+      transform-origin: center;
+    }
+    .logo-a.scale-sm {
+      transform: scale(0.3);
+      transform-origin: center;
+    }
+    .logo-a.scale-xs {
+      transform: scale(0.18);
+      transform-origin: center;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 48px;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--yellow);
+      color: var(--black);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(0.95);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--gray-200);
+      color: var(--gray-900);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-500);
+      color: var(--white);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>AliCooks — Typography First</h1>
+    <p>Making the wordmark itself the logo</p>
+  </div>
+
+  <div class="logo-grid">
+
+    <!-- A: Stacked weight contrast -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>A — Stacked Contrast</h3>
+      <div class="logo-display">
+        <div class="logo-a">
+          <span class="top">ali</span>
+          <span class="bottom">cooks</span>
+        </div>
+      </div>
+      <div class="logo-notes">
+        Outfit font. Heavy "ali", light "cooks". Tight leading creates unity. Classic weight contrast.
+      </div>
+    </div>
+
+    <!-- B: Inline with dot -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>B — Dot Separator</h3>
+      <div class="logo-display">
+        <div class="logo-b">
+          ali<span class="dot"></span>cooks
+        </div>
+      </div>
+      <div class="logo-notes">
+        Plus Jakarta Sans. Yellow dot as visual pause. Reads as one word but with personality.
+      </div>
+    </div>
+
+    <!-- C: Highlighted letter -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>C — Color Pop</h3>
+      <div class="logo-display">
+        <div class="logo-c">
+          <span class="highlight">a</span>licooks
+        </div>
+      </div>
+      <div class="logo-notes">
+        Sora font. Yellow "a" creates a distinctive mark. Simple, modern, memorable.
+      </div>
+    </div>
+
+    <!-- D: Bar separator -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>D — Yellow Bar</h3>
+      <div class="logo-display">
+        <div class="logo-d">
+          <span class="top">ali</span>
+          <div class="bar"></div>
+          <span class="bottom">cooks</span>
+        </div>
+      </div>
+      <div class="logo-notes">
+        Nunito font. Yellow bar divides and connects. Strong vertical rhythm.
+      </div>
+    </div>
+
+    <!-- E: Yellow i-dot -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>E — Yellow Dot</h3>
+      <div class="logo-display">
+        <div class="logo-e">
+          al<span class="i-dot">i</span>cooks
+        </div>
+      </div>
+      <div class="logo-notes">
+        Poppins font. The dot on the "i" becomes yellow — subtle but ownable detail.
+      </div>
+    </div>
+
+    <!-- F: Uppercase spaced -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>F — All Caps</h3>
+      <div class="logo-display">
+        <div class="logo-f">
+          ALICOOKS
+        </div>
+      </div>
+      <div class="logo-notes">
+        Outfit Extra Bold. Uppercase with wide tracking. Bold, confident, app-store ready.
+      </div>
+    </div>
+
+    <!-- G: Underline accent -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>G — Underline</h3>
+      <div class="logo-display">
+        <div class="logo-g">
+          <span class="top">ali</span>
+          <span class="bottom">cooks</span>
+        </div>
+      </div>
+      <div class="logo-notes">
+        Plus Jakarta Sans. Yellow underline on "ali" — highlights the name. Left-aligned for app headers.
+      </div>
+    </div>
+
+    <!-- H: Badge + wordmark -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>H — Badge Combo</h3>
+      <div class="logo-display">
+        <div class="logo-h">
+          <div class="badge"><span>A</span></div>
+          <div class="text">
+            <span class="top">ali</span>
+            <span class="bottom">cooks</span>
+          </div>
+        </div>
+      </div>
+      <div class="logo-notes">
+        Black circle badge with "A" initial. Works as icon alone or with full wordmark.
+      </div>
+    </div>
+
+    <!-- I: Minimal period -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>I — Period Mark</h3>
+      <div class="logo-display">
+        <div class="logo-i">
+          alicooks<span class="period">.</span>
+        </div>
+      </div>
+      <div class="logo-notes">
+        Sora font. Simple period in yellow. Minimal, tech-forward, domain-ready.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SCRIPT SECTION -->
+  <div class="header" style="margin-top: 64px;">
+    <h1>✨ Script & Handwritten Options</h1>
+    <p>Warmer, more personal feel</p>
+  </div>
+
+  <div class="logo-grid">
+
+    <!-- J: Pacifico -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>J — Pacifico</h3>
+      <div class="logo-display">
+        <div class="logo-j">alicooks</div>
+      </div>
+      <div class="logo-notes">
+        Classic script font. Friendly, approachable, slightly retro diner feel.
+      </div>
+    </div>
+
+    <!-- K: Lobster -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>K — Lobster</h3>
+      <div class="logo-display">
+        <div class="logo-k">Alicooks</div>
+      </div>
+      <div class="logo-notes">
+        Bold script with character. Strong presence, works well at large sizes.
+      </div>
+    </div>
+
+    <!-- L: Satisfy -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>L — Satisfy</h3>
+      <div class="logo-display">
+        <div class="logo-l">Alicooks</div>
+      </div>
+      <div class="logo-notes">
+        Elegant flowing script. More refined, slightly feminine energy.
+      </div>
+    </div>
+
+    <!-- M: Caveat -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>M — Caveat</h3>
+      <div class="logo-display">
+        <div class="logo-m">alicooks</div>
+      </div>
+      <div class="logo-notes">
+        Casual handwriting. Feels personal, like a note on a recipe card.
+      </div>
+    </div>
+
+    <!-- N: Dancing Script -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>N — Dancing Script</h3>
+      <div class="logo-display">
+        <div class="logo-n">Alicooks</div>
+      </div>
+      <div class="logo-notes">
+        Flowing, celebratory script. Elegant but still friendly.
+      </div>
+    </div>
+
+    <!-- O: Kalam -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>O — Kalam</h3>
+      <div class="logo-display">
+        <div class="logo-o">alicooks</div>
+      </div>
+      <div class="logo-notes">
+        Handwritten with character. Feels authentic, homemade, personal.
+      </div>
+    </div>
+
+    <!-- P: Comfortaa -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>P — Comfortaa</h3>
+      <div class="logo-display">
+        <div class="logo-p">alicooks</div>
+      </div>
+      <div class="logo-notes">
+        Rounded geometric sans. Modern but soft. Not script, but feels friendly.
+      </div>
+    </div>
+
+    <!-- Q: Baloo 2 -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>Q — Baloo</h3>
+      <div class="logo-display">
+        <div class="logo-q">alicooks</div>
+      </div>
+      <div class="logo-notes">
+        Bubbly, playful rounded font. Fun, approachable, family-friendly.
+      </div>
+    </div>
+
+    <!-- R: Script + Sans Combo -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>R — Script + Sans</h3>
+      <div class="logo-display">
+        <div class="logo-r">
+          <span class="top">Ali</span>
+          <span class="bottom">COOKS</span>
+        </div>
+      </div>
+      <div class="logo-notes">
+        Pacifico script for "Ali" + Outfit light sans for "COOKS". Best of both worlds.
+      </div>
+    </div>
+
+    <!-- S: Script with underline -->
+    <div class="logo-card" onclick="selectLogo(this)">
+      <h3>S — Script + Swash</h3>
+      <div class="logo-display">
+        <div class="logo-s">Alicooks</div>
+      </div>
+      <div class="logo-notes">
+        Lobster with yellow underline swash. Adds the brand color in a subtle way.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Dark mode preview -->
+  <div class="dark-section">
+    <h2>🌙 Dark Mode Test</h2>
+    <div class="dark-row">
+      <div class="dark-logo">
+        <div class="logo-a dark">
+          <span class="top">ali</span>
+          <span class="bottom">cooks</span>
+        </div>
+      </div>
+      <div class="dark-logo">
+        <div class="logo-g dark">
+          <span class="top">ali</span>
+          <span class="bottom">cooks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size test -->
+  <div class="size-section">
+    <h2>📏 Size Test — Scalability</h2>
+    <div class="size-row">
+      <div class="size-item">
+        <div class="logo-a">
+          <span class="top">ali</span>
+          <span class="bottom">cooks</span>
+        </div>
+        <p>Full size</p>
+      </div>
+      <div class="size-item">
+        <div class="logo-a scale-md">
+          <span class="top">ali</span>
+          <span class="bottom">cooks</span>
+        </div>
+        <p>50%</p>
+      </div>
+      <div class="size-item">
+        <div class="logo-a scale-sm">
+          <span class="top">ali</span>
+          <span class="bottom">cooks</span>
+        </div>
+        <p>30%</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="location.href='design-mockup.html'">← Back to Mockup</button>
+    <button class="btn btn-primary" onclick="alert('Select a concept and let me know which direction to refine!')">Refine Selected</button>
+  </div>
+
+  <script>
+    function selectLogo(card) {
+      document.querySelectorAll('.logo-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    }
+  </script>
+
+</body>
+</html>
+
