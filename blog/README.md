@@ -13,6 +13,7 @@ development and AI pair programming.
 6. [Part 6: Meal Suggestions](./part-6-meal-suggestions.md) — Random pairing, animations, delight
 7. [Part 7: Completing the Core Flow](./part-7-complete-flow.md) — Plan a Menu, Edit & Delete
 8. [Part 8: Data Export](./part-8-data-export.md) — Export/import, settings page
+9. [Part 9: Design System](./part-9-design-system.md) — Sunflower & Charcoal visual identity
 
 ## About This Series
 
