@@ -309,8 +309,8 @@ export function HomePage() {
           type="button"
           onClick={handleAddClick}
           className={[
-            // Positioning - above the bottom nav bar
-            'fixed bottom-24 right-6 z-50',
+            // Positioning - above the bottom nav bar with breathing room
+            'fixed bottom-28 right-5 z-50',
             // Size and shape
             'w-14 h-14 rounded-full',
             // Shadow
