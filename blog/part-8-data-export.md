@@ -22,7 +22,7 @@ This phase delivers on that promise with a single-tap export.
 ```text
 SettingsPage → useExport hook → StorageService.exportData()
                      ↓
-              Blob download → alicooks-export-YYYY-MM-DD.json
+              Blob download → dishcourse-export-YYYY-MM-DD.json
 ```
 
 The existing `StorageService` already had `exportData()` and `importData()` functions
@@ -64,7 +64,7 @@ function downloadFile(content: string, filename: string): void {
 ```
 
 The filename includes the current date for easy identification:
-`alicooks-export-2024-12-18.json`
+`dishcourse-export-2024-12-18.json`
 
 ### Import Implementation
 

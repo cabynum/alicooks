@@ -1,7 +1,7 @@
 /**
  * Services
  *
- * Central export point for all services used in AliCooks.
+ * Central export point for all services used in DishCourse.
  */
 
 // Storage service for localStorage operations

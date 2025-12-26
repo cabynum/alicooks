@@ -66,7 +66,7 @@ export const storageService = {
 };
 ```
 
-All data lives in localStorage under `alicooks_` prefixed keys. Human-readable JSON, portable, no server required.
+All data lives in localStorage under `dishcourse_` prefixed keys. Human-readable JSON, portable, no server required.
 
 We wrote unit tests for every operation — 34 tests covering dishes, plans, and export/import. The export includes
 a version number for future migration support:
@@ -236,7 +236,7 @@ The foundation is laid. Now we build on top of it.
 
 ---
 
-*This is Part 3 of a series documenting the build of "AliCooks" — a family meal planning application.*
+*This is Part 3 of a series documenting the build of "DishCourse" — a family meal planning application.*
 
 **Previous:** [Part 2 — Specification & Planning](./part-2-specification.md)  
 **Next:** Part 4 — Add a Dish (coming soon)

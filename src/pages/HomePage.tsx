@@ -1,5 +1,5 @@
 /**
- * HomePage - The main landing page for AliCooks.
+ * HomePage - The main landing page for DishCourse.
  *
  * Shows the user's dish collection with quick access to main actions:
  * - View all dishes
@@ -133,7 +133,7 @@ export function HomePage() {
                 className="text-3xl font-bold text-white"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                AliCooks
+                DishCourse
               </h1>
             </div>
             {/* Avatar placeholder - could be user profile photo */}

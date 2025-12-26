@@ -1,4 +1,4 @@
-# AliCooks Ideas Backlog
+# DishCourse Ideas Backlog
 
 A place to capture enhancement ideas and future features. Add freely — this is for brainstorming,
 not commitment. Ideas here may or may not make it into the product.
@@ -63,6 +63,29 @@ Tag dishes with which household members especially like them. Could help with:
 
 Ideas related to sharing or multi-user features.
 
+### Family Collaboration 🌟 HIGH PRIORITY
+
+**Added**: 2024-12-26
+
+Aliya's vision: Make DishCourse a family app, not just a personal tool. Multiple family
+members should be able to:
+
+- View and add to the shared dish collection
+- See and edit meal plans together
+- Coordinate on what's for dinner without texting back and forth
+
+**Open questions to explore**:
+
+- Shared data model: One family account? Linked individual accounts?
+- Sync mechanism: Real-time (WebSocket)? Poll-based? Manual refresh?
+- Authentication: OAuth? Magic links? Simple PIN code?
+- Conflict resolution: What if two people edit the same plan?
+- Offline support: Can this work offline and sync later?
+
+*Consideration*: This is a significant scope expansion. Requires proper specification before
+implementation. May need a v2 milestone. Constitution principle IV (Data Ownership) must still
+apply — users should be able to export their shared data.
+
 ### Household Meal Voting
 
 **Added**: 2024-12-18
@@ -72,7 +95,7 @@ before committing to dinner. Takes the guesswork out of "what does everyone want
 
 *Consideration*: Multi-household features are out of scope for v1 per constitution. Would
 require user accounts, sharing mechanism (link? app invite?), and real-time or async voting
-UI. Big feature, but addresses a real pain point for families.
+UI. Big feature, but addresses a real pain point for families. **Connects to Family Collaboration above.**
 
 ---
 
@@ -132,3 +155,4 @@ No ideas yet.
 | Date | Action |
 | ---------- | ---------------------------------- |
 | 2024-12-18 | Created backlog with initial ideas |
+| 2024-12-26 | Added Family Collaboration (Aliya's request) |

@@ -1,24 +1,24 @@
 <p align="center">
-  <img src="public/icons/icon-512.png" alt="AliCooks" width="128" height="128" style="border-radius: 28px;">
+  <img src="public/icons/icon-512.png" alt="DishCourse" width="128" height="128" style="border-radius: 28px;">
 </p>
 
-<h1 align="center">AliCooks</h1>
+<h1 align="center">DishCourse</h1>
 
 <p align="center">
-  <strong>Your Meal Planning Companion</strong>
+  <strong>Family Meal Planning, Together</strong>
 </p>
 
 <p align="center">
-  <a href="https://alicooks.vercel.app">Live App</a> •
+  <a href="https://dishcourse.vercel.app">Live App</a> •
   <a href="#features">Features</a> •
   <a href="#getting-started">Getting Started</a>
 </p>
 
 ---
 
-# AliCooks
+# DishCourse
 
-A mobile-first meal planning app that helps you decide what to cook. Add your favorite dishes, get random meal suggestions, and plan your weekly menu—all from your phone.
+A mobile-first meal planning app that helps your family decide what to cook. Add your favorite dishes, get random meal suggestions, and plan your weekly menu—all from your phone.
 
 ## Features
 
@@ -56,8 +56,8 @@ A mobile-first meal planning app that helps you decide what to cook. Add your fa
 
 ```bash
 # Clone the repository
-git clone https://github.com/cabynum/alicooks.git
-cd alicooks
+git clone https://github.com/cabynum/dishcourse.git
+cd dishcourse
 
 # Install dependencies
 npm install
@@ -116,11 +116,11 @@ npm run test:watch
 npm run test:coverage
 ```
 
-Current test count: **554 tests** across 26 test files.
+Current test count: **627 tests** across 28 test files.
 
 ## Design Principles
 
-AliCooks follows a strict constitution that prioritizes:
+DishCourse follows a strict constitution that prioritizes:
 
 1. **User-First Simplicity** - No feature should need a manual
 2. **Delight Over Features** - Polish over quantity
@@ -136,12 +136,14 @@ The `blog/` directory contains a series of posts documenting the development pro
 
 - Part 1: Project Setup
 - Part 2: Specification
+- Part 3: Specification
 - Part 3: Foundation
 - Part 4: First Feature
 - Part 5: View Dishes
 - Part 6: Meal Suggestions
 - Part 7: Complete Flow
 - Part 8: Data Export
+- Part 9: Design System
 
 ## License
 
@@ -149,5 +151,4 @@ MIT
 
 ---
 
-Built with care for Aliya, who just wants to know what's for dinner.
-
+Built with care for family dinners everywhere.

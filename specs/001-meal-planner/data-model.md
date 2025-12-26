@@ -87,9 +87,9 @@ All data is stored in localStorage as JSON under these keys:
 ```typescript
 // localStorage keys
 const STORAGE_KEYS = {
-  dishes: 'alicooks_dishes',         // Dish[]
-  plans: 'alicooks_plans',           // MealPlan[]
-  version: 'alicooks_version',       // number (for migrations)
+  dishes: 'dishcourse_dishes',       // Dish[]
+  plans: 'dishcourse_plans',         // MealPlan[]
+  version: 'dishcourse_version',     // number (for migrations)
 } as const;
 
 // Current schema version
@@ -100,7 +100,7 @@ const SCHEMA_VERSION = 1;
 
 ```json
 {
-  "alicooks_dishes": [
+  "dishcourse_dishes": [
     {
       "id": "a1b2c3d4",
       "name": "Grilled Chicken",
@@ -116,7 +116,7 @@ const SCHEMA_VERSION = 1;
       "updatedAt": "2024-12-15T10:31:00Z"
     }
   ],
-  "alicooks_plans": [
+  "dishcourse_plans": [
     {
       "id": "p1q2r3s4",
       "name": "This Week",
@@ -129,7 +129,7 @@ const SCHEMA_VERSION = 1;
       "updatedAt": "2024-12-15T11:00:00Z"
     }
   ],
-  "alicooks_version": 1
+  "dishcourse_version": 1
 }
 ```
 

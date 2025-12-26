@@ -5,7 +5,7 @@ import App from '@/App'
 describe('App', () => {
   it('renders the app title', () => {
     render(<App />)
-    expect(screen.getByText('AliCooks')).toBeInTheDocument()
+    expect(screen.getByText('DishCourse')).toBeInTheDocument()
   })
 
   it('renders the greeting', () => {

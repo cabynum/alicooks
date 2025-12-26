@@ -1,6 +1,6 @@
 {
-  "name": "AliCooks",
-  "short_name": "AliCooks",
+  "name": "DishCourse",
+  "short_name": "DishCourse",
   "description": "Meal planning made simple",
   "start_url": "/",
   "display": "standalone",

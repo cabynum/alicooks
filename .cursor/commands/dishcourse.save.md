@@ -1,8 +1,8 @@
 ---
-description: Save AliCooks session context before ending
+description: Save DishCourse session context before ending
 ---
 
-## AliCooks Session Save
+## DishCourse Session Save
 
 Before we end this session, please complete these steps:
 

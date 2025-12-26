@@ -1,5 +1,5 @@
 ---
-description: Markdown linting enforcement for AliCooks
+description: Markdown linting enforcement for DishCourse
 globs: ["**/*.md"]
 ---
 
@@ -68,6 +68,6 @@ When a table is the better choice, explicitly recommend it to the user.
 
 ## Why This Matters
 
-Per the AliCooks Constitution (Quality Standards): Documentation MUST be written
+Per the DishCourse Constitution (Quality Standards): Documentation MUST be written
 for a reader unfamiliar with the codebase. Clean, consistent markdown ensures
 readability and professionalism.

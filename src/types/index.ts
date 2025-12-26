@@ -1,7 +1,7 @@
 /**
  * Type Definitions
  *
- * Central export point for all TypeScript types used in AliCooks.
+ * Central export point for all TypeScript types used in DishCourse.
  *
  * Entity naming convention:
  * - Dish: Individual food item (e.g., "Grilled Chicken")

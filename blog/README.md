@@ -1,6 +1,6 @@
-# AliCooks Blog Series
+# DishCourse Blog Series
 
-A series documenting the build of AliCooks — a family meal planning application using spec-driven
+A series documenting the build of DishCourse — a family meal planning application using spec-driven
 development and AI pair programming.
 
 ## Posts
@@ -14,6 +14,7 @@ development and AI pair programming.
 7. [Part 7: Completing the Core Flow](./part-7-complete-flow.md) — Plan a Menu, Edit & Delete
 8. [Part 8: Data Export](./part-8-data-export.md) — Export/import, settings page
 9. [Part 9: Design System](./part-9-design-system.md) — Sunflower & Charcoal visual identity
+10. [Part 10: The Rename](./part-10-rename.md) — AliCooks becomes DishCourse
 
 ## About This Series
 

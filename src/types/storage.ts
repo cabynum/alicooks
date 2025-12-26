@@ -10,13 +10,13 @@
  */
 export const STORAGE_KEYS = {
   /** Array of Dish objects */
-  dishes: 'alicooks_dishes',
+  dishes: 'dishcourse_dishes',
 
   /** Array of MealPlan objects */
-  plans: 'alicooks_plans',
+  plans: 'dishcourse_plans',
 
   /** Schema version number (for future migrations) */
-  version: 'alicooks_version',
+  version: 'dishcourse_version',
 } as const;
 
 /**

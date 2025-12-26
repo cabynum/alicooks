@@ -1,12 +1,12 @@
 # Part 6: Meal Suggestions
 
-*The "magic moment" — random meal pairing brings AliCooks to life.*
+*The "magic moment" — random meal pairing brings DishCourse to life.*
 
 ---
 
 ## The Goal
 
-Phase 4 delivers the core value proposition of AliCooks: **answering "What should I make for
+Phase 4 delivers the core value proposition of DishCourse: **answering "What should I make for
 dinner?"** with a single tap. This is where the app stops being just a dish list and starts
 being genuinely useful.
 

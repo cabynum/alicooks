@@ -2,7 +2,7 @@
  * SuggestionCard Component
  *
  * Displays a suggested meal combination (entree + sides).
- * This is the "magic moment" - the core value prop of AliCooks.
+ * This is the "magic moment" - the core value prop of DishCourse.
  * Designed to be visually delightful and feel special.
  */
 

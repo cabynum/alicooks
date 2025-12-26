@@ -1,7 +1,7 @@
 /**
  * Custom Hooks
  *
- * Central export point for all React hooks used in AliCooks.
+ * Central export point for all React hooks used in DishCourse.
  */
 
 export { useDishes } from './useDishes';

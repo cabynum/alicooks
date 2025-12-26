@@ -16,8 +16,8 @@ Get the development environment running in under 5 minutes.
 
 ```bash
 # Clone the repository (if not already done)
-git clone <repo-url> alicooks
-cd alicooks
+git clone <repo-url> dishcourse
+cd dishcourse
 
 # Switch to feature branch
 git checkout 001-meal-planner
@@ -115,11 +115,11 @@ tests/                   # Test files mirror src/ structure
 Open browser DevTools and check localStorage:
 
 ```javascript
-// View all meals
-JSON.parse(localStorage.getItem('alicooks_meals'))
+// View all dishes
+JSON.parse(localStorage.getItem('dishcourse_dishes'))
 
 // View all plans
-JSON.parse(localStorage.getItem('alicooks_plans'))
+JSON.parse(localStorage.getItem('dishcourse_plans'))
 
 // Clear all data (for testing fresh start)
 localStorage.clear()

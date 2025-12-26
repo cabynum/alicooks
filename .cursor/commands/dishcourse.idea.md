@@ -1,8 +1,8 @@
 ---
-description: Capture a feature idea or enhancement for the AliCooks backlog
+description: Capture a feature idea or enhancement for the DishCourse backlog
 ---
 
-## AliCooks Idea Capture
+## DishCourse Idea Capture
 
 Add this idea to the backlog at `.specify/memory/ideas.md`.
 

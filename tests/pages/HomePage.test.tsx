@@ -53,7 +53,7 @@ function createTestDish(overrides: Partial<Dish> = {}): Dish {
  * Helper to set up dishes in localStorage
  */
 function setupDishes(dishes: Dish[]) {
-  localStorageMock.setItem('alicooks_dishes', JSON.stringify(dishes));
+  localStorageMock.setItem('dishcourse_dishes', JSON.stringify(dishes));
 }
 
 /**
@@ -105,7 +105,7 @@ describe('HomePage', () => {
     it('renders page title', () => {
       renderHomePage();
 
-      expect(screen.getByRole('heading', { name: 'AliCooks' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'DishCourse' })).toBeInTheDocument();
     });
 
     it('renders greeting', () => {

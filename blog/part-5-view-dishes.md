@@ -99,7 +99,7 @@ Mid-session, we created a system for capturing feature ideas without derailing c
 work:
 
 1. Created `.specify/memory/ideas.md` — a backlog organized by category
-2. Added `/alicooks.idea` command for frictionless idea capture
+2. Added `/dishcourse.idea` command for frictionless idea capture
 
 Initial ideas captured:
 
@@ -125,7 +125,7 @@ Total test count: **264 passing**
 ## What's Next
 
 Phase 4 is the "magic moment" — **Get Meal Suggestions**. The app will randomly pair an
-entree with sides to suggest complete meals. This is where AliCooks starts to feel
+entree with sides to suggest complete meals. This is where DishCourse starts to feel
 genuinely useful.
 
 ---

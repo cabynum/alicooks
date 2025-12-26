@@ -12,7 +12,7 @@ Before diving into features, spec-kit asks you to establish a *constitution* —
 principles that guide every decision. This felt a bit formal at first, but it turned out to be
 incredibly valuable.
 
-I ran `/speckit.constitution` in Cursor and worked with Claude to define what matters most for AliCooks.
+I ran `/speckit.constitution` in Cursor and worked with Claude to define what matters most for DishCourse.
 
 ### The Five Principles
 
@@ -114,7 +114,7 @@ I ran `/speckit.plan` and worked through technology decisions. Given our require
 
 ```text
 ┌────────────────────────────────────────────────┐
-│                 AliCooks PWA                   │
+│                 DishCourse PWA                   │
 ├────────────────────────────────────────────────┤
 │  UI:        React 18 + TypeScript              │
 │  Styling:   Tailwind CSS (mobile-first)        │
@@ -154,7 +154,7 @@ DayAssignment
 └── dishIds[]
 ```
 
-All stored in localStorage with an `alicooks_` prefix. Simple, portable, human-readable.
+All stored in localStorage with a `dishcourse_` prefix. Simple, portable, human-readable.
 
 ### A Naming Refinement
 
@@ -207,9 +207,9 @@ I solved this with **custom Cursor slash commands**:
 
 | Command | When | What It Does |
 | --------- | ------ | -------------- |
-| `/alicooks.start` | Beginning of session | Loads constitution, session guide, summarizes status |
-| `/alicooks.lint` | Anytime | Checks all markdown files for linting errors |
-| `/alicooks.save` | End of session | Updates session guide, blog, suggests commit message |
+| `/dishcourse.start` | Beginning of session | Loads constitution, session guide, summarizes status |
+| `/dishcourse.lint` | Anytime | Checks all markdown files for linting errors |
+| `/dishcourse.save` | End of session | Updates session guide, blog, suggests commit message |
 
 ### How to Create Them
 
@@ -217,19 +217,19 @@ In Cursor, create markdown files in `.cursor/commands/`:
 
 ```text
 .cursor/commands/
-├── alicooks.start.md
-├── alicooks.lint.md
-└── alicooks.save.md
+├── dishcourse.start.md
+├── dishcourse.lint.md
+└── dishcourse.save.md
 ```
 
 Each file has a YAML frontmatter with a description, then instructions for the AI:
 
 ```markdown
 ---
-description: Start a new AliCooks development session
+description: Start a new DishCourse development session
 ---
 
-## AliCooks Session Start
+## DishCourse Session Start
 
 Please read these files to get up to speed:
 1. `.specify/memory/constitution.md`
@@ -247,7 +247,7 @@ The real magic is the **session guide** — a markdown file that tracks:
 - What the next step is
 - Key file locations
 
-The `/alicooks.save` command updates this file, so the next session's `/alicooks.start` has accurate
+The `/dishcourse.save` command updates this file, so the next session's `/dishcourse.start` has accurate
 context. It's like leaving a note for your future self (and your AI pair).
 
 ---
@@ -263,7 +263,7 @@ context. It's like leaving a note for your future self (and your AI pair).
 
 ---
 
-*This is Part 2 of a series documenting the build of "AliCooks" — a family meal planning application.*
+*This is Part 2 of a series documenting the build of "DishCourse" — a family meal planning application.*
 
 **Previous:** [Part 1 — Setup](./part-1-setup.md)  
 **Next:** [Part 3 — Building the Foundation](./part-3-foundation.md)

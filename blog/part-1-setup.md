@@ -79,7 +79,7 @@ export PATH="$HOME/.local/bin:$PATH"
 Here's the key insight: spec-kit supports multiple AI assistants. Since I'm using Cursor, I initialized with:
 
 ```bash
-specify init alicooks --ai cursor-agent
+specify init dishcourse --ai cursor-agent
 ```
 
 This created the project structure with:
@@ -107,7 +107,7 @@ In [Part 2](./part-2-specification.md), we establish the constitution and create
 
 ---
 
-*This is Part 1 of a series documenting the build of "AliCooks" — a family meal planning application.*
+*This is Part 1 of a series documenting the build of "DishCourse" — a family meal planning application.*
 
 **Next:** [Part 2 — Constitution, Specification & Planning](./part-2-specification.md)
 

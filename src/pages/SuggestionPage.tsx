@@ -1,7 +1,7 @@
 /**
  * SuggestionPage - The meal suggestion experience.
  *
- * This is the "magic moment" of AliCooks - where users get dinner ideas.
+ * This is the "magic moment" of DishCourse - where users get dinner ideas.
  * Generates random meal suggestions and lets users try different options.
  */
 

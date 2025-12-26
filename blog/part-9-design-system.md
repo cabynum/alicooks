@@ -1,6 +1,6 @@
 # Part 9: The Sunflower & Charcoal Design System
 
-Building a cohesive visual identity for AliCooks.
+Building a cohesive visual identity for DishCourse.
 
 ## The Problem with "Good Enough"
 

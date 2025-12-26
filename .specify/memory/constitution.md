@@ -13,7 +13,7 @@ Previous versions:
   - 1.0.0 (2024-12-15): Initial ratification with 5 core principles
 -->
 
-# AliCooks Constitution
+# DishCourse Constitution
 
 ## Core Principles
 
@@ -62,7 +62,7 @@ The interface MUST work well on phones — that's where dinner decisions happen.
 
 ## Current Scope Boundaries
 
-These define what AliCooks is NOT — for now. This scope may expand in future versions,
+These define what DishCourse is NOT — for now. This scope may expand in future versions,
 but these boundaries keep the initial build focused.
 
 **Out of scope for v1:**
@@ -97,7 +97,7 @@ but these boundaries keep the initial build focused.
 
 ## Governance
 
-This constitution establishes the foundational principles for AliCooks development.
+This constitution establishes the foundational principles for DishCourse development.
 All implementation decisions MUST align with these principles.
 
 **Amendment Process:**

@@ -1,5 +1,5 @@
 ---
-description: Git commit conventions for AliCooks
+description: Git commit conventions for DishCourse
 globs: ["**/*"]
 ---
 

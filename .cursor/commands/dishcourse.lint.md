@@ -2,7 +2,7 @@
 description: Check all markdown files for linting errors
 ---
 
-## AliCooks Lint Check
+## DishCourse Lint Check
 
 Please run a lint check on all markdown files in the project:
 

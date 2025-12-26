@@ -102,13 +102,13 @@ describe('useExport Hook', () => {
         result.current.exportToFile();
       });
 
-      expect(mockLink?.download).toMatch(/^alicooks-export-\d{4}-\d{2}-\d{2}\.json$/);
+      expect(mockLink?.download).toMatch(/^dishcourse-export-\d{4}-\d{2}-\d{2}\.json$/);
     });
 
     it('includes dishes and plans in export', () => {
       // Set up some data
       localStorageMock.setItem(
-        'alicooks_dishes',
+        'dishcourse_dishes',
         JSON.stringify([
           {
             id: '1',
@@ -280,7 +280,7 @@ describe('useExport Hook', () => {
         await result.current.importFromFile(file);
       });
 
-      const stored = JSON.parse(localStorageMock.getItem('alicooks_dishes') || '[]');
+      const stored = JSON.parse(localStorageMock.getItem('dishcourse_dishes') || '[]');
       expect(stored).toHaveLength(1);
       expect(stored[0].name).toBe('Test Dish');
     });

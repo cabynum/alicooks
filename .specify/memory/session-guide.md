@@ -1,4 +1,4 @@
-# AliCooks Session Guide
+# DishCourse Session Guide
 
 Quick reference for starting and ending AI pair programming sessions.
 
@@ -6,17 +6,17 @@ Quick reference for starting and ending AI pair programming sessions.
 
 | Command | Purpose |
 | ----------------- | ---------------------------------------------- |
-| `/alicooks.start` | Start a new session (loads context) |
-| `/alicooks.idea` | Capture a feature idea to the backlog |
-| `/alicooks.lint` | Check all markdown files for linting errors |
-| `/alicooks.save` | End a session (saves context, suggests commit) |
+| `/dishcourse.start` | Start a new session (loads context) |
+| `/dishcourse.idea` | Capture a feature idea to the backlog |
+| `/dishcourse.lint` | Check all markdown files for linting errors |
+| `/dishcourse.save` | End a session (saves context, suggests commit) |
 
 ## Starting a New Session
 
-Type `/alicooks.start` in Cursor, or paste this prompt:
+Type `/dishcourse.start` in Cursor, or paste this prompt:
 
 ```text
-Let's continue working on AliCooks.
+Let's continue working on DishCourse.
 
 Please read these files to get up to speed:
 - `.specify/memory/constitution.md` (project principles)
@@ -27,7 +27,7 @@ Current status: [see below]
 
 ## Ending a Session
 
-Type `/alicooks.save` in Cursor, or ask:
+Type `/dishcourse.save` in Cursor, or ask:
 
 ```text
 Before we end, please:
@@ -40,17 +40,19 @@ Before we end, please:
 
 **Last Updated**: 2024-12-26  
 **Current Branch**: `master`  
-**Repository**: <https://github.com/cabynum/alicooks>  
-**Live URL**: <https://alicooks.vercel.app>  
-**Current Phase**: Logo Design Exploration
+**Repository**: <https://github.com/cabynum/dishcourse>  
+**Live URL**: <https://dishcourse.vercel.app>  
+**Current Phase**: Rename & Branding
 
 ### Completed This Session
 
-- ✅ **Logo exploration page created**: `logo-exploration.html` with 19 typographic logo concepts
-- ✅ **Sans-serif options (A-I)**: Stacked contrast, dot separator, color pop, yellow bar, yellow i-dot, all caps, underline, badge combo, period mark
-- ✅ **Script options (J-S)**: Pacifico, Lobster, Satisfy, Caveat, Dancing Script, Kalam, Comfortaa, Baloo, Script+Sans hybrid, Script+Swash
-- ✅ **Dark mode and size tests**: Included in exploration page
-- ✅ **Committed to master**: Logo exploration ready for review
+- ✅ **Renamed app**: AliCooks → DishCourse (per Aliya's feedback)
+- ✅ **Updated all references**: UI, manifest, package.json, tests, docs, blog, commands
+- ✅ **Updated storage keys**: `alicooks_*` → `dishcourse_*` (clean slate, no migration)
+- ✅ **Updated logo exploration**: Now shows "DishCourse" instead of "AliCooks"
+- ✅ **Updated app icon SVG**: New "D" lettermark with sunflower/charcoal palette
+- ✅ **Renamed slash commands**: `/alicooks.*` → `/dishcourse.*`
+- ✅ **Tests passing**: 626/627 (1 pre-existing failure unrelated to rename)
 
 ### Phase Summary
 
@@ -112,12 +114,12 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Select logo direction** — Review `logo-exploration.html` and choose a direction to refine
-   - Top candidates: Q (Baloo), R (Script+Sans), S (Script+Swash), or A (Stacked Contrast)
-   - Consider how it works in app header, favicon, and app icon contexts
+1. **Review logo exploration** — Open `logo-exploration.html` and pick a direction for "DishCourse"
+   - The existing concepts now show "DishCourse" — evaluate which work best for the new name
+   - May need to adjust letter spacing for the longer word
 2. **Refine chosen logo** — Polish typography, spacing, and create final SVG assets
-3. **Share with Aliya** — Get feedback from the primary user on logo choice
-4. **PWA polish** — Update app icon, splash screen with final logo
+3. **Regenerate app icons** — Run `scripts/generate-icons.mjs` after finalizing logo
+4. **Scope collaboration feature** — Capture Aliya's vision for family collaboration in ideas backlog
 
 ### Key Files
 
@@ -141,11 +143,13 @@ Core features:
 
 ### Open Decisions
 
-- **Logo direction**: 19 typography-first options created in `logo-exploration.html`
+- **Logo direction for DishCourse**: 19 typography-first options now show "DishCourse"
   - Palette: Black, white, sunflower yellow (`#FFB800`)
   - Sans-serif vs script style to be decided
-  - Top candidates: Baloo (Q), Script+Sans hybrid (R), Stacked Contrast (A)
-  - Character-based logos (like Crumbl) require illustration tools — deferred
+  - May need new explorations — "DishCourse" is longer than "AliCooks"
+- **Collaboration feature**: Aliya wants the app to be family-collaborative
+  - Needs proper specification before implementation
+  - Possible directions: shared data, user accounts, real-time sync
 
 ### Notes
 
