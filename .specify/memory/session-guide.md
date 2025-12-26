@@ -38,18 +38,19 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2024-12-22  
+**Last Updated**: 2024-12-26  
 **Current Branch**: `master`  
 **Repository**: <https://github.com/cabynum/alicooks>  
 **Live URL**: <https://alicooks.vercel.app>  
-**Current Phase**: UI Polish - FAB improvements
+**Current Phase**: Logo Design Exploration
 
 ### Completed This Session
 
-- ✅ **FAB always visible**: Circular + button for adding dishes now shows at all times (was hidden when no dishes existed)
-- ✅ **FAB positioning fixed**: Raised button above bottom nav bar (`bottom-28`) with proper z-index for full visibility
-- ✅ **Removed redundant UI**: Removed "+ New Plan" link from "This Week" section (Plan button in header already handles this)
-- ✅ **Deployed to Vercel**: All changes pushed to origin
+- ✅ **Logo exploration page created**: `logo-exploration.html` with 19 typographic logo concepts
+- ✅ **Sans-serif options (A-I)**: Stacked contrast, dot separator, color pop, yellow bar, yellow i-dot, all caps, underline, badge combo, period mark
+- ✅ **Script options (J-S)**: Pacifico, Lobster, Satisfy, Caveat, Dancing Script, Kalam, Comfortaa, Baloo, Script+Sans hybrid, Script+Swash
+- ✅ **Dark mode and size tests**: Included in exploration page
+- ✅ **Committed to master**: Logo exploration ready for review
 
 ### Phase Summary
 
@@ -111,12 +112,12 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Logo redesign** — Create a memorable brand mark
-   - Reference: Crumbl, Starbucks, Chick-fil-A style logos
-   - Palette: Black, white, and sunflower yellow
-   - Goal: Distinctive, ownable, works at any size
-2. **Share with Aliya** — Get feedback from the primary user on new design
-3. **PWA polish** — Improve offline experience, splash screen, app icon
+1. **Select logo direction** — Review `logo-exploration.html` and choose a direction to refine
+   - Top candidates: Q (Baloo), R (Script+Sans), S (Script+Swash), or A (Stacked Contrast)
+   - Consider how it works in app header, favicon, and app icon contexts
+2. **Refine chosen logo** — Polish typography, spacing, and create final SVG assets
+3. **Share with Aliya** — Get feedback from the primary user on logo choice
+4. **PWA polish** — Update app icon, splash screen with final logo
 
 ### Key Files
 
@@ -134,15 +135,17 @@ Core features:
 | **App Icon SVG** | `public/icons/icon-512.svg` |
 | Icon Generation | `scripts/generate-icons.mjs` |
 | **Design Mockup** | `design-mockup.html` |
+| **Logo Exploration** | `logo-exploration.html` |
 | Markdown Rules | `.cursor/rules/markdown-linting.mdc` |
 | This Guide | `.specify/memory/session-guide.md` |
 
 ### Open Decisions
 
-- **Logo direction**: Need a memorable, brand-worthy mark (not generic icons)
+- **Logo direction**: 19 typography-first options created in `logo-exploration.html`
   - Palette: Black, white, sunflower yellow (`#FFB800`)
-  - Inspiration: Major brand logos (Crumbl, Starbucks, Chick-fil-A)
-  - Previous attempts were too generic or not memorable enough
+  - Sans-serif vs script style to be decided
+  - Top candidates: Baloo (Q), Script+Sans hybrid (R), Stacked Contrast (A)
+  - Character-based logos (like Crumbl) require illustration tools — deferred
 
 ### Notes
 
