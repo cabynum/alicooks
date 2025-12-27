@@ -46,18 +46,12 @@ Before we end, please:
 
 ### Completed This Session
 
-- ✅ **Mascots integrated into app**: Duo mascot now appears in all empty states
-  - HomePage empty state
-  - SuggestionPage "need more dishes" state
-  - PlanPage "add dishes first" state
-  - DayAssignmentPage "no dishes" state
-- ✅ **Header mascot avatar**: Single mascot replaces egg emoji in header
-- ✅ **App icons regenerated**: Now feature the single mascot on yellow background
-  - Updated `scripts/generate-icons.mjs` to use mascot.png
-  - Generated new icons at 192px and 512px (regular + maskable)
-- ✅ **EmptyState component enhanced**: Now supports `imageSrc` prop for mascot images
-- ✅ **GitHub repo renamed**: `alicooks` → `dishcourse`
-- ✅ **Local folder renamed**: `~/projects/alicooks` → `~/projects/dishcourse`
+- ✅ **Splash screen added**: Duo mascot with bounce animation during app load
+  - Shows for 800ms minimum, then fades out smoothly
+  - Charcoal background with "DishCourse" branding (yellow "Dish" + white "Course")
+  - Added Outfit font for logo typography
+  - Splash removed from DOM after animation completes
+- ✅ **Deployed to Vercel**: Splash screen now live at havedishcourse.vercel.app
 - ✅ **Tests passing**: 627/627
 
 ### Phase Summary
@@ -121,9 +115,8 @@ Core features:
 ### Recommended Next Steps
 
 1. **Create onboarding flow** — Use mascots to create a welcoming first-run experience
-2. **Add splash/loading screen** — Show duo mascot during initial app load
-3. **Scope collaboration feature** — Capture Aliya's vision for family collaboration in ideas backlog
-4. **Deploy to Vercel** — Push latest changes to production
+2. **Scope collaboration feature** — Capture Aliya's vision for family collaboration in ideas backlog
+3. **Add micro-interactions** — Polish touch feedback and transitions for delight
 
 ### Key Files
 
