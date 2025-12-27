@@ -103,7 +103,39 @@ UI. Big feature, but addresses a real pain point for families. **Connects to Fam
 
 Visual and interaction improvements.
 
-No ideas yet.
+### Onboarding Flow
+
+**Added**: 2024-12-27
+
+Create a welcoming first-run experience using the mascot duo. Would introduce new users to
+the app's key features without requiring configuration.
+
+Potential elements:
+
+- Welcome screen with Duo mascots
+- Brief walkthrough: add dish → get suggestions → plan meals
+- Optional "Add your first dish" prompt to bootstrap the experience
+- Skip option for returning users
+
+*Consideration*: Aligns with Principle III (Smart Defaults) — first-run must work without
+configuration. Onboarding should be delightful but not mandatory. Splash screen already
+showcases mascots; this would extend that warmth into the first interaction.
+
+---
+
+### Micro-Interactions Polish
+
+**Added**: 2024-12-27
+
+Add subtle animations and touch feedback to make the app feel more alive:
+
+- Button press feedback (scale/opacity)
+- Card tap responses
+- Smooth page transitions
+- Loading states with personality
+
+*Consideration*: Supports Principle II (Delight Over Features). Should feel polished, not
+distracting. Mobile-first means touch feedback is especially important.
 
 ---
 

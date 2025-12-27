@@ -39,20 +39,26 @@ Before we end, please:
 ## Current Status
 
 **Last Updated**: 2024-12-27  
-**Current Branch**: `master`  
+**Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Ready for Next Feature
+**Current Phase**: Specifying Family Collaboration Feature
 
 ### Completed This Session
 
-- ✅ **Splash screen added**: Duo mascot with bounce animation during app load
-  - Shows for 800ms minimum, then fades out smoothly
-  - Charcoal background with "DishCourse" branding (yellow "Dish" + white "Course")
-  - Added Outfit font for logo typography
-  - Splash removed from DOM after animation completes
-- ✅ **Deployed to Vercel**: Splash screen now live at havedishcourse.vercel.app
-- ✅ **Tests passing**: 627/627
+- ✅ **Ideas backlog updated**: Added onboarding flow and micro-interactions to ideas.md
+- ✅ **Family Collaboration spec created** using spec-kit workflow:
+  - Created branch `002-family-collaboration`
+  - Wrote full specification with 7 user stories (P1-P3)
+  - Defined 31 functional requirements
+  - Created quality checklist (all items passing)
+- ✅ **Key design decisions made**:
+  - Multiple households allowed (users can belong to more than one)
+  - Conflict prevention via edit locking (auto-release after inactivity)
+  - Magic link authentication (passwordless, email-based)
+- ✅ **SMS/iMessage invites specified**:
+  - Support for phone numbers AND iMessage email addresses (e.g., iCloud)
+  - Invites arrive in Messages app, not email inbox
 
 ### Phase Summary
 
@@ -114,9 +120,9 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Create onboarding flow** — Use mascots to create a welcoming first-run experience
-2. **Scope collaboration feature** — Capture Aliya's vision for family collaboration in ideas backlog
-3. **Add micro-interactions** — Polish touch feedback and transitions for delight
+1. **Run `/speckit.plan`** — Create technical implementation plan for family collaboration
+2. **Create onboarding flow** — Use mascots for welcoming first-run experience (in ideas backlog)
+3. **Add micro-interactions** — Polish touch feedback and transitions (in ideas backlog)
 
 ### Key Files
 
@@ -124,11 +130,13 @@ Core features:
 | ------------------- | --------------------------------------------------- |
 | Constitution | `.specify/memory/constitution.md` |
 | **Ideas Backlog** | `.specify/memory/ideas.md` |
-| Feature Spec | `specs/001-meal-planner/spec.md` |
-| Implementation Plan | `specs/001-meal-planner/plan.md` |
-| **Task Breakdown** | `specs/001-meal-planner/tasks.md` |
+| **Collab Spec** | `specs/002-family-collaboration/spec.md` |
+| Collab Checklist | `specs/002-family-collaboration/checklists/requirements.md` |
+| Meal Planner Spec | `specs/001-meal-planner/spec.md` |
+| Meal Planner Plan | `specs/001-meal-planner/plan.md` |
+| Meal Planner Tasks | `specs/001-meal-planner/tasks.md` |
 | Data Model | `specs/001-meal-planner/data-model.md` |
-| Component Contracts | `specs/001-meal-planner/contracts/components.md` |
+| Components | `specs/001-meal-planner/contracts/components.md` |
 | Quality Checklist | `specs/001-meal-planner/checklists/requirements.md` |
 | Blog Posts | `blog/` (Part 1–8) |
 | **App Icon SVG** | `public/icons/icon-512.svg` |
@@ -143,9 +151,9 @@ Core features:
 
 ### Open Decisions
 
-- **Collaboration feature**: Aliya wants the app to be family-collaborative
-  - Needs proper specification before implementation
-  - Possible directions: shared data, user accounts, real-time sync
+- **Collaboration feature**: Specification complete, ready for technical planning
+  - See `specs/002-family-collaboration/spec.md` for full details
+  - Next: Run `/speckit.plan` to create implementation plan
 
 ### Branding Assets (Finalized)
 
