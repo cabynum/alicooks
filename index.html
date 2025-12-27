@@ -8,10 +8,10 @@
     <title>DishCourse</title>
     <meta name="description" content="Meal planning made simple" />
     
-    <!-- Google Fonts: Fraunces (headers) + DM Sans (body) -->
+    <!-- Google Fonts: Fraunces (headers) + DM Sans (body) + Outfit (logo) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Outfit:wght@700&display=swap" rel="stylesheet" />
     
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json" />
@@ -28,6 +28,67 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
   </head>
   <body>
+    <!-- Splash screen - shows instantly before React loads -->
+    <div id="splash" aria-hidden="true">
+      <img src="/mascot-duo.png" alt="" class="splash-mascot" />
+      <h1 class="splash-title">
+        <span class="splash-dish">Dish</span><span class="splash-course">Course</span>
+      </h1>
+    </div>
+    
+    <!-- Inline critical styles for instant splash display -->
+    <style>
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #2C2C2C;
+        transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+      }
+      
+      #splash.splash-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      
+      .splash-mascot {
+        width: 180px;
+        height: 180px;
+        object-fit: contain;
+        animation: splash-bounce 1s ease-in-out infinite;
+      }
+      
+      .splash-title {
+        margin-top: 24px;
+        font-family: 'Outfit', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      
+      .splash-dish {
+        color: #FFB800;
+      }
+      
+      .splash-course {
+        color: #FFFFFF;
+      }
+      
+      @keyframes splash-bounce {
+        0%, 100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+    </style>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
