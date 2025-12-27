@@ -136,12 +136,16 @@ export function HomePage() {
                 DishCourse
               </h1>
             </div>
-            {/* Avatar placeholder - could be user profile photo */}
+            {/* Mascot avatar */}
             <div
-              className="w-11 h-11 rounded-full flex items-center justify-center text-xl"
+              className="w-11 h-11 rounded-full flex items-center justify-center overflow-hidden"
               style={{ backgroundColor: 'var(--color-accent)' }}
             >
-              🍳
+              <img
+                src="/mascot.png"
+                alt="DishCourse mascot"
+                className="w-9 h-9 object-contain"
+              />
             </div>
           </div>
 
