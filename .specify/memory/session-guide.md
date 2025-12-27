@@ -41,7 +41,7 @@ Before we end, please:
 **Last Updated**: 2024-12-27  
 **Current Branch**: `master`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
-**Live URL**: <https://dishcourse.vercel.app>  
+**Live URL**: <https://havedishcourse.vercel.app>  
 **Current Phase**: Ready for Next Feature
 
 ### Completed This Session
