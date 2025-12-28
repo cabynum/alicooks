@@ -38,27 +38,25 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2024-12-27  
+**Last Updated**: 2024-12-28  
 **Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Specifying Family Collaboration Feature
+**Current Phase**: Technical Planning Complete — Ready for Implementation
 
 ### Completed This Session
 
-- ✅ **Ideas backlog updated**: Added onboarding flow and micro-interactions to ideas.md
-- ✅ **Family Collaboration spec created** using spec-kit workflow:
-  - Created branch `002-family-collaboration`
-  - Wrote full specification with 7 user stories (P1-P3)
-  - Defined 31 functional requirements
-  - Created quality checklist (all items passing)
-- ✅ **Key design decisions made**:
-  - Multiple households allowed (users can belong to more than one)
-  - Conflict prevention via edit locking (auto-release after inactivity)
-  - Magic link authentication (passwordless, email-based)
-- ✅ **SMS/iMessage invites specified**:
-  - Support for phone numbers AND iMessage email addresses (e.g., iCloud)
-  - Invites arrive in Messages app, not email inbox
+- ✅ **Technical implementation plan created** for family collaboration:
+  - `plan.md`: Architecture overview with Supabase backend, offline-first sync
+  - `data-model.md`: Database schema with 6 tables, RLS policies, IndexedDB cache
+  - `contracts/components.md`: 20+ new component/hook/service interfaces
+  - `tasks.md`: 57 tasks across 8 phases (~4-6 weeks estimated)
+- ✅ **Key technical decisions made**:
+  - **Backend**: Supabase (PostgreSQL + Auth + Realtime)
+  - **Auth**: Magic links via Supabase Auth
+  - **Sync**: Optimistic UI with IndexedDB cache + real-time subscriptions
+  - **Locking**: Database-level locks with 5-minute auto-release
+  - **SMS**: Twilio via Supabase Edge Functions (optional Phase 6)
 
 ### Phase Summary
 
@@ -120,7 +118,7 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Run `/speckit.plan`** — Create technical implementation plan for family collaboration
+1. **Start Phase 0** — Set up Supabase project and database schema (see `tasks.md`)
 2. **Create onboarding flow** — Use mascots for welcoming first-run experience (in ideas backlog)
 3. **Add micro-interactions** — Polish touch feedback and transitions (in ideas backlog)
 
@@ -131,19 +129,15 @@ Core features:
 | Constitution | `.specify/memory/constitution.md` |
 | **Ideas Backlog** | `.specify/memory/ideas.md` |
 | **Collab Spec** | `specs/002-family-collaboration/spec.md` |
+| **Collab Plan** | `specs/002-family-collaboration/plan.md` |
+| **Collab Data Model** | `specs/002-family-collaboration/data-model.md` |
+| **Collab Components** | `specs/002-family-collaboration/contracts/components.md` |
+| **Collab Tasks** | `specs/002-family-collaboration/tasks.md` |
 | Collab Checklist | `specs/002-family-collaboration/checklists/requirements.md` |
 | Meal Planner Spec | `specs/001-meal-planner/spec.md` |
 | Meal Planner Plan | `specs/001-meal-planner/plan.md` |
-| Meal Planner Tasks | `specs/001-meal-planner/tasks.md` |
-| Data Model | `specs/001-meal-planner/data-model.md` |
-| Components | `specs/001-meal-planner/contracts/components.md` |
-| Quality Checklist | `specs/001-meal-planner/checklists/requirements.md` |
-| Blog Posts | `blog/` (Part 1–8) |
+| Blog Posts | `blog/` (Part 1–10) |
 | **App Icon SVG** | `public/icons/icon-512.svg` |
-| Icon Generation | `scripts/generate-icons.mjs` |
-| **Design Mockup** | `design-mockup.html` |
-| **Mascot Mockup** | `mascot-mockup.html` |
-| **Logo Exploration** | `logo-exploration.html` |
 | **Mascot (Single)** | `public/mascot.png` |
 | **Mascot (Duo)** | `public/mascot-duo.png` |
 | Markdown Rules | `.cursor/rules/markdown-linting.mdc` |
@@ -151,9 +145,9 @@ Core features:
 
 ### Open Decisions
 
-- **Collaboration feature**: Specification complete, ready for technical planning
-  - See `specs/002-family-collaboration/spec.md` for full details
-  - Next: Run `/speckit.plan` to create implementation plan
+- **Collaboration feature**: Technical plan complete, ready for implementation
+  - See `specs/002-family-collaboration/tasks.md` for 57 implementation tasks
+  - Next: Start Phase 0 (Supabase setup) when ready to begin coding
 
 ### Branding Assets (Finalized)
 
