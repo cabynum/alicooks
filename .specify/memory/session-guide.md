@@ -38,25 +38,27 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2024-12-28  
+**Last Updated**: 2024-12-31  
 **Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Technical Planning Complete — Ready for Implementation
+**Current Phase**: Phase 0 Complete — Backend Setup Done
 
 ### Completed This Session
 
-- ✅ **Technical implementation plan created** for family collaboration:
-  - `plan.md`: Architecture overview with Supabase backend, offline-first sync
-  - `data-model.md`: Database schema with 6 tables, RLS policies, IndexedDB cache
-  - `contracts/components.md`: 20+ new component/hook/service interfaces
-  - `tasks.md`: 57 tasks across 8 phases (~4-6 weeks estimated)
-- ✅ **Key technical decisions made**:
-  - **Backend**: Supabase (PostgreSQL + Auth + Realtime)
-  - **Auth**: Magic links via Supabase Auth
-  - **Sync**: Optimistic UI with IndexedDB cache + real-time subscriptions
-  - **Locking**: Database-level locks with 5-minute auto-release
-  - **SMS**: Twilio via Supabase Edge Functions (optional Phase 6)
+- ✅ **Phase 0: Backend Setup** completed (5/5 tasks):
+  - Created Supabase project and configured auth settings
+  - Installed `@supabase/supabase-js`, created `src/lib/supabase.ts`
+  - Created database schema migration with 6 tables + triggers
+  - Configured 15 Row-Level Security policies for data isolation
+  - Set up Dexie (IndexedDB) local cache with sync metadata
+- ✅ **Test count**: 627 → 639 (+12 new database cache tests)
+- ✅ **Files created**:
+  - `src/lib/supabase.ts` — Supabase client initialization
+  - `src/lib/db.ts` — Local IndexedDB cache with Dexie
+  - `supabase/migrations/001_initial_schema.sql` — Tables and triggers
+  - `supabase/migrations/002_row_level_security.sql` — RLS policies
+  - `.env.local` / `.env.example` — Environment configuration
 
 ### Phase Summary
 
@@ -114,11 +116,12 @@ Core features:
 | DayAssignmentPage | 22 |
 | HomePage | 26 |
 | App | 2 |
-| **Total** | **627** |
+| Local DB (Dexie) | 12 |
+| **Total** | **639** |
 
 ### Recommended Next Steps
 
-1. **Start Phase 0** — Set up Supabase project and database schema (see `tasks.md`)
+1. **Start Phase 1** — Authentication (magic links, AuthService, useAuth hook)
 2. **Create onboarding flow** — Use mascots for welcoming first-run experience (in ideas backlog)
 3. **Add micro-interactions** — Polish touch feedback and transitions (in ideas backlog)
 
@@ -145,9 +148,9 @@ Core features:
 
 ### Open Decisions
 
-- **Collaboration feature**: Technical plan complete, ready for implementation
-  - See `specs/002-family-collaboration/tasks.md` for 57 implementation tasks
-  - Next: Start Phase 0 (Supabase setup) when ready to begin coding
+- **Collaboration feature**: Phase 0 complete, Phase 1 (Authentication) is next
+  - See `specs/002-family-collaboration/tasks.md` for remaining 52 tasks
+  - Next: Create AuthService, useAuth hook, and MagicLinkForm component
 
 ### Branding Assets (Finalized)
 
