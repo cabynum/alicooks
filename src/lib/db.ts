@@ -230,10 +230,13 @@ export async function markAsSynced<T extends CacheMetadata>(
   id: string,
   serverUpdatedAt?: string
 ): Promise<void> {
-  await table.update(id, {
-    _syncStatus: 'synced',
-    _serverUpdatedAt: serverUpdatedAt,
-  } as Partial<T>);
+  // Use modify callback to avoid TypeScript generics issues with Dexie's UpdateSpec
+  await table.where('id').equals(id).modify((item) => {
+    item._syncStatus = 'synced';
+    if (serverUpdatedAt) {
+      item._serverUpdatedAt = serverUpdatedAt;
+    }
+  });
 }
 
 /**
