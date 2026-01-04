@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar, Plus } from 'lucide-react';
 import { usePlans, useDishes } from '@/hooks';
 import { DaySlot } from '@/components/meals';
 import { Button, EmptyState } from '@/components/ui';
@@ -75,8 +75,8 @@ export function PlanPage() {
     navigate('/');
   };
 
-  const handleCreatePlan = () => {
-    const newPlan = createPlan(selectedDayCount, new Date());
+  const handleCreatePlan = async () => {
+    const newPlan = await createPlan(selectedDayCount, new Date());
     navigate(`/plan/${newPlan.id}`, { replace: true });
     setIsCreatingPlan(false);
   };
@@ -339,7 +339,7 @@ export function PlanPage() {
             onClick={() => navigate('/plan')}
           >
             <span className="flex items-center justify-center gap-2">
-              <span>➕</span>
+              <Plus size={18} strokeWidth={2} />
               <span>Create New Plan</span>
             </span>
           </Button>

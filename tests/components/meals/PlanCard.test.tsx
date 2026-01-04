@@ -55,11 +55,13 @@ describe('PlanCard', () => {
       expect(screen.getByText('This Week')).toBeInTheDocument();
     });
 
-    it('renders the calendar emoji', () => {
+    it('renders the calendar icon', () => {
       const plan = createTestPlan();
-      render(<PlanCard plan={plan} />);
+      const { container } = render(<PlanCard plan={plan} />);
 
-      expect(screen.getByText('📅')).toBeInTheDocument();
+      // Calendar is now a Lucide icon (SVG) instead of an emoji
+      const calendarIcon = container.querySelector('svg.lucide-calendar');
+      expect(calendarIcon).toBeInTheDocument();
     });
 
     it('renders the date range', () => {
@@ -226,9 +228,10 @@ describe('PlanCard', () => {
       const plan = createTestPlan();
       const { container } = render(<PlanCard plan={plan} />);
 
-      // Should only have the calendar emoji, no navigation arrow
+      // Should only have the calendar icon, no navigation arrow (ChevronRight)
+      // Calendar icon is present, but ChevronRight should not be
       const svgs = container.querySelectorAll('svg');
-      expect(svgs.length).toBe(0);
+      expect(svgs.length).toBe(1); // Just the Calendar icon
     });
   });
 

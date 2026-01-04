@@ -2,11 +2,31 @@
  * useExport Hook Tests
  *
  * Tests for the export/import functionality hook.
+ * Tests are focused on LOCAL MODE (no household) since that's
+ * the primary test case and doesn't require sync service mocking.
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useExport } from '@/hooks/useExport';
+
+// Mock the auth context to return unauthenticated state (local mode)
+vi.mock('@/components/auth', () => ({
+  useAuthContext: () => ({
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+  }),
+}));
+
+// Mock useHousehold to return no household (local mode)
+vi.mock('@/hooks/useHousehold', () => ({
+  useHousehold: () => ({
+    currentHousehold: null,
+    households: [],
+    isLoading: false,
+  }),
+}));
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -80,14 +100,24 @@ describe('useExport Hook', () => {
       const { result } = renderHook(() => useExport());
       expect(result.current.isImporting).toBe(false);
     });
+
+    it('starts with isExporting false', () => {
+      const { result } = renderHook(() => useExport());
+      expect(result.current.isExporting).toBe(false);
+    });
+
+    it('reports isSyncedMode as false in local mode', () => {
+      const { result } = renderHook(() => useExport());
+      expect(result.current.isSyncedMode).toBe(false);
+    });
   });
 
   describe('exportToFile', () => {
-    it('creates a downloadable file', () => {
+    it('creates a downloadable file', async () => {
       const { result } = renderHook(() => useExport());
 
-      act(() => {
-        result.current.exportToFile();
+      await act(async () => {
+        await result.current.exportToFile();
       });
 
       expect(mockCreateObjectURL).toHaveBeenCalled();
@@ -95,17 +125,17 @@ describe('useExport Hook', () => {
       expect(mockRevokeObjectURL).toHaveBeenCalled();
     });
 
-    it('uses correct filename format with date', () => {
+    it('uses correct filename format with date', async () => {
       const { result } = renderHook(() => useExport());
 
-      act(() => {
-        result.current.exportToFile();
+      await act(async () => {
+        await result.current.exportToFile();
       });
 
       expect(mockLink?.download).toMatch(/^dishcourse-export-\d{4}-\d{2}-\d{2}\.json$/);
     });
 
-    it('includes dishes and plans in export', () => {
+    it('includes dishes and plans in export', async () => {
       // Set up some data
       localStorageMock.setItem(
         'dishcourse_dishes',
@@ -122,8 +152,8 @@ describe('useExport Hook', () => {
 
       const { result } = renderHook(() => useExport());
 
-      act(() => {
-        result.current.exportToFile();
+      await act(async () => {
+        await result.current.exportToFile();
       });
 
       // Verify Blob was created with correct data
@@ -131,16 +161,25 @@ describe('useExport Hook', () => {
       expect(blobCall.type).toBe('application/json');
     });
 
-    it('clears previous error on export', () => {
+    it('clears previous error on export', async () => {
       const { result } = renderHook(() => useExport());
 
-      // Manually set an error for testing
-      act(() => {
-        // Trigger an export that will clear any existing error
-        result.current.exportToFile();
+      // Trigger an export that will clear any existing error
+      await act(async () => {
+        await result.current.exportToFile();
       });
 
       expect(result.current.error).toBeNull();
+    });
+
+    it('sets isExporting to false after completion', async () => {
+      const { result } = renderHook(() => useExport());
+
+      await act(async () => {
+        await result.current.exportToFile();
+      });
+
+      expect(result.current.isExporting).toBe(false);
     });
   });
 
@@ -333,4 +372,3 @@ describe('useExport Hook', () => {
     });
   });
 });
-

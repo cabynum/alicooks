@@ -1,15 +1,17 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: 1.0.0 → 1.1.0
-Amendment: Added mandatory markdown linting to Documentation quality standards
-  - New rule: All markdown files MUST pass linting before merge
-  - Enforcement: .cursor/rules/markdown-linting.mdc created
+Version change: 1.1.0 → 1.2.0
+Amendment: Added Visual Standards section prohibiting Unicode emojis
+  - New rule: Standard Unicode emojis MUST NOT be used in app UI
+  - All icons MUST come from Lucide React or custom SVG assets
+  - Enforcement: .cursor/rules/no-emojis.mdc created
 Templates reviewed:
   ✅ No template updates required
 Follow-up TODOs: None
 
 Previous versions:
+  - 1.1.0 (2024-12-15): Added markdown linting requirement
   - 1.0.0 (2024-12-15): Initial ratification with 5 core principles
 -->
 
@@ -75,6 +77,12 @@ but these boundaries keep the initial build focused.
 
 ## Quality Standards
 
+### Visual Standards
+
+- Standard Unicode emojis MUST NOT be used in the app UI
+- All icons MUST come from Lucide React or custom SVG assets
+- This ensures a consistent, professional appearance across platforms
+
 ### Code Quality
 
 - All code MUST be tested before merge
@@ -112,4 +120,4 @@ All implementation decisions MUST align with these principles.
 - Complexity MUST be justified against Principle II (Delight Over Features)
 - Performance optimizations MUST be justified against Quality Standards (clarity over efficiency)
 
-**Version**: 1.1.0 | **Ratified**: 2024-12-15 | **Last Amended**: 2024-12-15
+**Version**: 1.2.0 | **Ratified**: 2024-12-15 | **Last Amended**: 2026-01-04

@@ -40,5 +40,11 @@ export interface ExportData {
 
   /** All user meal plans */
   plans: import('./plan').MealPlan[];
+
+  /** Household info (synced mode only) */
+  household?: {
+    id: string;
+    name: string;
+  };
 }
 

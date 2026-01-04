@@ -1,0 +1,52 @@
+---
+description: No Unicode emojis in DishCourse UI
+globs: ["src/**/*.tsx", "src/**/*.ts"]
+alwaysApply: true
+---
+
+# No Unicode Emojis in UI
+
+Per the DishCourse Constitution (v1.2.0), standard Unicode emojis MUST NOT be used in the app UI.
+
+## Rule
+
+- ❌ Do NOT use Unicode emojis like 📅, ➕, ✅, 🍽️, etc.
+- ✅ DO use Lucide React icons (already installed)
+- ✅ DO use custom SVG assets when Lucide doesn't have what you need
+
+## Why
+
+Standard emojis render differently across platforms (iOS, Android, Windows, macOS) and can look unprofessional or inconsistent. Lucide icons provide a consistent, polished appearance.
+
+## Examples
+
+**Bad:**
+```tsx
+<span>📅</span>
+<button>➕ Add</button>
+```
+
+**Good:**
+```tsx
+import { Calendar, Plus } from 'lucide-react';
+
+<Calendar size={16} />
+<button><Plus size={16} /> Add</button>
+```
+
+## Common Replacements
+
+| Emoji | Lucide Icon |
+|-------|-------------|
+| 📅 🗓 | `Calendar` |
+| ➕ | `Plus` |
+| ✅ | `Check` |
+| ❌ | `X` |
+| 🍽️ | Use custom mascot or `Utensils` |
+| ⚙️ | `Settings` |
+| 🏠 | `Home` |
+| 👤 | `User` |
+
+## Exception
+
+The dev-only test user switcher section (marked with 🧪) is acceptable since it's not user-facing in production.

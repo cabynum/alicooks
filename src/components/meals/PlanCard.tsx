@@ -5,6 +5,7 @@
  * Designed for mobile with 44px minimum touch targets.
  */
 
+import { Calendar } from 'lucide-react';
 import type { MealPlan } from '@/types';
 
 export interface PlanCardProps {
@@ -101,9 +102,12 @@ export function PlanCard({
       <div className="min-w-0 flex-1">
         {/* Plan name with current badge */}
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-2xl" role="img" aria-hidden="true">
-            📅
-          </span>
+          <Calendar
+            size={24}
+            strokeWidth={2}
+            className="text-amber-500 shrink-0"
+            aria-hidden="true"
+          />
           <span className="font-medium text-stone-800 truncate">
             {plan.name}
           </span>

@@ -57,9 +57,11 @@ describe('DaySlot', () => {
       expect(screen.getByText('Tap to add dishes')).toBeInTheDocument();
     });
 
-    it('includes plate emoji in empty state', () => {
-      render(<DaySlot {...defaultProps} dishes={[]} />);
-      expect(screen.getByText('🍽️')).toBeInTheDocument();
+    it('includes utensils icon in empty state', () => {
+      const { container } = render(<DaySlot {...defaultProps} dishes={[]} />);
+      // Utensils is now a Lucide icon (SVG) instead of an emoji
+      const utensilsIcon = container.querySelector('svg.lucide-utensils');
+      expect(utensilsIcon).toBeInTheDocument();
     });
   });
 

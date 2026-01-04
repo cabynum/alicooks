@@ -46,17 +46,22 @@ Before we end, please:
 
 ### Completed This Session
 
-- ✅ **Manual E2E sync test completed successfully**:
-  - Two test users (test@dishcourse.local, test2@dishcourse.local) in "Test Family"
-  - Dishes sync to Supabase and appear for other users
-  - Real-time updates now work without page refresh
-- ✅ **Fixed real-time sync bug** — `onDataChange()` was using a single callback variable:
-  - Changed from single `dataChangeCallback` to `Set<DataChangeCallback>`
-  - Now supports multiple subscribers (multiple `useDishes` hook instances)
-- ✅ **Enabled Supabase Realtime replication** for `dishes` and `meal_plans` tables:
-  - Created migration `007_enable_realtime.sql`
-  - Added tables to `supabase_realtime` publication
-  - WebSocket events now broadcast on INSERT/UPDATE/DELETE
+- ✅ **Meal plan sync working** — Verified meal plans sync between household members:
+  - Test User 1 creates meal plan → Test User 2 sees it on their home page
+  - Real-time sync for meal plans confirmed working
+- ✅ **Updated `usePlans` hook** to be sync-aware (Task 3.8):
+  - Routes to sync service in synced mode, localStorage in local mode
+  - Subscribes to `onDataChange` for real-time updates
+  - All 26 usePlans tests passing
+- ✅ **Updated `useExport` hook** to be sync-aware (Task 3.6):
+  - Exports from IndexedDB cache in synced mode
+  - Imports to IndexedDB with sync in synced mode
+  - Added `isExporting` and `isSyncedMode` to return type
+  - All 17 useExport tests passing
+- ✅ **Updated types** for sync compatibility:
+  - `MealPlan` now includes optional sync fields (householdId, createdBy, etc.)
+  - `ExportData` now includes optional household info
+- ✅ **Fixed `PlanPage` for async `createPlan`** — Navigation now works correctly
 
 ### Phase Summary
 
@@ -91,8 +96,8 @@ Core features:
 | **Auth Service** | 23 |
 | useDishes Hook | 15 |
 | useSuggestion Hook | 17 |
-| usePlans Hook | 25 |
-| useExport Hook | 14 |
+| usePlans Hook | 26 |
+| useExport Hook | 17 |
 | **useAuth Hook** | 17 |
 | Button | 26 |
 | Input | 22 |
@@ -118,14 +123,14 @@ Core features:
 | HomePage | 26 |
 | App | 2 |
 | Local DB (Dexie) | 12 |
-| **Total** | **694** |
+| **Total** | **698** |
 
 ### Recommended Next Steps
 
 1. **Implement offline queue** (Task 3.3) — Queue writes when offline, process on reconnect
-2. **Update StorageService** (Task 3.6) — Migrate local-only storage to use sync service
-3. **Implement conflict detection** (Task 3.9) — Detect concurrent edits during sync
-4. **Test meal plan sync** — Verify meal plans also sync in real-time between users
+2. **Implement conflict detection** (Task 3.9) — Detect concurrent edits during sync
+3. **Build ConflictResolver component** (Task 3.10) — UI for resolving sync conflicts
+4. **Start Phase 4: Collaborative Planning** — Implement plan locking for multi-user editing
 
 ### Key Files
 
@@ -150,13 +155,14 @@ Core features:
 
 ### Open Decisions
 
-- **Collaboration feature**: Phase 1 & 2 complete, Phase 3 (Sync Infrastructure) core working
-  - ✅ Tasks 3.1, 3.2, 3.4, 3.5, 3.7 verified working (sync service, real-time, hooks, UI)
-  - ✅ Real-time dish sync confirmed working via manual E2E test
-  - Remaining: 3.3 (offline queue), 3.6 (StorageService update), 3.8-3.10 (plans, conflicts)
+- **Collaboration feature**: Phase 1 & 2 complete, Phase 3 (Sync Infrastructure) nearly complete
+  - ✅ Tasks 3.1, 3.2, 3.4, 3.5, 3.6, 3.7, 3.8 verified working
+  - ✅ Real-time sync for both dishes AND meal plans confirmed working
+  - ✅ Export/import works in both local and synced modes
+  - Remaining: 3.3 (offline queue), 3.9-3.10 (conflict detection/resolution)
   - Two test users ready: `test@dishcourse.local`, `test2@dishcourse.local` in "Test Family"
 - **User experience**: Zero-friction start implemented — auth only required for collaboration
-- **Sync approach**: All household dishes sync automatically (decided)
+- **Sync approach**: All household dishes and plans sync automatically (decided)
 - **Testing limitation**: Browser automation can't properly interact with React controlled inputs
   - Manual browser testing required for full end-to-end verification
 

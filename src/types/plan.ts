@@ -64,6 +64,23 @@ export interface MealPlan {
 
   /** ISO 8601 timestamp when the plan was last modified */
   updatedAt: string;
+
+  // --- Sync/collaboration fields (only present in synced mode) ---
+
+  /** Household this plan belongs to (synced mode only) */
+  householdId?: string;
+
+  /** User ID of who created this plan (synced mode only) */
+  createdBy?: string;
+
+  /** User ID who has this plan locked for editing (synced mode only) */
+  lockedBy?: string;
+
+  /** ISO 8601 timestamp when the plan was locked (synced mode only) */
+  lockedAt?: string;
+
+  /** Soft delete timestamp (synced mode only) */
+  deletedAt?: string;
 }
 
 /**

@@ -5,6 +5,7 @@
  * Designed for mobile with clear tap targets and visual hierarchy.
  */
 
+import { Utensils } from 'lucide-react';
 import type { Dish } from '@/types';
 
 export interface DaySlotProps {
@@ -150,9 +151,7 @@ export function DaySlot({
         </div>
       ) : (
         <div className="flex items-center gap-2">
-          <span className="text-2xl opacity-30" role="img" aria-hidden="true">
-            🍽️
-          </span>
+          <Utensils size={24} className="text-stone-300" aria-hidden="true" />
           <span className="text-sm text-stone-500 italic">
             Tap to add dishes
           </span>

@@ -2,12 +2,32 @@
  * usePlans Hook Tests
  *
  * Tests the React hook for managing meal plans.
+ * Tests are focused on LOCAL MODE (no household) since that's
+ * the primary use case and doesn't require Supabase mocking.
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { usePlans } from '@/hooks/usePlans';
 import { STORAGE_KEYS } from '@/types';
+
+// Mock the auth context to return unauthenticated state (local mode)
+vi.mock('@/components/auth', () => ({
+  useAuthContext: () => ({
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+  }),
+}));
+
+// Mock useHousehold to return no household (local mode)
+vi.mock('@/hooks/useHousehold', () => ({
+  useHousehold: () => ({
+    currentHousehold: null,
+    households: [],
+    isLoading: false,
+  }),
+}));
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -86,6 +106,16 @@ describe('usePlans', () => {
 
       expect(result.current.plans).toEqual([]);
     });
+
+    it('reports isSyncedMode as false in local mode', async () => {
+      const { result } = renderHook(() => usePlans());
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.isSyncedMode).toBe(false);
+    });
   });
 
   describe('createPlan', () => {
@@ -97,8 +127,8 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan();
+      await act(async () => {
+        plan = await result.current.createPlan();
       });
 
       expect(plan).toBeDefined();
@@ -114,8 +144,8 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(3);
+      await act(async () => {
+        plan = await result.current.createPlan(3);
       });
 
       expect(plan.days).toHaveLength(3);
@@ -130,8 +160,8 @@ describe('usePlans', () => {
 
       const startDate = new Date('2024-12-25');
       let plan;
-      act(() => {
-        plan = result.current.createPlan(3, startDate);
+      await act(async () => {
+        plan = await result.current.createPlan(3, startDate);
       });
 
       expect(plan.startDate).toBe('2024-12-25');
@@ -148,8 +178,8 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(7, new Date(), 'Holiday Week');
+      await act(async () => {
+        plan = await result.current.createPlan(7, new Date(), 'Holiday Week');
       });
 
       expect(plan.name).toBe('Holiday Week');
@@ -163,8 +193,8 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan();
+      await act(async () => {
+        plan = await result.current.createPlan();
       });
 
       expect(plan.name).toBe('Meal Plan');
@@ -177,8 +207,8 @@ describe('usePlans', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      act(() => {
-        result.current.createPlan(7, new Date(), 'Persisted Plan');
+      await act(async () => {
+        await result.current.createPlan(7, new Date(), 'Persisted Plan');
       });
 
       const stored = JSON.parse(
@@ -198,12 +228,12 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(7, new Date(), 'Original');
+      await act(async () => {
+        plan = await result.current.createPlan(7, new Date(), 'Original');
       });
 
-      act(() => {
-        result.current.updatePlan(plan.id, { name: 'Updated' });
+      await act(async () => {
+        await result.current.updatePlan(plan.id, { name: 'Updated' });
       });
 
       expect(result.current.plans[0].name).toBe('Updated');
@@ -217,8 +247,8 @@ describe('usePlans', () => {
       });
 
       let updated;
-      act(() => {
-        updated = result.current.updatePlan('nonexistent', { name: 'Test' });
+      await act(async () => {
+        updated = await result.current.updatePlan('nonexistent', { name: 'Test' });
       });
 
       expect(updated).toBeUndefined();
@@ -234,14 +264,14 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan();
+      await act(async () => {
+        plan = await result.current.createPlan();
       });
 
       expect(result.current.plans).toHaveLength(1);
 
-      act(() => {
-        result.current.deletePlan(plan.id);
+      await act(async () => {
+        await result.current.deletePlan(plan.id);
       });
 
       expect(result.current.plans).toHaveLength(0);
@@ -255,13 +285,13 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan();
+      await act(async () => {
+        plan = await result.current.createPlan();
       });
 
       let success;
-      act(() => {
-        success = result.current.deletePlan(plan.id);
+      await act(async () => {
+        success = await result.current.deletePlan(plan.id);
       });
 
       expect(success).toBe(true);
@@ -275,8 +305,8 @@ describe('usePlans', () => {
       });
 
       let success;
-      act(() => {
-        success = result.current.deletePlan('nonexistent');
+      await act(async () => {
+        success = await result.current.deletePlan('nonexistent');
       });
 
       expect(success).toBe(false);
@@ -292,8 +322,8 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(7, new Date(), 'Find Me');
+      await act(async () => {
+        plan = await result.current.createPlan(7, new Date(), 'Find Me');
       });
 
       const found = result.current.getPlanById(plan.id);
@@ -321,13 +351,13 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(3, new Date('2024-12-16'));
+      await act(async () => {
+        plan = await result.current.createPlan(3, new Date('2024-12-16'));
       });
 
       let success;
-      act(() => {
-        success = result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
+      await act(async () => {
+        success = await result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
       });
 
       expect(success).toBe(true);
@@ -342,13 +372,16 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(3, new Date('2024-12-16'));
+      await act(async () => {
+        plan = await result.current.createPlan(3, new Date('2024-12-16'));
       });
 
-      act(() => {
-        result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
-        result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-2');
+      await act(async () => {
+        await result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
+      });
+
+      await act(async () => {
+        await result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-2');
       });
 
       expect(result.current.plans[0].days[0].dishIds).toHaveLength(2);
@@ -364,8 +397,8 @@ describe('usePlans', () => {
       });
 
       let success;
-      act(() => {
-        success = result.current.assignDishToDay('nonexistent', '2024-12-16', 'dish-1');
+      await act(async () => {
+        success = await result.current.assignDishToDay('nonexistent', '2024-12-16', 'dish-1');
       });
 
       expect(success).toBe(false);
@@ -379,13 +412,13 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(3, new Date('2024-12-16'));
+      await act(async () => {
+        plan = await result.current.createPlan(3, new Date('2024-12-16'));
       });
 
       let success;
-      act(() => {
-        success = result.current.assignDishToDay(plan.id, '2024-12-25', 'dish-1');
+      await act(async () => {
+        success = await result.current.assignDishToDay(plan.id, '2024-12-25', 'dish-1');
       });
 
       expect(success).toBe(false);
@@ -401,19 +434,19 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(3, new Date('2024-12-16'));
+      await act(async () => {
+        plan = await result.current.createPlan(3, new Date('2024-12-16'));
       });
 
-      act(() => {
-        result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
+      await act(async () => {
+        await result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
       });
 
       expect(result.current.plans[0].days[0].dishIds).toContain('dish-1');
 
       let success;
-      act(() => {
-        success = result.current.removeDishFromDay(plan.id, '2024-12-16', 'dish-1');
+      await act(async () => {
+        success = await result.current.removeDishFromDay(plan.id, '2024-12-16', 'dish-1');
       });
 
       expect(success).toBe(true);
@@ -428,20 +461,23 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(3, new Date('2024-12-16'));
+      await act(async () => {
+        plan = await result.current.createPlan(3, new Date('2024-12-16'));
       });
 
       // Add same dish twice
-      act(() => {
-        result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
-        result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
+      await act(async () => {
+        await result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
+      });
+
+      await act(async () => {
+        await result.current.assignDishToDay(plan.id, '2024-12-16', 'dish-1');
       });
 
       expect(result.current.plans[0].days[0].dishIds).toHaveLength(2);
 
-      act(() => {
-        result.current.removeDishFromDay(plan.id, '2024-12-16', 'dish-1');
+      await act(async () => {
+        await result.current.removeDishFromDay(plan.id, '2024-12-16', 'dish-1');
       });
 
       // Should still have one occurrence
@@ -457,8 +493,8 @@ describe('usePlans', () => {
       });
 
       let success;
-      act(() => {
-        success = result.current.removeDishFromDay('nonexistent', '2024-12-16', 'dish-1');
+      await act(async () => {
+        success = await result.current.removeDishFromDay('nonexistent', '2024-12-16', 'dish-1');
       });
 
       expect(success).toBe(false);
@@ -472,13 +508,13 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(3, new Date('2024-12-16'));
+      await act(async () => {
+        plan = await result.current.createPlan(3, new Date('2024-12-16'));
       });
 
       let success;
-      act(() => {
-        success = result.current.removeDishFromDay(plan.id, '2024-12-25', 'dish-1');
+      await act(async () => {
+        success = await result.current.removeDishFromDay(plan.id, '2024-12-25', 'dish-1');
       });
 
       expect(success).toBe(false);
@@ -492,17 +528,16 @@ describe('usePlans', () => {
       });
 
       let plan;
-      act(() => {
-        plan = result.current.createPlan(3, new Date('2024-12-16'));
+      await act(async () => {
+        plan = await result.current.createPlan(3, new Date('2024-12-16'));
       });
 
       let success;
-      act(() => {
-        success = result.current.removeDishFromDay(plan.id, '2024-12-16', 'dish-1');
+      await act(async () => {
+        success = await result.current.removeDishFromDay(plan.id, '2024-12-16', 'dish-1');
       });
 
       expect(success).toBe(false);
     });
   });
 });
-

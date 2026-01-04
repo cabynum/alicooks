@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { Utensils, RefreshCw } from 'lucide-react';
 import type { MealSuggestion } from '@/types';
 import { Button } from '../ui';
 
@@ -99,9 +100,7 @@ export function SuggestionCard({
           <div className="text-center mb-6">
             {/* Decorative plate icon with gentle pulse */}
             <div className="inline-flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 shadow-lg shadow-amber-400/30 animate-gentle-pulse">
-              <span className="text-3xl" role="img" aria-hidden="true">
-                🍽️
-              </span>
+              <Utensils size={28} className="text-white" aria-hidden="true" />
             </div>
 
             {/* Entree name */}
@@ -169,7 +168,7 @@ export function SuggestionCard({
                 onClick={onTryAnother}
               >
                 <span className="flex items-center justify-center gap-2">
-                  <span role="img" aria-hidden="true">🔄</span>
+                  <RefreshCw size={18} aria-hidden="true" />
                   Try Another
                 </span>
               </Button>
