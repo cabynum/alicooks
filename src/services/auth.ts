@@ -235,3 +235,45 @@ export async function refreshSession(): Promise<void> {
     throw new Error('Unable to refresh session. Please sign in again.');
   }
 }
+
+/**
+ * Development-only auto-login for testing.
+ *
+ * Automatically signs in with the test user credentials from environment
+ * variables. This makes testing authenticated features much easier during
+ * development — no need to go through the magic link flow every time.
+ *
+ * Only works in development mode (import.meta.env.DEV === true).
+ * Requires VITE_DEV_TEST_EMAIL and VITE_DEV_TEST_PASSWORD in .env.local.
+ *
+ * @returns The authenticated user, or null if auto-login is not configured
+ */
+export async function devAutoLogin(): Promise<User | null> {
+  // Only run in development mode
+  if (!import.meta.env.DEV) {
+    return null;
+  }
+
+  const testEmail = import.meta.env.VITE_DEV_TEST_EMAIL;
+  const testPassword = import.meta.env.VITE_DEV_TEST_PASSWORD;
+
+  // Skip if test credentials are not configured
+  if (!testEmail || !testPassword) {
+    return null;
+  }
+
+  console.log('🧪 Dev auto-login: Signing in as', testEmail);
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: testEmail,
+    password: testPassword,
+  });
+
+  if (error) {
+    console.error('🧪 Dev auto-login failed:', error.message);
+    return null;
+  }
+
+  console.log('🧪 Dev auto-login successful!');
+  return data.user;
+}

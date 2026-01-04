@@ -34,6 +34,7 @@ import {
   signOut as authSignOut,
   updateProfile as authUpdateProfile,
   onAuthStateChange,
+  devAutoLogin,
 } from '@/services';
 
 /**
@@ -87,7 +88,12 @@ export function useAuth(): UseAuthReturn {
     // Fetch initial user and profile
     async function initAuth() {
       try {
-        const currentUser = await getCurrentUser();
+        let currentUser = await getCurrentUser();
+
+        // In development, auto-login with test user if not authenticated
+        if (!currentUser && import.meta.env.DEV) {
+          currentUser = await devAutoLogin();
+        }
 
         if (!isMounted) return;
 

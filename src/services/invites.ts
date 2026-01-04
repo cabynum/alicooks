@@ -286,9 +286,10 @@ export async function getActiveInvite(householdId: string): Promise<Invite | nul
     .gt('expires_at', now)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (error || !data) {
+    // No active invite exists - this is expected for new households
     return null;
   }
 

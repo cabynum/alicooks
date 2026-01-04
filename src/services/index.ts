@@ -37,6 +37,7 @@ export {
   updateProfile,
   onAuthStateChange,
   refreshSession,
+  devAutoLogin,
 } from './auth';
 
 // Household service for household management
