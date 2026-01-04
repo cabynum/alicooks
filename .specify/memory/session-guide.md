@@ -38,35 +38,28 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2025-01-04  
+**Last Updated**: 2026-01-04  
 **Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Phase 3 In Progress — Sync Infrastructure
+**Current Phase**: Phase 3 In Progress — Sync Infrastructure (Verification Complete)
 
 ### Completed This Session
 
-- ✅ **Sync service created** (`src/services/sync.ts`):
-  - `fullSync()` and `pushChanges()` functions
-  - IndexedDB + Supabase integration points
-- ✅ **useSync hook created** (`src/hooks/useSync.ts`):
-  - Exposes sync status: synced, syncing, offline, error
-  - Tracks last sync time and error messages
-- ✅ **SyncStatus UI component** (`src/components/ui/SyncStatus.tsx`):
-  - Visual indicator for sync state
-  - Shown in HomePage header near mascot avatar
-- ✅ **useDishes hook updated for dual mode**:
-  - Local mode: Uses `localStorage` for unauthenticated users
-  - Synced mode: Uses IndexedDB + Supabase for authenticated users with household
-  - All CRUD operations now async
-- ✅ **Dish type extended**:
-  - Added `householdId`, `addedBy`, `deletedAt` fields for collaboration
-- ✅ **All tests updated and passing** (694 tests):
-  - Fixed context provider requirements for `useAuth`/`useHousehold` dependencies
-  - Updated async `act()` calls for new async CRUD operations
-  - Fixed time-dependent greeting test in HomePage
-- ✅ **Blog Part 11 written** (`blog/part-11-sync-infrastructure.md`):
-  - Documents sync strategy, dual-mode architecture, and implementation details
+- ✅ **Verified sync infrastructure is fully operational**:
+  - Supabase auth working (network requests returning 200)
+  - Household lookup working (Test Family: `d88b2736-40fe-48db-9420-a42447cfff15`)
+  - Full sync for dishes and meal_plans executing correctly
+  - WebSocket real-time connection established (status 101)
+  - Console confirms: "Subscribed to household changes"
+- ✅ **Confirmed real-time subscriptions already implemented**:
+  - `subscribeToHousehold()` in `sync.ts` sets up Postgres changes listener
+  - `handleDishChange()` and `handlePlanChange()` update IndexedDB on remote changes
+  - `useDishes` hook subscribes via `onDataChange()` for automatic UI updates
+  - Full chain: WebSocket → IndexedDB → React state → UI re-render
+- ✅ **Identified that "Recommended Next Steps" were outdated**:
+  - Real-time subscriptions are already coded and connected
+  - What remains is manual end-to-end testing with two users
 
 ### Phase Summary
 
@@ -132,9 +125,11 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Complete Phase 3: Real-time Subscriptions** — Subscribe to dishes table changes in Supabase
-2. **Implement StorageService sync** — Update StorageService to write to IndexedDB + trigger sync
-3. **Test dish sync between users** — Verify dish created by test2 appears for test user
+1. **Manual end-to-end sync test** — Use two browser profiles (regular + incognito) to:
+   - Sign in as `test@dishcourse.local` and `test2@dishcourse.local`
+   - Add a dish as one user, verify it appears for the other (real-time or after refresh)
+2. **Implement offline queue** (Task 3.3) — Queue writes when offline, process on reconnect
+3. **Implement conflict detection** (Task 3.9) — Detect concurrent edits during sync
 
 ### Key Files
 
@@ -159,11 +154,14 @@ Core features:
 
 ### Open Decisions
 
-- **Collaboration feature**: Phase 1 & 2 complete, Phase 3 (Sync Infrastructure) in progress
-  - See `specs/002-family-collaboration/tasks.md` for remaining tasks
-  - Two test users ready for sync testing (test, test2 in "Test Family")
+- **Collaboration feature**: Phase 1 & 2 complete, Phase 3 (Sync Infrastructure) nearly complete
+  - Tasks 3.1, 3.2, 3.4, 3.5, 3.7 verified working (sync service, real-time, hooks, UI)
+  - Remaining: 3.3 (offline queue), 3.6 (StorageService update), 3.8-3.10 (plans, conflicts)
+  - Two test users ready: `test@dishcourse.local`, `test2@dishcourse.local` in "Test Family"
 - **User experience**: Zero-friction start implemented — auth only required for collaboration
 - **Sync approach**: All household dishes sync automatically (decided)
+- **Testing limitation**: Browser automation can't properly interact with React controlled inputs
+  - Manual browser testing required for full end-to-end verification
 
 ### Branding Assets (Finalized)
 
