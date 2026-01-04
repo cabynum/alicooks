@@ -42,26 +42,17 @@ Before we end, please:
 **Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Phase 3 In Progress — Sync Infrastructure (Real-time Working!)
+**Current Phase**: Phase 3 In Progress — Sync Infrastructure (Offline Queue Complete!)
 
 ### Completed This Session
 
-- ✅ **Meal plan sync working** — Verified meal plans sync between household members:
-  - Test User 1 creates meal plan → Test User 2 sees it on their home page
-  - Real-time sync for meal plans confirmed working
-- ✅ **Updated `usePlans` hook** to be sync-aware (Task 3.8):
-  - Routes to sync service in synced mode, localStorage in local mode
-  - Subscribes to `onDataChange` for real-time updates
-  - All 26 usePlans tests passing
-- ✅ **Updated `useExport` hook** to be sync-aware (Task 3.6):
-  - Exports from IndexedDB cache in synced mode
-  - Imports to IndexedDB with sync in synced mode
-  - Added `isExporting` and `isSyncedMode` to return type
-  - All 17 useExport tests passing
-- ✅ **Updated types** for sync compatibility:
-  - `MealPlan` now includes optional sync fields (householdId, createdBy, etc.)
-  - `ExportData` now includes optional household info
-- ✅ **Fixed `PlanPage` for async `createPlan`** — Navigation now works correctly
+- ✅ **Implemented Offline Queue (Task 3.3)** — Queue writes when offline, process on reconnect:
+  - Added `offlineQueue` table to IndexedDB (Dexie v2 migration)
+  - Implemented intelligent deduplication (add+delete cancels, update+delete keeps delete)
+  - Queue operations processed in FIFO order with retry logic
+  - `MAX_QUEUE_RETRIES` (5) prevents infinite retry loops
+  - All write operations now queue when offline, sync when back online
+  - Added 17 new tests for queue operations (now 715 total tests)
 
 ### Phase Summary
 
@@ -122,15 +113,14 @@ Core features:
 | DayAssignmentPage | 22 |
 | HomePage | 26 |
 | App | 2 |
-| Local DB (Dexie) | 12 |
-| **Total** | **698** |
+| Local DB (Dexie) | 29 |
+| **Total** | **715** |
 
 ### Recommended Next Steps
 
-1. **Implement offline queue** (Task 3.3) — Queue writes when offline, process on reconnect
-2. **Implement conflict detection** (Task 3.9) — Detect concurrent edits during sync
-3. **Build ConflictResolver component** (Task 3.10) — UI for resolving sync conflicts
-4. **Start Phase 4: Collaborative Planning** — Implement plan locking for multi-user editing
+1. **Implement conflict detection** (Task 3.9) — Detect concurrent edits during sync
+2. **Build ConflictResolver component** (Task 3.10) — UI for resolving sync conflicts
+3. **Start Phase 4: Collaborative Planning** — Implement plan locking for multi-user editing
 
 ### Key Files
 
@@ -156,10 +146,11 @@ Core features:
 ### Open Decisions
 
 - **Collaboration feature**: Phase 1 & 2 complete, Phase 3 (Sync Infrastructure) nearly complete
-  - ✅ Tasks 3.1, 3.2, 3.4, 3.5, 3.6, 3.7, 3.8 verified working
+  - ✅ Tasks 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8 verified working
   - ✅ Real-time sync for both dishes AND meal plans confirmed working
   - ✅ Export/import works in both local and synced modes
-  - Remaining: 3.3 (offline queue), 3.9-3.10 (conflict detection/resolution)
+  - ✅ Offline queue implemented with deduplication and retry logic
+  - Remaining: 3.9-3.10 (conflict detection/resolution)
   - Two test users ready: `test@dishcourse.local`, `test2@dishcourse.local` in "Test Family"
 - **User experience**: Zero-friction start implemented — auth only required for collaboration
 - **Sync approach**: All household dishes and plans sync automatically (decided)

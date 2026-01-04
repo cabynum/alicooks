@@ -78,6 +78,7 @@ export {
   // Sync operations
   fullSync,
   pushChanges,
+  processOfflineQueue,
   getLastSyncTime,
   // Real-time
   subscribeToHousehold,

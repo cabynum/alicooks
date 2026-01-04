@@ -20,10 +20,17 @@ import {
   markAsSynced,
   setSyncMeta,
   getSyncMeta,
+  enqueueOperation,
+  getQueuedOperations,
+  getQueuedOperationCount,
+  dequeueOperation,
+  markQueueAttempt,
+  MAX_QUEUE_RETRIES,
   type CachedDish,
   type CachedMealPlan,
   type Dish,
   type MealPlan,
+  type QueuedOperation,
 } from '@/lib/db';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
@@ -103,11 +110,13 @@ async function notifySyncState(state: SyncState): Promise<void> {
 
 /**
  * Get count of pending (unsynced) changes.
+ * Includes both items with pending sync status and queued operations.
  */
 export async function getPendingChangesCount(): Promise<number> {
   const pendingDishes = await getPendingItems(db.dishes);
   const pendingPlans = await getPendingItems(db.mealPlans);
-  return pendingDishes.length + pendingPlans.length;
+  const queuedOperations = await getQueuedOperationCount();
+  return pendingDishes.length + pendingPlans.length + queuedOperations;
 }
 
 // ============================================================================
@@ -248,6 +257,10 @@ export async function getLastSyncTime(householdId: string): Promise<string | nul
 /**
  * Push all pending local changes to Supabase.
  * Called automatically when coming back online, or can be called manually.
+ *
+ * This now processes both:
+ * 1. Items with pending sync status (legacy approach, still used for immediate syncs)
+ * 2. Queued operations (for offline changes)
  */
 export async function pushChanges(): Promise<SyncResult> {
   if (!isOnline) {
@@ -259,7 +272,11 @@ export async function pushChanges(): Promise<SyncResult> {
 
     let syncedCount = 0;
 
-    // Push pending dishes
+    // First, process the offline queue
+    const queueResult = await processOfflineQueue();
+    syncedCount += queueResult.syncedCount ?? 0;
+
+    // Then, push any items with pending status (for immediate syncs that didn't use the queue)
     const pendingDishes = await getPendingItems(db.dishes);
     for (const dish of pendingDishes) {
       const success = await pushDish(dish);
@@ -288,6 +305,104 @@ export async function pushChanges(): Promise<SyncResult> {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Push failed',
+    };
+  }
+}
+
+/**
+ * Process all operations in the offline queue.
+ * Operations are processed in FIFO order with retry logic.
+ */
+export async function processOfflineQueue(): Promise<SyncResult> {
+  if (!isOnline) {
+    return { success: false, error: 'No internet connection' };
+  }
+
+  const operations = await getQueuedOperations();
+
+  if (operations.length === 0) {
+    return { success: true, syncedCount: 0 };
+  }
+
+  let syncedCount = 0;
+  const errors: string[] = [];
+
+  for (const operation of operations) {
+    // Skip operations that have exceeded max retries
+    if (operation.retryCount >= MAX_QUEUE_RETRIES) {
+      console.warn(
+        `Skipping operation ${operation.id} - exceeded max retries (${MAX_QUEUE_RETRIES})`
+      );
+      continue;
+    }
+
+    const result = await processQueuedOperation(operation);
+
+    if (result.success) {
+      // Remove from queue on success
+      await dequeueOperation(operation.id);
+      syncedCount++;
+    } else {
+      // Record the attempt and error
+      await markQueueAttempt(operation.id, result.error);
+      if (result.error) {
+        errors.push(`${operation.entityType}:${operation.entityId} - ${result.error}`);
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    console.error('Some queue operations failed:', errors);
+  }
+
+  return {
+    success: errors.length === 0,
+    syncedCount,
+    error: errors.length > 0 ? `${errors.length} operations failed` : undefined,
+  };
+}
+
+/**
+ * Process a single queued operation.
+ */
+async function processQueuedOperation(
+  operation: QueuedOperation
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    switch (operation.entityType) {
+      case 'dish': {
+        const dish = await db.dishes.get(operation.entityId);
+        if (!dish) {
+          // Entity was deleted locally - nothing to sync
+          return { success: true };
+        }
+        const success = await pushDish(dish);
+        if (success) {
+          await markAsSynced(db.dishes, dish.id);
+        }
+        return { success };
+      }
+
+      case 'mealPlan': {
+        const plan = await db.mealPlans.get(operation.entityId);
+        if (!plan) {
+          // Entity was deleted locally - nothing to sync
+          return { success: true };
+        }
+        const success = await pushPlan(plan);
+        if (success) {
+          await markAsSynced(db.mealPlans, plan.id);
+        }
+        return { success };
+      }
+
+      default:
+        return { success: false, error: `Unknown entity type: ${operation.entityType}` };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -491,20 +606,25 @@ async function handlePlanChange(payload: {
 
 /**
  * Add a dish to local cache with pending status.
- * Will be synced to server in background.
+ * Will be synced to server in background, or queued for later if offline.
  */
 export async function addDishToCache(dish: Dish): Promise<void> {
   const cached = withSyncMetadata(dish, 'pending');
   await db.dishes.put(cached);
 
-  // Attempt to sync immediately if online
   if (isOnline) {
+    // Attempt to sync immediately
     pushChanges();
+  } else {
+    // Queue for later when back online
+    await enqueueOperation('add', 'dish', dish.id);
+    await notifySyncState('offline');
   }
 }
 
 /**
  * Update a dish in local cache.
+ * Will be synced to server in background, or queued for later if offline.
  */
 export async function updateDishInCache(dish: Dish): Promise<void> {
   const cached = withSyncMetadata(dish, 'pending');
@@ -512,11 +632,15 @@ export async function updateDishInCache(dish: Dish): Promise<void> {
 
   if (isOnline) {
     pushChanges();
+  } else {
+    await enqueueOperation('update', 'dish', dish.id);
+    await notifySyncState('offline');
   }
 }
 
 /**
  * Soft-delete a dish in local cache.
+ * Will be synced to server in background, or queued for later if offline.
  */
 export async function deleteDishFromCache(dishId: string): Promise<void> {
   const existing = await db.dishes.get(dishId);
@@ -531,6 +655,9 @@ export async function deleteDishFromCache(dishId: string): Promise<void> {
 
     if (isOnline) {
       pushChanges();
+    } else {
+      await enqueueOperation('delete', 'dish', dishId);
+      await notifySyncState('offline');
     }
   }
 }
@@ -552,6 +679,7 @@ export async function getDishesFromCache(householdId: string): Promise<Dish[]> {
 
 /**
  * Add a meal plan to local cache.
+ * Will be synced to server in background, or queued for later if offline.
  */
 export async function addPlanToCache(plan: MealPlan): Promise<void> {
   const cached = withSyncMetadata(plan, 'pending');
@@ -559,11 +687,15 @@ export async function addPlanToCache(plan: MealPlan): Promise<void> {
 
   if (isOnline) {
     pushChanges();
+  } else {
+    await enqueueOperation('add', 'mealPlan', plan.id);
+    await notifySyncState('offline');
   }
 }
 
 /**
  * Update a meal plan in local cache.
+ * Will be synced to server in background, or queued for later if offline.
  */
 export async function updatePlanInCache(plan: MealPlan): Promise<void> {
   const cached = withSyncMetadata(plan, 'pending');
@@ -571,11 +703,15 @@ export async function updatePlanInCache(plan: MealPlan): Promise<void> {
 
   if (isOnline) {
     pushChanges();
+  } else {
+    await enqueueOperation('update', 'mealPlan', plan.id);
+    await notifySyncState('offline');
   }
 }
 
 /**
  * Soft-delete a meal plan in local cache.
+ * Will be synced to server in background, or queued for later if offline.
  */
 export async function deletePlanFromCache(planId: string): Promise<void> {
   const existing = await db.mealPlans.get(planId);
@@ -590,6 +726,9 @@ export async function deletePlanFromCache(planId: string): Promise<void> {
 
     if (isOnline) {
       pushChanges();
+    } else {
+      await enqueueOperation('delete', 'mealPlan', planId);
+      await notifySyncState('offline');
     }
   }
 }

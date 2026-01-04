@@ -157,6 +157,43 @@ export interface SyncMeta {
 }
 
 // ============================================================================
+// OFFLINE QUEUE
+// ============================================================================
+
+/**
+ * Types of operations that can be queued for offline sync.
+ */
+export type QueuedOperationType = 'add' | 'update' | 'delete';
+
+/**
+ * Entity types that can be synced.
+ */
+export type QueuedEntityType = 'dish' | 'mealPlan';
+
+/**
+ * A queued operation waiting to be synced to the server.
+ * Operations are processed in FIFO order (by createdAt timestamp).
+ */
+export interface QueuedOperation {
+  /** Unique ID for this queue entry */
+  id: string;
+  /** Type of operation: add, update, or delete */
+  operationType: QueuedOperationType;
+  /** Type of entity: dish or mealPlan */
+  entityType: QueuedEntityType;
+  /** ID of the entity being operated on */
+  entityId: string;
+  /** When this operation was queued */
+  createdAt: string;
+  /** Number of times we've tried to process this operation */
+  retryCount: number;
+  /** Last error message if processing failed */
+  lastError?: string;
+  /** When we last attempted to process this */
+  lastAttemptAt?: string;
+}
+
+// ============================================================================
 // DATABASE SCHEMA
 // ============================================================================
 
@@ -173,12 +210,12 @@ class DishCourseDB extends Dexie {
   dishes!: Table<CachedDish>;
   mealPlans!: Table<CachedMealPlan>;
   syncMeta!: Table<SyncMeta>;
+  offlineQueue!: Table<QueuedOperation>;
 
   constructor() {
     super('dishcourse');
 
-    // Schema definition
-    // Only indexed fields are listed; all fields are still stored
+    // Version 1: Initial schema
     this.version(1).stores({
       profiles: 'id',
       households: 'id',
@@ -186,6 +223,17 @@ class DishCourseDB extends Dexie {
       dishes: 'id, householdId, _syncStatus',
       mealPlans: 'id, householdId, _syncStatus',
       syncMeta: 'key',
+    });
+
+    // Version 2: Add offline queue for reliable sync
+    this.version(2).stores({
+      profiles: 'id',
+      households: 'id',
+      members: 'id, householdId, userId',
+      dishes: 'id, householdId, _syncStatus',
+      mealPlans: 'id, householdId, _syncStatus',
+      syncMeta: 'key',
+      offlineQueue: 'id, entityType, entityId, createdAt',
     });
   }
 }
@@ -249,6 +297,7 @@ export async function clearAllData(): Promise<void> {
   await db.dishes.clear();
   await db.mealPlans.clear();
   await db.syncMeta.clear();
+  await db.offlineQueue.clear();
 }
 
 /**
@@ -265,3 +314,138 @@ export async function getSyncMeta<T>(key: string): Promise<T | undefined> {
 export async function setSyncMeta<T>(key: string, value: T): Promise<void> {
   await db.syncMeta.put({ key, value });
 }
+
+// ============================================================================
+// OFFLINE QUEUE FUNCTIONS
+// ============================================================================
+
+/**
+ * Generate a unique ID for queue entries.
+ */
+function generateQueueId(): string {
+  return `q_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
+ * Add an operation to the offline queue.
+ * Deduplicates by replacing existing operations for the same entity.
+ *
+ * @param operationType - The type of operation (add, update, delete)
+ * @param entityType - The type of entity (dish, mealPlan)
+ * @param entityId - The ID of the entity
+ */
+export async function enqueueOperation(
+  operationType: QueuedOperationType,
+  entityType: QueuedEntityType,
+  entityId: string
+): Promise<void> {
+  // Check for existing operations on this entity
+  const existing = await db.offlineQueue
+    .where('entityId')
+    .equals(entityId)
+    .first();
+
+  if (existing) {
+    // Merge operations intelligently:
+    // - add + update = add (still need to create it)
+    // - add + delete = remove from queue entirely (never existed on server)
+    // - update + update = update (just one update needed)
+    // - update + delete = delete (override the update)
+    // - delete + anything = keep delete (can't operate on deleted item)
+
+    if (existing.operationType === 'add' && operationType === 'delete') {
+      // Item was created and deleted locally before syncing - remove from queue
+      await db.offlineQueue.delete(existing.id);
+      return;
+    }
+
+    if (existing.operationType === 'delete') {
+      // Can't update or add a deleted item - keep the delete
+      return;
+    }
+
+    if (existing.operationType === 'add' && operationType === 'update') {
+      // Still an add - the add will include the updated data
+      return;
+    }
+
+    // For other cases (update+update, update+delete, add+add), replace with new operation
+    await db.offlineQueue.update(existing.id, {
+      operationType,
+      createdAt: new Date().toISOString(),
+      retryCount: 0,
+      lastError: undefined,
+      lastAttemptAt: undefined,
+    });
+    return;
+  }
+
+  // No existing operation, add new one
+  const queuedOperation: QueuedOperation = {
+    id: generateQueueId(),
+    operationType,
+    entityType,
+    entityId,
+    createdAt: new Date().toISOString(),
+    retryCount: 0,
+  };
+
+  await db.offlineQueue.add(queuedOperation);
+}
+
+/**
+ * Get all queued operations, ordered by creation time (FIFO).
+ */
+export async function getQueuedOperations(): Promise<QueuedOperation[]> {
+  return db.offlineQueue.orderBy('createdAt').toArray();
+}
+
+/**
+ * Get the count of queued operations.
+ */
+export async function getQueuedOperationCount(): Promise<number> {
+  return db.offlineQueue.count();
+}
+
+/**
+ * Mark a queued operation as attempted (increment retry count, record error).
+ */
+export async function markQueueAttempt(
+  operationId: string,
+  error?: string
+): Promise<void> {
+  const operation = await db.offlineQueue.get(operationId);
+  if (operation) {
+    await db.offlineQueue.update(operationId, {
+      retryCount: operation.retryCount + 1,
+      lastError: error,
+      lastAttemptAt: new Date().toISOString(),
+    });
+  }
+}
+
+/**
+ * Remove a queued operation (after successful sync).
+ */
+export async function dequeueOperation(operationId: string): Promise<void> {
+  await db.offlineQueue.delete(operationId);
+}
+
+/**
+ * Remove all queued operations for an entity (e.g., after full sync).
+ */
+export async function clearQueueForEntity(entityId: string): Promise<void> {
+  await db.offlineQueue.where('entityId').equals(entityId).delete();
+}
+
+/**
+ * Clear the entire offline queue.
+ */
+export async function clearOfflineQueue(): Promise<void> {
+  await db.offlineQueue.clear();
+}
+
+/**
+ * Maximum number of retries before an operation is considered failed.
+ */
+export const MAX_QUEUE_RETRIES = 5;
