@@ -38,32 +38,28 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2025-01-03  
+**Last Updated**: 2025-01-04  
 **Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Phase 2 Complete — Households Infrastructure Done
+**Current Phase**: Phase 2 Complete — Households Tested & Working
 
 ### Completed This Session
 
-- ✅ **Phase 1: Authentication** completed:
-  - Created `AuthService` with magic link authentication
-  - Created `useAuth` hook for React integration
-  - Built `MagicLinkForm`, `AuthProvider`, `ProtectedRoute` components
-  - Added `AuthPage` with sign-in flow and verification handling
-- ✅ **Phase 2: Households** completed:
-  - Created `HouseholdService` and `InviteService`
-  - Created `useHousehold` and `useInvite` hooks
-  - Built `HouseholdPage`, `HouseholdCreatePage`, `JoinPage`
-  - Built `MemberList`, `InviteModal`, `HouseholdSwitcher` components
-- ✅ **Auth UX improvements**:
-  - HomePage shows personalized greeting with user's display name
-  - SettingsPage shows Account section with profile info + Sign Out
-  - Share with Family section shows authenticated vs unauthenticated state
-- ✅ **RLS recursion fix**: Fixed infinite recursion in `household_members` policy
-  - Added `get_user_household_ids()` SECURITY DEFINER function
-  - Created migration `003_fix_rls_recursion.sql`
-- ✅ **Test count**: 639 → 694 (+55 new tests for auth/household features)
+- ✅ **Dev auto-login for testing**:
+  - Created test user in Supabase (test@dishcourse.local)
+  - Added `devAutoLogin()` function for automatic sign-in in dev mode
+  - Credentials stored in `.env.local` (gitignored)
+- ✅ **Tested household creation flow**:
+  - Created "Test Family" household successfully
+  - Verified member display with Creator badge
+  - Generated invite link/code (VUP4DB)
+- ✅ **Fixed RLS issue for household creation**:
+  - Added migration `004_fix_household_create_select.sql`
+  - Creators can now SELECT their households immediately after INSERT
+- ✅ **Fixed invites service**:
+  - Changed `.single()` to `.maybeSingle()` in `getActiveInvite()`
+  - Queries returning 0 rows no longer throw 406 errors
 
 ### Phase Summary
 
@@ -129,9 +125,9 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Test household creation** — Create a household and verify it persists
-2. **Test invite flow** — Generate invite link and test joining
-3. **Add sync infrastructure** — Phase 3 tasks for real-time data sync
+1. **Test invite join flow** — Open invite link in different browser/session and verify joining works
+2. **Add sync infrastructure** — Phase 3 tasks for real-time data sync
+3. **Connect dishes/plans to households** — Link local storage data to Supabase when in a household
 
 ### Key Files
 
