@@ -22,7 +22,6 @@
 
 import { supabase } from '@/lib/supabase';
 import type { Invite, InviteValidation, Household } from '@/types';
-import { addMember } from './households';
 
 /**
  * Generates a random 6-character alphanumeric code.
@@ -137,71 +136,72 @@ export async function getInvite(code: string): Promise<Invite | null> {
 export async function validateInvite(code: string): Promise<InviteValidation> {
   const normalizedCode = code.toUpperCase().trim();
 
-  // Fetch invite with household details
-  const { data, error } = await supabase
+  // Fetch invite (without household join - RLS may block it for non-members)
+  const { data: inviteData, error: inviteError } = await supabase
     .from('invites')
-    .select(`
-      id,
-      household_id,
-      code,
-      created_by,
-      expires_at,
-      used_at,
-      used_by,
-      created_at,
-      households:household_id (
-        id,
-        name,
-        created_by,
-        created_at,
-        updated_at
-      )
-    `)
+    .select('id, household_id, code, created_by, expires_at, used_at, used_by, created_at')
     .eq('code', normalizedCode)
     .single();
 
-  if (error || !data) {
+  if (inviteError || !inviteData) {
     return { valid: false, reason: 'not_found' };
   }
 
   // Check if already used
-  if (data.used_at) {
+  if (inviteData.used_at) {
     return { valid: false, reason: 'used' };
   }
 
   // Check if expired
   const now = new Date();
-  const expiresAt = new Date(data.expires_at);
+  const expiresAt = new Date(inviteData.expires_at);
   if (now > expiresAt) {
     return { valid: false, reason: 'expired' };
   }
 
-  // Build household object from joined data
-  const householdData = data.households as unknown as {
-    id: string;
-    name: string;
-    created_by: string;
-    created_at: string;
-    updated_at: string;
-  };
+  // Fetch household using SECURITY DEFINER function (bypasses RLS)
+  const { data: householdData, error: householdError } = await supabase
+    .rpc('get_household_for_invite', { invite_household_id: inviteData.household_id });
 
-  const household: Household = {
-    id: householdData.id,
-    name: householdData.name,
-    createdBy: householdData.created_by,
-    createdAt: householdData.created_at,
-    updatedAt: householdData.updated_at,
-  };
+  let household: Household;
+  
+  if (householdError || !householdData) {
+    // RPC might not exist yet or failed - use placeholder
+    // This is a fallback until the migration is applied
+    household = {
+      id: inviteData.household_id,
+      name: 'A Household', // Placeholder - will be revealed after joining
+      createdBy: inviteData.created_by,
+      createdAt: inviteData.created_at,
+      updatedAt: inviteData.created_at,
+    };
+  } else {
+    // RPC returns JSON object
+    const hData = householdData as {
+      id: string;
+      name: string;
+      created_by: string;
+      created_at: string;
+      updated_at: string;
+    };
+    household = {
+      id: hData.id,
+      name: hData.name,
+      createdBy: hData.created_by,
+      createdAt: hData.created_at,
+      updatedAt: hData.updated_at,
+    };
+  }
 
   const invite: Invite = {
-    id: data.id,
-    householdId: data.household_id,
-    code: data.code,
-    createdBy: data.created_by,
-    expiresAt: data.expires_at,
-    usedAt: data.used_at ?? undefined,
-    usedBy: data.used_by ?? undefined,
-    createdAt: data.created_at,
+    id: inviteData.id,
+    householdId: inviteData.household_id,
+    code: inviteData.code,
+    createdBy: inviteData.created_by,
+    expiresAt: inviteData.expires_at,
+    usedAt: inviteData.used_at ?? undefined,
+    usedBy: inviteData.used_by ?? undefined,
+    createdAt: inviteData.created_at,
   };
 
   return { valid: true, invite, household };
@@ -210,48 +210,57 @@ export async function validateInvite(code: string): Promise<InviteValidation> {
 /**
  * Uses an invite code to join a household.
  *
- * Validates the invite, adds the user as a member, and marks the invite as used.
+ * Uses a SECURITY DEFINER function to bypass RLS and allow non-members
+ * to add themselves to a household via a valid invite.
  *
  * @param code - The 6-character invite code
- * @param userId - The user joining the household
+ * @param userId - The user joining the household (used for validation)
  * @returns The household that was joined
  * @throws Error if the invite is invalid or joining fails
  */
 export async function useInvite(
   code: string,
-  userId: string
+  // userId is kept for API compatibility but not used - RPC uses auth.uid()
+  _userId?: string
 ): Promise<Household> {
-  // Validate the invite first
-  const validation = await validateInvite(code);
+  // Use the RPC function which handles validation, membership, and invite marking
+  const { data, error } = await supabase.rpc('join_household_with_invite', {
+    invite_code: code,
+  });
 
-  if (!validation.valid) {
-    switch (validation.reason) {
-      case 'not_found':
-        throw new Error('This invite code is not valid. Please check and try again.');
-      case 'used':
-        throw new Error('This invite has already been used.');
-      case 'expired':
-        throw new Error('This invite has expired. Please ask for a new one.');
-      default:
-        throw new Error('Unable to use invite. Please try again.');
-    }
+  if (error) {
+    console.error('Join household RPC error:', error);
+    throw new Error('Unable to join household. Please try again.');
   }
 
-  const { invite, household } = validation;
+  // The RPC returns a JSON object with success, error, and household
+  const result = data as {
+    success: boolean;
+    error?: string;
+    household?: {
+      id: string;
+      name: string;
+      created_by: string;
+      created_at: string;
+      updated_at: string;
+    };
+  };
 
-  // Add the user as a member
-  await addMember(household!.id, userId);
+  if (!result.success) {
+    throw new Error(result.error || 'Unable to join household.');
+  }
 
-  // Mark the invite as used
-  await supabase
-    .from('invites')
-    .update({
-      used_at: new Date().toISOString(),
-      used_by: userId,
-    })
-    .eq('id', invite!.id);
+  if (!result.household) {
+    throw new Error('Household data not returned.');
+  }
 
-  return household!;
+  return {
+    id: result.household.id,
+    name: result.household.name,
+    createdBy: result.household.created_by,
+    createdAt: result.household.created_at,
+    updatedAt: result.household.updated_at,
+  };
 }
 
 /**

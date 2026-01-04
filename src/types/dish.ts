@@ -50,6 +50,17 @@ export interface Dish {
 
   /** Cook time in minutes (e.g., 90 = 1h 30m) */
   cookTimeMinutes?: number;
+
+  // --- Sync/collaboration fields (only present in synced mode) ---
+
+  /** Household this dish belongs to (synced mode only) */
+  householdId?: string;
+
+  /** User ID of who added this dish (synced mode only) */
+  addedBy?: string;
+
+  /** Soft delete timestamp (synced mode only) */
+  deletedAt?: string;
 }
 
 /**

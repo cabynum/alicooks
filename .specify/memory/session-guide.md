@@ -42,24 +42,31 @@ Before we end, please:
 **Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Phase 2 Complete — Households Tested & Working
+**Current Phase**: Phase 3 In Progress — Sync Infrastructure
 
 ### Completed This Session
 
-- ✅ **Dev auto-login for testing**:
-  - Created test user in Supabase (test@dishcourse.local)
-  - Added `devAutoLogin()` function for automatic sign-in in dev mode
-  - Credentials stored in `.env.local` (gitignored)
-- ✅ **Tested household creation flow**:
-  - Created "Test Family" household successfully
-  - Verified member display with Creator badge
-  - Generated invite link/code (VUP4DB)
-- ✅ **Fixed RLS issue for household creation**:
-  - Added migration `004_fix_household_create_select.sql`
-  - Creators can now SELECT their households immediately after INSERT
-- ✅ **Fixed invites service**:
-  - Changed `.single()` to `.maybeSingle()` in `getActiveInvite()`
-  - Queries returning 0 rows no longer throw 406 errors
+- ✅ **Sync service created** (`src/services/sync.ts`):
+  - `fullSync()` and `pushChanges()` functions
+  - IndexedDB + Supabase integration points
+- ✅ **useSync hook created** (`src/hooks/useSync.ts`):
+  - Exposes sync status: synced, syncing, offline, error
+  - Tracks last sync time and error messages
+- ✅ **SyncStatus UI component** (`src/components/ui/SyncStatus.tsx`):
+  - Visual indicator for sync state
+  - Shown in HomePage header near mascot avatar
+- ✅ **useDishes hook updated for dual mode**:
+  - Local mode: Uses `localStorage` for unauthenticated users
+  - Synced mode: Uses IndexedDB + Supabase for authenticated users with household
+  - All CRUD operations now async
+- ✅ **Dish type extended**:
+  - Added `householdId`, `addedBy`, `deletedAt` fields for collaboration
+- ✅ **All tests updated and passing** (694 tests):
+  - Fixed context provider requirements for `useAuth`/`useHousehold` dependencies
+  - Updated async `act()` calls for new async CRUD operations
+  - Fixed time-dependent greeting test in HomePage
+- ✅ **Blog Part 11 written** (`blog/part-11-sync-infrastructure.md`):
+  - Documents sync strategy, dual-mode architecture, and implementation details
 
 ### Phase Summary
 
@@ -125,9 +132,9 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Test invite join flow** — Open invite link in different browser/session and verify joining works
-2. **Add sync infrastructure** — Phase 3 tasks for real-time data sync
-3. **Connect dishes/plans to households** — Link local storage data to Supabase when in a household
+1. **Complete Phase 3: Real-time Subscriptions** — Subscribe to dishes table changes in Supabase
+2. **Implement StorageService sync** — Update StorageService to write to IndexedDB + trigger sync
+3. **Test dish sync between users** — Verify dish created by test2 appears for test user
 
 ### Key Files
 
@@ -152,10 +159,11 @@ Core features:
 
 ### Open Decisions
 
-- **Collaboration feature**: Phase 1 & 2 complete, Phase 3 (Sync) is next
+- **Collaboration feature**: Phase 1 & 2 complete, Phase 3 (Sync Infrastructure) in progress
   - See `specs/002-family-collaboration/tasks.md` for remaining tasks
-  - Next: Test full household/invite flow, then implement sync infrastructure
+  - Two test users ready for sync testing (test, test2 in "Test Family")
 - **User experience**: Zero-friction start implemented — auth only required for collaboration
+- **Sync approach**: All household dishes sync automatically (decided)
 
 ### Branding Assets (Finalized)
 

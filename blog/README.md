@@ -15,6 +15,7 @@ development and AI pair programming.
 8. [Part 8: Data Export](./part-8-data-export.md) — Export/import, settings page
 9. [Part 9: Design System](./part-9-design-system.md) — Sunflower & Charcoal visual identity
 10. [Part 10: The Rename](./part-10-rename.md) — AliCooks becomes DishCourse
+11. [Part 11: Sync Infrastructure](./part-11-sync-infrastructure.md) — Optimistic UI, dual-mode storage
 
 ## About This Series
 

@@ -12,8 +12,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Calendar, Dices } from 'lucide-react';
 import { DishList, PlanCard } from '@/components/meals';
+import { SyncStatus } from '@/components/ui';
 import { useDishes, usePlans } from '@/hooks';
 import { useAuthContext } from '@/components/auth';
+import { useHousehold } from '@/hooks';
 
 /**
  * Food photos from Unsplash (free, high-quality, open license)
@@ -53,10 +55,14 @@ function getGreeting(): string {
 
 export function HomePage() {
   const navigate = useNavigate();
-  const { dishes, isLoading: dishesLoading } = useDishes();
+  const { dishes, isLoading: dishesLoading, isSyncedMode } = useDishes();
   const { plans, isLoading: plansLoading } = usePlans();
-  const { profile } = useAuthContext();
+  const { profile, isAuthenticated } = useAuthContext();
+  const { currentHousehold } = useHousehold();
   const [photoIndex] = useState(getRandomPhotoIndex);
+
+  // Show sync status when user is authenticated and has a household
+  const showSyncStatus = isAuthenticated && currentHousehold !== null;
 
   // Build personalized greeting
   const greeting = getGreeting();
@@ -155,16 +161,20 @@ export function HomePage() {
                 DishCourse
               </h1>
             </div>
-            {/* Mascot avatar */}
-            <div
-              className="w-11 h-11 rounded-full flex items-center justify-center overflow-hidden"
-              style={{ backgroundColor: 'var(--color-accent)' }}
-            >
-              <img
-                src="/mascot.png"
-                alt="DishCourse mascot"
-                className="w-9 h-9 object-contain"
-              />
+            {/* Sync status and mascot */}
+            <div className="flex items-center gap-2">
+              {showSyncStatus && <SyncStatus />}
+              {/* Mascot avatar */}
+              <div
+                className="w-11 h-11 rounded-full flex items-center justify-center overflow-hidden"
+                style={{ backgroundColor: 'var(--color-accent)' }}
+              >
+                <img
+                  src="/mascot.png"
+                  alt="DishCourse mascot"
+                  className="w-9 h-9 object-contain"
+                />
+              </div>
             </div>
           </div>
 

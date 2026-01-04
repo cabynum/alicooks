@@ -8,6 +8,46 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useDishes } from '@/hooks/useDishes';
 import { STORAGE_KEYS } from '@/types';
+import type { ReactNode } from 'react';
+import { AuthProvider } from '@/components/auth';
+
+// Mock useAuth to avoid Supabase dependency
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: null,
+    profile: null,
+    isLoading: false,
+    isAuthenticated: false,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    updateProfile: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
+
+// Mock useHousehold to avoid Supabase dependency
+vi.mock('@/hooks/useHousehold', () => ({
+  useHousehold: () => ({
+    households: [],
+    currentHousehold: null,
+    members: [],
+    isLoading: false,
+    isCreator: false,
+    switchHousehold: vi.fn(),
+    createHousehold: vi.fn(),
+    leaveCurrentHousehold: vi.fn(),
+    removeMember: vi.fn(),
+    refresh: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
+
+// Wrapper component for hooks that need AuthProvider
+function Wrapper({ children }: { children: ReactNode }) {
+  return <AuthProvider>{children}</AuthProvider>;
+}
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -44,7 +84,7 @@ describe('useDishes', () => {
 
   describe('initial state', () => {
     it('sets isLoading false after loading completes', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       // After the effect runs, isLoading should be false
       await waitFor(() => {
@@ -67,7 +107,7 @@ describe('useDishes', () => {
         JSON.stringify(existingDishes)
       );
 
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -78,7 +118,7 @@ describe('useDishes', () => {
     });
 
     it('returns empty array when no dishes exist', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -90,15 +130,15 @@ describe('useDishes', () => {
 
   describe('addDish', () => {
     it('adds a dish and updates state', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       let newDish;
-      act(() => {
-        newDish = result.current.addDish({ name: 'New Dish', type: 'side' });
+      await act(async () => {
+        newDish = await result.current.addDish({ name: 'New Dish', type: 'side' });
       });
 
       expect(newDish).toBeDefined();
@@ -108,14 +148,14 @@ describe('useDishes', () => {
     });
 
     it('persists to localStorage', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      act(() => {
-        result.current.addDish({ name: 'Persisted Dish' });
+      await act(async () => {
+        await result.current.addDish({ name: 'Persisted Dish' });
       });
 
       const stored = JSON.parse(
@@ -126,15 +166,15 @@ describe('useDishes', () => {
     });
 
     it('returns the created dish', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       let created;
-      act(() => {
-        created = result.current.addDish({ name: 'Test' });
+      await act(async () => {
+        created = await result.current.addDish({ name: 'Test' });
       });
 
       expect(created).toMatchObject({
@@ -147,34 +187,34 @@ describe('useDishes', () => {
 
   describe('updateDish', () => {
     it('updates a dish and reflects in state', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       let dish;
-      act(() => {
-        dish = result.current.addDish({ name: 'Original' });
+      await act(async () => {
+        dish = await result.current.addDish({ name: 'Original' });
       });
 
-      act(() => {
-        result.current.updateDish(dish.id, { name: 'Updated' });
+      await act(async () => {
+        await result.current.updateDish(dish.id, { name: 'Updated' });
       });
 
       expect(result.current.dishes[0].name).toBe('Updated');
     });
 
     it('returns undefined for non-existent dish', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       let updated;
-      act(() => {
-        updated = result.current.updateDish('nonexistent', { name: 'Test' });
+      await act(async () => {
+        updated = await result.current.updateDish('nonexistent', { name: 'Test' });
       });
 
       expect(updated).toBeUndefined();
@@ -183,56 +223,56 @@ describe('useDishes', () => {
 
   describe('deleteDish', () => {
     it('removes dish from state', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       let dish;
-      act(() => {
-        dish = result.current.addDish({ name: 'To Delete' });
+      await act(async () => {
+        dish = await result.current.addDish({ name: 'To Delete' });
       });
 
       expect(result.current.dishes).toHaveLength(1);
 
-      act(() => {
-        result.current.deleteDish(dish.id);
+      await act(async () => {
+        await result.current.deleteDish(dish.id);
       });
 
       expect(result.current.dishes).toHaveLength(0);
     });
 
     it('returns true on successful delete', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       let dish;
-      act(() => {
-        dish = result.current.addDish({ name: 'Test' });
+      await act(async () => {
+        dish = await result.current.addDish({ name: 'Test' });
       });
 
       let success;
-      act(() => {
-        success = result.current.deleteDish(dish.id);
+      await act(async () => {
+        success = await result.current.deleteDish(dish.id);
       });
 
       expect(success).toBe(true);
     });
 
     it('returns false for non-existent dish', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       let success;
-      act(() => {
-        success = result.current.deleteDish('nonexistent');
+      await act(async () => {
+        success = await result.current.deleteDish('nonexistent');
       });
 
       expect(success).toBe(false);
@@ -241,16 +281,16 @@ describe('useDishes', () => {
 
   describe('getDishesByType', () => {
     it('filters dishes by type', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      act(() => {
-        result.current.addDish({ name: 'Chicken', type: 'entree' });
-        result.current.addDish({ name: 'Rice', type: 'side' });
-        result.current.addDish({ name: 'Salad', type: 'side' });
+      await act(async () => {
+        await result.current.addDish({ name: 'Chicken', type: 'entree' });
+        await result.current.addDish({ name: 'Rice', type: 'side' });
+        await result.current.addDish({ name: 'Salad', type: 'side' });
       });
 
       const entrees = result.current.getDishesByType('entree');
@@ -265,14 +305,14 @@ describe('useDishes', () => {
     });
 
     it('returns empty array when no matches', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      act(() => {
-        result.current.addDish({ name: 'Chicken', type: 'entree' });
+      await act(async () => {
+        await result.current.addDish({ name: 'Chicken', type: 'entree' });
       });
 
       const others = result.current.getDishesByType('other');
@@ -282,15 +322,15 @@ describe('useDishes', () => {
 
   describe('getDishById', () => {
     it('finds dish by ID', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       let dish;
-      act(() => {
-        dish = result.current.addDish({ name: 'Find Me' });
+      await act(async () => {
+        dish = await result.current.addDish({ name: 'Find Me' });
       });
 
       const found = result.current.getDishById(dish.id);
@@ -298,7 +338,7 @@ describe('useDishes', () => {
     });
 
     it('returns undefined for non-existent ID', async () => {
-      const { result } = renderHook(() => useDishes());
+      const { result } = renderHook(() => useDishes(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);

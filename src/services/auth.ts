@@ -156,7 +156,13 @@ export async function updateProfile(
   };
 
   if (updates.displayName !== undefined) {
-    updateData.display_name = updates.displayName.trim();
+    // Capitalize first letter of each word for proper name formatting
+    const formatted = updates.displayName
+      .trim()
+      .split(/\s+/)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+    updateData.display_name = formatted;
   }
 
   const { data, error } = await supabase
@@ -275,5 +281,40 @@ export async function devAutoLogin(): Promise<User | null> {
   }
 
   console.log('🧪 Dev auto-login successful!');
+  return data.user;
+}
+
+/**
+ * Development-only sign in with email and password.
+ *
+ * Allows switching between test users during development.
+ * Only works in development mode.
+ *
+ * @param email - Test user email
+ * @param password - Test user password
+ * @returns The authenticated user
+ * @throws Error if sign in fails or not in dev mode
+ */
+export async function devSignInWithPassword(
+  email: string,
+  password: string
+): Promise<User> {
+  if (!import.meta.env.DEV) {
+    throw new Error('devSignInWithPassword is only available in development mode');
+  }
+
+  console.log('🧪 Dev sign-in: Switching to', email);
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    console.error('🧪 Dev sign-in failed:', error.message);
+    throw new Error(`Sign in failed: ${error.message}`);
+  }
+
+  console.log('🧪 Dev sign-in successful!');
   return data.user;
 }

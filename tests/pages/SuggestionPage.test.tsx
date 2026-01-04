@@ -9,8 +9,42 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { SuggestionPage } from '@/pages/SuggestionPage';
+import { AuthProvider } from '@/components/auth';
 import type { Dish } from '@/types';
 import { STORAGE_KEYS } from '@/types';
+
+// Mock useAuth to avoid Supabase dependency
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: null,
+    profile: null,
+    isLoading: false,
+    isAuthenticated: false,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    updateProfile: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
+
+// Mock useHousehold to avoid Supabase dependency
+vi.mock('@/hooks/useHousehold', () => ({
+  useHousehold: () => ({
+    households: [],
+    currentHousehold: null,
+    members: [],
+    isLoading: false,
+    isCreator: false,
+    switchHousehold: vi.fn(),
+    createHousehold: vi.fn(),
+    leaveCurrentHousehold: vi.fn(),
+    removeMember: vi.fn(),
+    refresh: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
 
 // ============================================================================
 // Test Setup
@@ -82,7 +116,9 @@ function setupDishes(dishes: Dish[]) {
 function renderPage() {
   return render(
     <MemoryRouter>
-      <SuggestionPage />
+      <AuthProvider>
+        <SuggestionPage />
+      </AuthProvider>
     </MemoryRouter>
   );
 }

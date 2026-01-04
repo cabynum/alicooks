@@ -24,3 +24,6 @@ export type { UseHouseholdReturn } from './useHousehold';
 
 export { useInvite } from './useInvite';
 export type { UseInviteReturn } from './useInvite';
+
+export { useSync, useDataChange } from './useSync';
+export type { UseSyncReturn } from './useSync';

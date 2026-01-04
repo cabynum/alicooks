@@ -6,9 +6,49 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { useSuggestion } from '@/hooks/useSuggestion';
+import { AuthProvider } from '@/components/auth';
 import type { Dish } from '@/types';
 import { STORAGE_KEYS } from '@/types';
+
+// Mock useAuth to avoid Supabase dependency
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: null,
+    profile: null,
+    isLoading: false,
+    isAuthenticated: false,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    updateProfile: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
+
+// Mock useHousehold to avoid Supabase dependency
+vi.mock('@/hooks/useHousehold', () => ({
+  useHousehold: () => ({
+    households: [],
+    currentHousehold: null,
+    members: [],
+    isLoading: false,
+    isCreator: false,
+    switchHousehold: vi.fn(),
+    createHousehold: vi.fn(),
+    leaveCurrentHousehold: vi.fn(),
+    removeMember: vi.fn(),
+    refresh: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
+
+// Wrapper for hooks that need AuthProvider
+function Wrapper({ children }: { children: ReactNode }) {
+  return <AuthProvider>{children}</AuthProvider>;
+}
 
 // ============================================================================
 // Test Setup
@@ -75,7 +115,7 @@ describe('useSuggestion', () => {
 
   describe('initial state', () => {
     it('resolves loading state after mount', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       // Loading resolves immediately since localStorage is synchronous
       await waitFor(() => {
@@ -84,7 +124,7 @@ describe('useSuggestion', () => {
     });
 
     it('has null suggestion initially when no dishes', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -96,7 +136,7 @@ describe('useSuggestion', () => {
 
   describe('when no dishes exist', () => {
     it('isAvailable is false', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -106,7 +146,7 @@ describe('useSuggestion', () => {
     });
 
     it('suggestion is null', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -116,7 +156,7 @@ describe('useSuggestion', () => {
     });
 
     it('shows helpful message', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -137,7 +177,7 @@ describe('useSuggestion', () => {
     });
 
     it('isAvailable is false', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -147,7 +187,7 @@ describe('useSuggestion', () => {
     });
 
     it('shows entree-specific message', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -168,7 +208,7 @@ describe('useSuggestion', () => {
     });
 
     it('isAvailable is true', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -178,7 +218,7 @@ describe('useSuggestion', () => {
     });
 
     it('auto-generates a suggestion', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.suggestion).not.toBeNull();
@@ -189,7 +229,7 @@ describe('useSuggestion', () => {
     });
 
     it('shows encouragement to add sides', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -212,7 +252,7 @@ describe('useSuggestion', () => {
     });
 
     it('isAvailable is true', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -222,7 +262,7 @@ describe('useSuggestion', () => {
     });
 
     it('auto-generates a suggestion with entree and sides', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.suggestion).not.toBeNull();
@@ -233,7 +273,7 @@ describe('useSuggestion', () => {
     });
 
     it('generate() creates a new suggestion', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.suggestion).not.toBeNull();
@@ -261,7 +301,7 @@ describe('useSuggestion', () => {
     });
 
     it('shows ready message', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -280,7 +320,7 @@ describe('useSuggestion', () => {
     });
 
     it('suggests adding more entrees', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -292,7 +332,7 @@ describe('useSuggestion', () => {
     });
 
     it('still generates suggestions', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.suggestion).not.toBeNull();
@@ -304,7 +344,7 @@ describe('useSuggestion', () => {
 
   describe('generate function', () => {
     it('does nothing when not available', async () => {
-      const { result } = renderHook(() => useSuggestion());
+      const { result } = renderHook(() => useSuggestion(), { wrapper: Wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);

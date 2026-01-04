@@ -7,10 +7,11 @@
 
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Upload, Check, Users, ChevronRight, LogOut, User } from 'lucide-react';
+import { ArrowLeft, Download, Upload, Check, Users, ChevronRight, LogOut, User, RefreshCw } from 'lucide-react';
 import { Button, Card } from '@/components/ui';
 import { useExport, useDishes, usePlans, useHousehold } from '@/hooks';
 import { useAuthContext } from '@/components/auth';
+import { devSignInWithPassword } from '@/services';
 
 export function SettingsPage() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export function SettingsPage() {
   const [showImportConfirm, setShowImportConfirm] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isSwitchingUser, setIsSwitchingUser] = useState(false);
 
   /**
    * Handle back navigation
@@ -117,6 +119,26 @@ export function SettingsPage() {
       navigate('/');
     } catch {
       // Error is handled by the auth context
+    }
+  };
+
+  /**
+   * Handle dev user switch (development only)
+   */
+  const handleDevUserSwitch = async (email: string, password: string) => {
+    if (!import.meta.env.DEV) return;
+    
+    setIsSwitchingUser(true);
+    try {
+      await devSignInWithPassword(email, password);
+      setSuccessMessage(`Switched to ${email}`);
+      // Reload to refresh all state
+      window.location.reload();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to switch user';
+      console.error('Dev user switch failed:', message);
+    } finally {
+      setIsSwitchingUser(false);
     }
   };
 
@@ -392,6 +414,62 @@ export function SettingsPage() {
             />
           </Card>
         </section>
+
+        {/* Dev User Switcher - Development Only */}
+        {import.meta.env.DEV && (
+          <section className="mt-8 pt-8 border-t border-dashed" style={{ borderColor: 'var(--color-text-light)' }}>
+            <h2
+              className="text-lg font-semibold mb-2 flex items-center gap-2"
+              style={{
+                fontFamily: 'var(--font-display)',
+                color: 'var(--color-text-muted)',
+              }}
+            >
+              🧪 Dev: Switch Test User
+            </h2>
+            <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
+              Switch between test accounts for collaboration testing.
+              {profile && (
+                <span className="block mt-1">
+                  Currently signed in as: <strong>{profile.email}</strong>
+                </span>
+              )}
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => handleDevUserSwitch('test@dishcourse.local', 'testpass123')}
+                disabled={isSwitchingUser || profile?.email === 'test@dishcourse.local'}
+                fullWidth
+              >
+                <span className="flex items-center gap-2">
+                  {isSwitchingUser ? (
+                    <RefreshCw size={18} className="animate-spin" />
+                  ) : (
+                    <User size={18} />
+                  )}
+                  <span>Test User 1 (test@dishcourse.local)</span>
+                </span>
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => handleDevUserSwitch('test2@dishcourse.local', 'testpass456')}
+                disabled={isSwitchingUser || profile?.email === 'test2@dishcourse.local'}
+                fullWidth
+              >
+                <span className="flex items-center gap-2">
+                  {isSwitchingUser ? (
+                    <RefreshCw size={18} className="animate-spin" />
+                  ) : (
+                    <User size={18} />
+                  )}
+                  <span>Test User 2 (test2@dishcourse.local)</span>
+                </span>
+              </Button>
+            </div>
+          </section>
+        )}
 
         {/* Import Confirmation Modal */}
         {showImportConfirm && (

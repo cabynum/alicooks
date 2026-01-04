@@ -38,6 +38,7 @@ export {
   onAuthStateChange,
   refreshSession,
   devAutoLogin,
+  devSignInWithPassword,
 } from './auth';
 
 // Household service for household management
@@ -63,3 +64,33 @@ export {
   getInviteUrl,
   getActiveInvite,
 } from './invites';
+
+// Sync service for offline-first data synchronization
+export {
+  // State
+  type SyncState,
+  onSyncStateChange,
+  onDataChange,
+  getPendingChangesCount,
+  getIsOnline,
+  // Network
+  initializeNetworkListeners,
+  // Sync operations
+  fullSync,
+  pushChanges,
+  getLastSyncTime,
+  // Real-time
+  subscribeToHousehold,
+  unsubscribeFromHousehold,
+  // Local cache operations
+  addDishToCache,
+  updateDishInCache,
+  deleteDishFromCache,
+  getDishesFromCache,
+  addPlanToCache,
+  updatePlanInCache,
+  deletePlanFromCache,
+  getPlansFromCache,
+  // Cleanup
+  cleanupSync,
+} from './sync';

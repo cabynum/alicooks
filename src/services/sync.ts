@@ -1,0 +1,711 @@
+/**
+ * Sync Service
+ *
+ * Handles synchronization between local IndexedDB cache and Supabase.
+ * Implements an offline-first approach where all reads come from local
+ * cache and writes are pushed to the server in the background.
+ *
+ * Key responsibilities:
+ * - Full sync: Download all household data on login/household switch
+ * - Push changes: Upload pending local changes to Supabase
+ * - Real-time subscriptions: Listen for changes from other household members
+ * - Offline support: Queue changes when offline, sync when back online
+ */
+
+import { supabase } from '@/lib/supabase';
+import {
+  db,
+  withSyncMetadata,
+  getPendingItems,
+  markAsSynced,
+  setSyncMeta,
+  getSyncMeta,
+  type CachedDish,
+  type CachedMealPlan,
+  type Dish,
+  type MealPlan,
+} from '@/lib/db';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+/**
+ * Sync status for the UI to display.
+ */
+export type SyncState = 'idle' | 'syncing' | 'offline' | 'error';
+
+/**
+ * Callback for sync state changes.
+ */
+export type SyncStateCallback = (state: SyncState, pendingCount: number) => void;
+
+/**
+ * Callback for when new data arrives from the server.
+ */
+export type DataChangeCallback = () => void;
+
+/**
+ * Result of a sync operation.
+ */
+interface SyncResult {
+  success: boolean;
+  error?: string;
+  syncedCount?: number;
+}
+
+// ============================================================================
+// STATE
+// ============================================================================
+
+let currentChannel: RealtimeChannel | null = null;
+let syncStateCallback: SyncStateCallback | null = null;
+let dataChangeCallback: DataChangeCallback | null = null;
+let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+let currentHouseholdId: string | null = null;
+
+// ============================================================================
+// SYNC STATE MANAGEMENT
+// ============================================================================
+
+/**
+ * Register a callback to receive sync state updates.
+ */
+export function onSyncStateChange(callback: SyncStateCallback): () => void {
+  syncStateCallback = callback;
+  return () => {
+    syncStateCallback = null;
+  };
+}
+
+/**
+ * Register a callback to receive data change notifications.
+ */
+export function onDataChange(callback: DataChangeCallback): () => void {
+  dataChangeCallback = callback;
+  return () => {
+    dataChangeCallback = null;
+  };
+}
+
+/**
+ * Notify listeners of sync state changes.
+ */
+async function notifySyncState(state: SyncState): Promise<void> {
+  if (!syncStateCallback) return;
+
+  const pendingCount = await getPendingChangesCount();
+  syncStateCallback(state, pendingCount);
+}
+
+/**
+ * Get count of pending (unsynced) changes.
+ */
+export async function getPendingChangesCount(): Promise<number> {
+  const pendingDishes = await getPendingItems(db.dishes);
+  const pendingPlans = await getPendingItems(db.mealPlans);
+  return pendingDishes.length + pendingPlans.length;
+}
+
+// ============================================================================
+// ONLINE/OFFLINE DETECTION
+// ============================================================================
+
+/**
+ * Initialize online/offline listeners.
+ */
+export function initializeNetworkListeners(): () => void {
+  if (typeof window === 'undefined') return () => {};
+
+  const handleOnline = async () => {
+    isOnline = true;
+    // Attempt to push pending changes when back online
+    await pushChanges();
+  };
+
+  const handleOffline = async () => {
+    isOnline = false;
+    await notifySyncState('offline');
+  };
+
+  window.addEventListener('online', handleOnline);
+  window.addEventListener('offline', handleOffline);
+
+  // Set initial state
+  isOnline = navigator.onLine;
+  if (!isOnline) {
+    notifySyncState('offline');
+  }
+
+  return () => {
+    window.removeEventListener('online', handleOnline);
+    window.removeEventListener('offline', handleOffline);
+  };
+}
+
+/**
+ * Check if we're currently online.
+ */
+export function getIsOnline(): boolean {
+  return isOnline;
+}
+
+// ============================================================================
+// FULL SYNC
+// ============================================================================
+
+/**
+ * Perform a full sync for a household.
+ * Downloads all dishes and meal plans from Supabase and stores them locally.
+ *
+ * @param householdId - The household to sync
+ * @returns Result of the sync operation
+ */
+export async function fullSync(householdId: string): Promise<SyncResult> {
+  if (!isOnline) {
+    return { success: false, error: 'No internet connection' };
+  }
+
+  try {
+    await notifySyncState('syncing');
+    currentHouseholdId = householdId;
+
+    // Fetch dishes from Supabase
+    const { data: dishes, error: dishesError } = await supabase
+      .from('dishes')
+      .select('*')
+      .eq('household_id', householdId)
+      .is('deleted_at', null);
+
+    if (dishesError) throw dishesError;
+
+    // Fetch meal plans from Supabase
+    const { data: plans, error: plansError } = await supabase
+      .from('meal_plans')
+      .select('*')
+      .eq('household_id', householdId)
+      .is('deleted_at', null);
+
+    if (plansError) throw plansError;
+
+    // Transform and store dishes locally
+    const cachedDishes: CachedDish[] = (dishes || []).map((d) =>
+      withSyncMetadata(transformDishFromServer(d), 'synced')
+    );
+
+    // Clear existing dishes for this household and add new ones
+    await db.dishes.where('householdId').equals(householdId).delete();
+    if (cachedDishes.length > 0) {
+      await db.dishes.bulkAdd(cachedDishes);
+    }
+
+    // Transform and store meal plans locally
+    const cachedPlans: CachedMealPlan[] = (plans || []).map((p) =>
+      withSyncMetadata(transformPlanFromServer(p), 'synced')
+    );
+
+    await db.mealPlans.where('householdId').equals(householdId).delete();
+    if (cachedPlans.length > 0) {
+      await db.mealPlans.bulkAdd(cachedPlans);
+    }
+
+    // Record last sync time
+    await setSyncMeta(`lastSync:${householdId}`, new Date().toISOString());
+
+    await notifySyncState('idle');
+    dataChangeCallback?.();
+
+    return {
+      success: true,
+      syncedCount: cachedDishes.length + cachedPlans.length,
+    };
+  } catch (error) {
+    console.error('Full sync failed:', error);
+    await notifySyncState('error');
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Sync failed',
+    };
+  }
+}
+
+/**
+ * Get the last sync time for a household.
+ */
+export async function getLastSyncTime(householdId: string): Promise<string | null> {
+  const time = await getSyncMeta<string>(`lastSync:${householdId}`);
+  return time ?? null;
+}
+
+// ============================================================================
+// PUSH CHANGES
+// ============================================================================
+
+/**
+ * Push all pending local changes to Supabase.
+ * Called automatically when coming back online, or can be called manually.
+ */
+export async function pushChanges(): Promise<SyncResult> {
+  if (!isOnline) {
+    return { success: false, error: 'No internet connection' };
+  }
+
+  try {
+    await notifySyncState('syncing');
+
+    let syncedCount = 0;
+
+    // Push pending dishes
+    const pendingDishes = await getPendingItems(db.dishes);
+    for (const dish of pendingDishes) {
+      const success = await pushDish(dish);
+      if (success) {
+        await markAsSynced(db.dishes, dish.id);
+        syncedCount++;
+      }
+    }
+
+    // Push pending meal plans
+    const pendingPlans = await getPendingItems(db.mealPlans);
+    for (const plan of pendingPlans) {
+      const success = await pushPlan(plan);
+      if (success) {
+        await markAsSynced(db.mealPlans, plan.id);
+        syncedCount++;
+      }
+    }
+
+    await notifySyncState('idle');
+
+    return { success: true, syncedCount };
+  } catch (error) {
+    console.error('Push changes failed:', error);
+    await notifySyncState('error');
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Push failed',
+    };
+  }
+}
+
+/**
+ * Push a single dish to Supabase.
+ */
+async function pushDish(dish: CachedDish): Promise<boolean> {
+  try {
+    const serverDish = transformDishToServer(dish);
+
+    if (dish.deletedAt) {
+      // Soft delete on server
+      const { error } = await supabase
+        .from('dishes')
+        .update({ deleted_at: dish.deletedAt })
+        .eq('id', dish.id);
+
+      if (error) throw error;
+    } else {
+      // Upsert the dish
+      const { error } = await supabase.from('dishes').upsert(serverDish, {
+        onConflict: 'id',
+      });
+
+      if (error) throw error;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Failed to push dish:', dish.id, error);
+    return false;
+  }
+}
+
+/**
+ * Push a single meal plan to Supabase.
+ */
+async function pushPlan(plan: CachedMealPlan): Promise<boolean> {
+  try {
+    const serverPlan = transformPlanToServer(plan);
+
+    if (plan.deletedAt) {
+      // Soft delete on server
+      const { error } = await supabase
+        .from('meal_plans')
+        .update({ deleted_at: plan.deletedAt })
+        .eq('id', plan.id);
+
+      if (error) throw error;
+    } else {
+      // Upsert the plan
+      const { error } = await supabase.from('meal_plans').upsert(serverPlan, {
+        onConflict: 'id',
+      });
+
+      if (error) throw error;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Failed to push plan:', plan.id, error);
+    return false;
+  }
+}
+
+// ============================================================================
+// REAL-TIME SUBSCRIPTIONS
+// ============================================================================
+
+/**
+ * Subscribe to real-time changes for a household.
+ * Call this after fullSync to receive updates from other household members.
+ *
+ * @param householdId - The household to subscribe to
+ */
+export function subscribeToHousehold(householdId: string): void {
+  // Unsubscribe from previous channel if any
+  unsubscribeFromHousehold();
+
+  currentHouseholdId = householdId;
+
+  // Create a new channel for this household
+  currentChannel = supabase
+    .channel(`household:${householdId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'dishes',
+        filter: `household_id=eq.${householdId}`,
+      },
+      handleDishChange
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'meal_plans',
+        filter: `household_id=eq.${householdId}`,
+      },
+      handlePlanChange
+    )
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('Subscribed to household changes:', householdId);
+      } else if (status === 'CHANNEL_ERROR') {
+        console.error('Failed to subscribe to household changes');
+      }
+    });
+}
+
+/**
+ * Unsubscribe from the current household's real-time channel.
+ */
+export function unsubscribeFromHousehold(): void {
+  if (currentChannel) {
+    supabase.removeChannel(currentChannel);
+    currentChannel = null;
+  }
+}
+
+/**
+ * Handle incoming dish changes from real-time subscription.
+ */
+async function handleDishChange(payload: {
+  eventType: string;
+  new: Record<string, unknown>;
+  old: Record<string, unknown>;
+}): Promise<void> {
+  const { eventType, new: newRecord, old: oldRecord } = payload;
+
+  try {
+    switch (eventType) {
+      case 'INSERT':
+      case 'UPDATE': {
+        // Check if this is a soft delete
+        if (newRecord.deleted_at) {
+          await db.dishes.delete(newRecord.id as string);
+        } else {
+          const dish = transformDishFromServer(newRecord);
+          const cached = withSyncMetadata(dish, 'synced');
+          await db.dishes.put(cached);
+        }
+        break;
+      }
+      case 'DELETE': {
+        await db.dishes.delete(oldRecord.id as string);
+        break;
+      }
+    }
+
+    // Notify listeners that data has changed
+    dataChangeCallback?.();
+  } catch (error) {
+    console.error('Failed to handle dish change:', error);
+  }
+}
+
+/**
+ * Handle incoming meal plan changes from real-time subscription.
+ */
+async function handlePlanChange(payload: {
+  eventType: string;
+  new: Record<string, unknown>;
+  old: Record<string, unknown>;
+}): Promise<void> {
+  const { eventType, new: newRecord, old: oldRecord } = payload;
+
+  try {
+    switch (eventType) {
+      case 'INSERT':
+      case 'UPDATE': {
+        if (newRecord.deleted_at) {
+          await db.mealPlans.delete(newRecord.id as string);
+        } else {
+          const plan = transformPlanFromServer(newRecord);
+          const cached = withSyncMetadata(plan, 'synced');
+          await db.mealPlans.put(cached);
+        }
+        break;
+      }
+      case 'DELETE': {
+        await db.mealPlans.delete(oldRecord.id as string);
+        break;
+      }
+    }
+
+    dataChangeCallback?.();
+  } catch (error) {
+    console.error('Failed to handle plan change:', error);
+  }
+}
+
+// ============================================================================
+// LOCAL CACHE OPERATIONS
+// ============================================================================
+
+/**
+ * Add a dish to local cache with pending status.
+ * Will be synced to server in background.
+ */
+export async function addDishToCache(dish: Dish): Promise<void> {
+  const cached = withSyncMetadata(dish, 'pending');
+  await db.dishes.put(cached);
+
+  // Attempt to sync immediately if online
+  if (isOnline) {
+    pushChanges();
+  }
+}
+
+/**
+ * Update a dish in local cache.
+ */
+export async function updateDishInCache(dish: Dish): Promise<void> {
+  const cached = withSyncMetadata(dish, 'pending');
+  await db.dishes.put(cached);
+
+  if (isOnline) {
+    pushChanges();
+  }
+}
+
+/**
+ * Soft-delete a dish in local cache.
+ */
+export async function deleteDishFromCache(dishId: string): Promise<void> {
+  const existing = await db.dishes.get(dishId);
+  if (existing) {
+    const deleted: CachedDish = {
+      ...existing,
+      deletedAt: new Date().toISOString(),
+      _syncStatus: 'pending',
+      _localUpdatedAt: new Date().toISOString(),
+    };
+    await db.dishes.put(deleted);
+
+    if (isOnline) {
+      pushChanges();
+    }
+  }
+}
+
+/**
+ * Get all dishes from local cache for a household.
+ */
+export async function getDishesFromCache(householdId: string): Promise<Dish[]> {
+  const dishes = await db.dishes
+    .where('householdId')
+    .equals(householdId)
+    .toArray();
+
+  // Filter out soft-deleted dishes and strip cache metadata
+  return dishes
+    .filter((d) => !d.deletedAt)
+    .map((d) => stripCacheMetadata(d));
+}
+
+/**
+ * Add a meal plan to local cache.
+ */
+export async function addPlanToCache(plan: MealPlan): Promise<void> {
+  const cached = withSyncMetadata(plan, 'pending');
+  await db.mealPlans.put(cached);
+
+  if (isOnline) {
+    pushChanges();
+  }
+}
+
+/**
+ * Update a meal plan in local cache.
+ */
+export async function updatePlanInCache(plan: MealPlan): Promise<void> {
+  const cached = withSyncMetadata(plan, 'pending');
+  await db.mealPlans.put(cached);
+
+  if (isOnline) {
+    pushChanges();
+  }
+}
+
+/**
+ * Soft-delete a meal plan in local cache.
+ */
+export async function deletePlanFromCache(planId: string): Promise<void> {
+  const existing = await db.mealPlans.get(planId);
+  if (existing) {
+    const deleted: CachedMealPlan = {
+      ...existing,
+      deletedAt: new Date().toISOString(),
+      _syncStatus: 'pending',
+      _localUpdatedAt: new Date().toISOString(),
+    };
+    await db.mealPlans.put(deleted);
+
+    if (isOnline) {
+      pushChanges();
+    }
+  }
+}
+
+/**
+ * Get all meal plans from local cache for a household.
+ */
+export async function getPlansFromCache(householdId: string): Promise<MealPlan[]> {
+  const plans = await db.mealPlans
+    .where('householdId')
+    .equals(householdId)
+    .toArray();
+
+  return plans
+    .filter((p) => !p.deletedAt)
+    .map((p) => stripCacheMetadata(p));
+}
+
+// ============================================================================
+// TRANSFORM FUNCTIONS
+// ============================================================================
+
+/**
+ * Transform a dish from Supabase format to app format.
+ */
+function transformDishFromServer(record: Record<string, unknown>): Dish {
+  return {
+    id: record.id as string,
+    householdId: record.household_id as string,
+    name: record.name as string,
+    type: record.type as Dish['type'],
+    cookTimeMinutes: record.cook_time_minutes as number | undefined,
+    recipeUrl: record.recipe_url as string | undefined,
+    addedBy: record.added_by as string,
+    createdAt: record.created_at as string,
+    updatedAt: record.updated_at as string,
+    deletedAt: record.deleted_at as string | undefined,
+  };
+}
+
+/**
+ * Transform a dish to Supabase format.
+ */
+function transformDishToServer(
+  dish: Dish
+): Record<string, unknown> {
+  return {
+    id: dish.id,
+    household_id: dish.householdId,
+    name: dish.name,
+    type: dish.type,
+    cook_time_minutes: dish.cookTimeMinutes ?? null,
+    recipe_url: dish.recipeUrl ?? null,
+    added_by: dish.addedBy,
+    created_at: dish.createdAt,
+    updated_at: dish.updatedAt,
+    deleted_at: dish.deletedAt ?? null,
+  };
+}
+
+/**
+ * Transform a meal plan from Supabase format to app format.
+ */
+function transformPlanFromServer(record: Record<string, unknown>): MealPlan {
+  return {
+    id: record.id as string,
+    householdId: record.household_id as string,
+    name: record.name as string | undefined,
+    startDate: record.start_date as string,
+    days: record.days as MealPlan['days'],
+    createdBy: record.created_by as string,
+    lockedBy: record.locked_by as string | undefined,
+    lockedAt: record.locked_at as string | undefined,
+    createdAt: record.created_at as string,
+    updatedAt: record.updated_at as string,
+    deletedAt: record.deleted_at as string | undefined,
+  };
+}
+
+/**
+ * Transform a meal plan to Supabase format.
+ */
+function transformPlanToServer(
+  plan: MealPlan
+): Record<string, unknown> {
+  return {
+    id: plan.id,
+    household_id: plan.householdId,
+    name: plan.name ?? null,
+    start_date: plan.startDate,
+    days: plan.days,
+    created_by: plan.createdBy,
+    locked_by: plan.lockedBy ?? null,
+    locked_at: plan.lockedAt ?? null,
+    created_at: plan.createdAt,
+    updated_at: plan.updatedAt,
+    deleted_at: plan.deletedAt ?? null,
+  };
+}
+
+/**
+ * Strip cache metadata from an entity.
+ */
+function stripCacheMetadata<T extends { _syncStatus?: unknown; _localUpdatedAt?: unknown; _serverUpdatedAt?: unknown }>(
+  entity: T
+): Omit<T, '_syncStatus' | '_localUpdatedAt' | '_serverUpdatedAt'> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { _syncStatus, _localUpdatedAt, _serverUpdatedAt, ...rest } = entity;
+  return rest as Omit<T, '_syncStatus' | '_localUpdatedAt' | '_serverUpdatedAt'>;
+}
+
+// ============================================================================
+// CLEANUP
+// ============================================================================
+
+/**
+ * Clean up sync resources.
+ * Call this on logout or when switching households.
+ */
+export function cleanupSync(): void {
+  unsubscribeFromHousehold();
+  currentHouseholdId = null;
+}

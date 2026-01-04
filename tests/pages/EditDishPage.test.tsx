@@ -5,13 +5,47 @@
  * deletion with confirmation, storage interaction, and navigation.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { EditDishPage } from '@/pages/EditDishPage';
+import { AuthProvider } from '@/components/auth';
 import { getDishes, saveDish, getPlans, savePlan, updatePlan } from '@/services';
 import type { Dish } from '@/types';
+
+// Mock useAuth to avoid Supabase dependency
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: null,
+    profile: null,
+    isLoading: false,
+    isAuthenticated: false,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    updateProfile: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
+
+// Mock useHousehold to avoid Supabase dependency
+vi.mock('@/hooks/useHousehold', () => ({
+  useHousehold: () => ({
+    households: [],
+    currentHousehold: null,
+    members: [],
+    isLoading: false,
+    isCreator: false,
+    switchHousehold: vi.fn(),
+    createHousehold: vi.fn(),
+    leaveCurrentHousehold: vi.fn(),
+    removeMember: vi.fn(),
+    refresh: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -36,7 +70,7 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 let navigatedTo: string | null = null;
 
 /**
- * Helper to render EditDishPage with router context
+ * Helper to render EditDishPage with router and auth context
  */
 function renderEditDishPage(dishId: string) {
   navigatedTo = null;
@@ -48,10 +82,12 @@ function renderEditDishPage(dishId: string) {
 
   return render(
     <MemoryRouter initialEntries={[`/edit/${dishId}`]}>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/edit/:dishId" element={<EditDishPage />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/edit/:dishId" element={<EditDishPage />} />
+        </Routes>
+      </AuthProvider>
     </MemoryRouter>
   );
 }

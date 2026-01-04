@@ -9,8 +9,42 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { PlanPage } from '@/pages/PlanPage';
+import { AuthProvider } from '@/components/auth';
 import type { Dish, MealPlan } from '@/types';
 import { STORAGE_KEYS } from '@/types';
+
+// Mock useAuth to avoid Supabase dependency
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: null,
+    profile: null,
+    isLoading: false,
+    isAuthenticated: false,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    updateProfile: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
+
+// Mock useHousehold to avoid Supabase dependency
+vi.mock('@/hooks/useHousehold', () => ({
+  useHousehold: () => ({
+    households: [],
+    currentHousehold: null,
+    members: [],
+    isLoading: false,
+    isCreator: false,
+    switchHousehold: vi.fn(),
+    createHousehold: vi.fn(),
+    leaveCurrentHousehold: vi.fn(),
+    removeMember: vi.fn(),
+    refresh: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
 
 // ============================================================================
 // Test Setup
@@ -109,9 +143,11 @@ function setupPlans(plans: MealPlan[]) {
 function renderNewPlanPage() {
   return render(
     <MemoryRouter initialEntries={['/plan']}>
-      <Routes>
-        <Route path="/plan" element={<PlanPage />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/plan" element={<PlanPage />} />
+        </Routes>
+      </AuthProvider>
     </MemoryRouter>
   );
 }
@@ -122,9 +158,11 @@ function renderNewPlanPage() {
 function renderExistingPlanPage(planId: string) {
   return render(
     <MemoryRouter initialEntries={[`/plan/${planId}`]}>
-      <Routes>
-        <Route path="/plan/:planId" element={<PlanPage />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/plan/:planId" element={<PlanPage />} />
+        </Routes>
+      </AuthProvider>
     </MemoryRouter>
   );
 }

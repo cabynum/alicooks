@@ -129,8 +129,8 @@ describe('HomePage', () => {
     it('renders greeting', () => {
       renderHomePage();
 
-      // The redesigned HomePage shows a greeting instead of subtitle
-      expect(screen.getByText(/Good evening/)).toBeInTheDocument();
+      // The redesigned HomePage shows a greeting (time-dependent)
+      expect(screen.getByText(/Good (morning|afternoon|evening)/)).toBeInTheDocument();
     });
 
     it('renders My Dishes section heading', () => {

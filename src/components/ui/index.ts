@@ -17,3 +17,5 @@ export {
   getUrlIcon,
   type RecipeSource,
 } from './UrlInput';
+
+export { SyncStatus, type SyncStatusProps } from './SyncStatus';
