@@ -29,3 +29,26 @@ export type {
 // Storage types
 export { STORAGE_KEYS, SCHEMA_VERSION } from './storage';
 export type { ExportData } from './storage';
+
+// Auth types
+export type {
+  User,
+  Profile,
+  UpdateProfileInput,
+  AuthState,
+  MagicLinkResult,
+  SignOutResult,
+} from './auth';
+
+// Household types
+export type {
+  Household,
+  CreateHouseholdInput,
+  UpdateHouseholdInput,
+  MemberRole,
+  HouseholdMember,
+  HouseholdMemberWithProfile,
+  Invite,
+  InviteValidation,
+  HouseholdState,
+} from './household';

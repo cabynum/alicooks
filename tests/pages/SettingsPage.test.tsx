@@ -9,6 +9,40 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { STORAGE_KEYS } from '@/types';
+import { AuthProvider } from '@/components/auth';
+
+// Mock useAuth to avoid Supabase dependency
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: null,
+    profile: null,
+    isLoading: false,
+    isAuthenticated: false,
+    error: null,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    updateProfile: vi.fn(),
+  }),
+}));
+
+// Mock useHousehold to avoid Supabase dependency
+vi.mock('@/hooks/useHousehold', () => ({
+  useHousehold: () => ({
+    households: [],
+    currentHousehold: null,
+    members: [],
+    isLoading: false,
+    isCreator: false,
+    error: null,
+    refresh: vi.fn(),
+    setCurrentHousehold: vi.fn(),
+    createHousehold: vi.fn(),
+    updateHousehold: vi.fn(),
+    addMember: vi.fn(),
+    removeMember: vi.fn(),
+    leaveCurrentHousehold: vi.fn(),
+  }),
+}));
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -42,7 +76,7 @@ vi.stubGlobal('URL', {
 let navigatedTo: string | null = null;
 
 /**
- * Helper to render SettingsPage with router
+ * Helper to render SettingsPage with router and auth provider
  */
 function renderSettingsPage() {
   navigatedTo = null;
@@ -54,10 +88,12 @@ function renderSettingsPage() {
 
   return render(
     <MemoryRouter initialEntries={['/settings']}>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </AuthProvider>
     </MemoryRouter>
   );
 }

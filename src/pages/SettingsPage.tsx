@@ -7,9 +7,10 @@
 
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Upload, Check } from 'lucide-react';
+import { ArrowLeft, Download, Upload, Check, Users, ChevronRight, LogOut, User } from 'lucide-react';
 import { Button, Card } from '@/components/ui';
-import { useExport, useDishes, usePlans } from '@/hooks';
+import { useExport, useDishes, usePlans, useHousehold } from '@/hooks';
+import { useAuthContext } from '@/components/auth';
 
 export function SettingsPage() {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ export function SettingsPage() {
     useExport();
   const { dishes } = useDishes();
   const { plans } = usePlans();
+  const { isAuthenticated, profile, signOut } = useAuthContext();
+  const { currentHousehold } = useHousehold();
 
   const [showImportConfirm, setShowImportConfirm] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -105,6 +108,18 @@ export function SettingsPage() {
     fileInputRef.current?.click();
   };
 
+  /**
+   * Handle sign out
+   */
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch {
+      // Error is handled by the auth context
+    }
+  };
+
   // Count of items to display
   const itemCount = dishes.length + plans.length;
   const itemSummary =
@@ -187,6 +202,104 @@ export function SettingsPage() {
             </p>
           </div>
         )}
+
+        {/* Account Section - only show when authenticated */}
+        {isAuthenticated && profile && (
+          <section className="mb-8">
+            <h2
+              className="text-lg font-semibold mb-2"
+              style={{
+                fontFamily: 'var(--font-display)',
+                color: 'var(--color-text)',
+              }}
+            >
+              Account
+            </h2>
+
+            <Card padding="md">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: 'var(--color-accent)' }}
+                  >
+                    <User size={20} style={{ color: 'var(--color-primary)' }} />
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ color: 'var(--color-text)' }}>
+                      {profile.displayName || 'User'}
+                    </p>
+                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      {profile.email}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  onClick={handleSignOut}
+                  aria-label="Sign out"
+                >
+                  <span className="flex items-center gap-2">
+                    <LogOut size={18} strokeWidth={2} />
+                    <span>Sign Out</span>
+                  </span>
+                </Button>
+              </div>
+            </Card>
+          </section>
+        )}
+
+        {/* Share with Family Section */}
+        <section className="mb-8">
+          <h2
+            className="text-lg font-semibold mb-2"
+            style={{
+              fontFamily: 'var(--font-display)',
+              color: 'var(--color-text)',
+            }}
+          >
+            Share with Family
+          </h2>
+          <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
+            {currentHousehold
+              ? 'Manage your household and invite family members.'
+              : 'Create a household to share dishes and meal plans with family members.'}
+          </p>
+
+          <Card padding="md">
+            <button
+              type="button"
+              onClick={() => navigate('/household')}
+              className="w-full flex items-center justify-between group"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: 'var(--color-accent)' }}
+                >
+                  <Users size={20} style={{ color: 'var(--color-primary)' }} />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium" style={{ color: 'var(--color-text)' }}>
+                    {currentHousehold ? currentHousehold.name : 'Get Started'}
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    {isAuthenticated
+                      ? currentHousehold
+                        ? 'Manage household'
+                        : 'Create or join a household'
+                      : 'Sign in to collaborate'}
+                  </p>
+                </div>
+              </div>
+              <ChevronRight
+                size={20}
+                style={{ color: 'var(--color-text-muted)' }}
+                className="group-hover:translate-x-0.5 transition-transform"
+              />
+            </button>
+          </Card>
+        </section>
 
         {/* Data Export Section */}
         <section className="mb-8">

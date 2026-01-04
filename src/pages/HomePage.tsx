@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Calendar, Dices } from 'lucide-react';
 import { DishList, PlanCard } from '@/components/meals';
 import { useDishes, usePlans } from '@/hooks';
+import { useAuthContext } from '@/components/auth';
 
 /**
  * Food photos from Unsplash (free, high-quality, open license)
@@ -40,11 +41,29 @@ function getRandomPhotoIndex(): number {
   return Math.floor(Math.random() * HEADER_PHOTOS.length);
 }
 
+/**
+ * Gets time-based greeting
+ */
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
 export function HomePage() {
   const navigate = useNavigate();
   const { dishes, isLoading: dishesLoading } = useDishes();
   const { plans, isLoading: plansLoading } = usePlans();
+  const { profile } = useAuthContext();
   const [photoIndex] = useState(getRandomPhotoIndex);
+
+  // Build personalized greeting
+  const greeting = getGreeting();
+  const displayName = profile?.displayName;
+  const personalGreeting = displayName 
+    ? `${greeting}, ${displayName}` 
+    : greeting;
 
   // Preload the header image
   useEffect(() => {
@@ -128,7 +147,7 @@ export function HomePage() {
         <div className="relative z-10 max-w-lg mx-auto px-4 pt-12 pb-6">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <p className="text-white/80 text-sm mb-1">Good evening 👋🏾</p>
+              <p className="text-white/80 text-sm mb-1">{personalGreeting} 👋🏾</p>
               <h1
                 className="text-3xl font-bold text-white"
                 style={{ fontFamily: 'var(--font-display)' }}

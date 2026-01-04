@@ -5,12 +5,28 @@
  * empty state, navigation, and quick actions.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { HomePage } from '@/pages/HomePage';
+import { AuthProvider } from '@/components/auth';
 import type { Dish } from '@/types';
+
+// Mock useAuth to avoid Supabase dependency
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: null,
+    profile: null,
+    isLoading: false,
+    isAuthenticated: false,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    updateProfile: vi.fn(),
+    error: null,
+    clearError: vi.fn(),
+  }),
+}));
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -84,13 +100,15 @@ function renderHomePage() {
 
   return render(
     <MemoryRouter initialEntries={['/']}>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/add" element={<AddDishPage />} />
-        <Route path="/edit/:dishId" element={<EditDishPage />} />
-        <Route path="/suggest" element={<SuggestPage />} />
-        <Route path="/plan" element={<PlanPage />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/add" element={<AddDishPage />} />
+          <Route path="/edit/:dishId" element={<EditDishPage />} />
+          <Route path="/suggest" element={<SuggestPage />} />
+          <Route path="/plan" element={<PlanPage />} />
+        </Routes>
+      </AuthProvider>
     </MemoryRouter>
   );
 }
