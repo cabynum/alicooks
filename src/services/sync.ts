@@ -61,7 +61,8 @@ interface SyncResult {
 
 let currentChannel: RealtimeChannel | null = null;
 let syncStateCallback: SyncStateCallback | null = null;
-let dataChangeCallback: DataChangeCallback | null = null;
+/** Set of data change callbacks - supports multiple subscribers */
+const dataChangeCallbacks = new Set<DataChangeCallback>();
 let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 let currentHouseholdId: string | null = null;
 
@@ -81,11 +82,12 @@ export function onSyncStateChange(callback: SyncStateCallback): () => void {
 
 /**
  * Register a callback to receive data change notifications.
+ * Supports multiple subscribers - each callback is stored in a Set.
  */
 export function onDataChange(callback: DataChangeCallback): () => void {
-  dataChangeCallback = callback;
+  dataChangeCallbacks.add(callback);
   return () => {
-    dataChangeCallback = null;
+    dataChangeCallbacks.delete(callback);
   };
 }
 
@@ -214,7 +216,8 @@ export async function fullSync(householdId: string): Promise<SyncResult> {
     await setSyncMeta(`lastSync:${householdId}`, new Date().toISOString());
 
     await notifySyncState('idle');
-    dataChangeCallback?.();
+    // Notify all listeners that data has changed
+    dataChangeCallbacks.forEach((callback) => callback());
 
     return {
       success: true,
@@ -439,8 +442,8 @@ async function handleDishChange(payload: {
       }
     }
 
-    // Notify listeners that data has changed
-    dataChangeCallback?.();
+    // Notify all listeners that data has changed
+    dataChangeCallbacks.forEach((callback) => callback());
   } catch (error) {
     console.error('Failed to handle dish change:', error);
   }
@@ -475,7 +478,8 @@ async function handlePlanChange(payload: {
       }
     }
 
-    dataChangeCallback?.();
+    // Notify all listeners that data has changed
+    dataChangeCallbacks.forEach((callback) => callback());
   } catch (error) {
     console.error('Failed to handle plan change:', error);
   }

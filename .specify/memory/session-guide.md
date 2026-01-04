@@ -42,24 +42,21 @@ Before we end, please:
 **Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Phase 3 In Progress — Sync Infrastructure (Verification Complete)
+**Current Phase**: Phase 3 In Progress — Sync Infrastructure (Real-time Working!)
 
 ### Completed This Session
 
-- ✅ **Verified sync infrastructure is fully operational**:
-  - Supabase auth working (network requests returning 200)
-  - Household lookup working (Test Family: `d88b2736-40fe-48db-9420-a42447cfff15`)
-  - Full sync for dishes and meal_plans executing correctly
-  - WebSocket real-time connection established (status 101)
-  - Console confirms: "Subscribed to household changes"
-- ✅ **Confirmed real-time subscriptions already implemented**:
-  - `subscribeToHousehold()` in `sync.ts` sets up Postgres changes listener
-  - `handleDishChange()` and `handlePlanChange()` update IndexedDB on remote changes
-  - `useDishes` hook subscribes via `onDataChange()` for automatic UI updates
-  - Full chain: WebSocket → IndexedDB → React state → UI re-render
-- ✅ **Identified that "Recommended Next Steps" were outdated**:
-  - Real-time subscriptions are already coded and connected
-  - What remains is manual end-to-end testing with two users
+- ✅ **Manual E2E sync test completed successfully**:
+  - Two test users (test@dishcourse.local, test2@dishcourse.local) in "Test Family"
+  - Dishes sync to Supabase and appear for other users
+  - Real-time updates now work without page refresh
+- ✅ **Fixed real-time sync bug** — `onDataChange()` was using a single callback variable:
+  - Changed from single `dataChangeCallback` to `Set<DataChangeCallback>`
+  - Now supports multiple subscribers (multiple `useDishes` hook instances)
+- ✅ **Enabled Supabase Realtime replication** for `dishes` and `meal_plans` tables:
+  - Created migration `007_enable_realtime.sql`
+  - Added tables to `supabase_realtime` publication
+  - WebSocket events now broadcast on INSERT/UPDATE/DELETE
 
 ### Phase Summary
 
@@ -125,11 +122,10 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Manual end-to-end sync test** — Use two browser profiles (regular + incognito) to:
-   - Sign in as `test@dishcourse.local` and `test2@dishcourse.local`
-   - Add a dish as one user, verify it appears for the other (real-time or after refresh)
-2. **Implement offline queue** (Task 3.3) — Queue writes when offline, process on reconnect
+1. **Implement offline queue** (Task 3.3) — Queue writes when offline, process on reconnect
+2. **Update StorageService** (Task 3.6) — Migrate local-only storage to use sync service
 3. **Implement conflict detection** (Task 3.9) — Detect concurrent edits during sync
+4. **Test meal plan sync** — Verify meal plans also sync in real-time between users
 
 ### Key Files
 
@@ -154,8 +150,9 @@ Core features:
 
 ### Open Decisions
 
-- **Collaboration feature**: Phase 1 & 2 complete, Phase 3 (Sync Infrastructure) nearly complete
-  - Tasks 3.1, 3.2, 3.4, 3.5, 3.7 verified working (sync service, real-time, hooks, UI)
+- **Collaboration feature**: Phase 1 & 2 complete, Phase 3 (Sync Infrastructure) core working
+  - ✅ Tasks 3.1, 3.2, 3.4, 3.5, 3.7 verified working (sync service, real-time, hooks, UI)
+  - ✅ Real-time dish sync confirmed working via manual E2E test
   - Remaining: 3.3 (offline queue), 3.6 (StorageService update), 3.8-3.10 (plans, conflicts)
   - Two test users ready: `test@dishcourse.local`, `test2@dishcourse.local` in "Test Family"
 - **User experience**: Zero-friction start implemented — auth only required for collaboration
