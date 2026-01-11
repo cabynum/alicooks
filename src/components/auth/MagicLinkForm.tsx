@@ -11,7 +11,7 @@
  * Follows Constitution principle I: User-First Simplicity.
  */
 
-import { useState, useRef, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { getUserFriendlyError } from '@/utils';
@@ -72,16 +72,7 @@ export function MagicLinkForm({
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [resendCountdown, setResendCountdown] = useState(0);
 
-  const codeInputRef = useRef<HTMLInputElement>(null);
-
   const loading = externalLoading ?? isLoading;
-
-  // Focus code input when entering code step
-  useEffect(() => {
-    if (step === 'code' && codeInputRef.current) {
-      codeInputRef.current.focus();
-    }
-  }, [step]);
 
   // Countdown timer for resend
   useEffect(() => {
@@ -243,10 +234,10 @@ export function MagicLinkForm({
 
         <form onSubmit={handleCodeSubmit} className="space-y-4">
           <Input
-            ref={codeInputRef}
             label="Verification code"
             value={code}
             onChange={setCode}
+            autoFocus
             placeholder="123456"
             type="text"
             inputMode="numeric"
