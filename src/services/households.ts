@@ -235,6 +235,51 @@ export async function updateHousehold(
 }
 
 /**
+ * Deletes a household and all associated data.
+ *
+ * Only the creator can delete their household.
+ * This will cascade delete:
+ * - All household members
+ * - All dishes (via database cascade)
+ * - All meal plans (via database cascade)
+ * - All invites (via database cascade)
+ *
+ * @param householdId - The household ID
+ * @param userId - The user requesting deletion (must be creator)
+ * @throws Error if user is not the creator or deletion fails
+ */
+export async function deleteHousehold(
+  householdId: string,
+  userId: string
+): Promise<void> {
+  // Verify the user is the creator
+  const { data: household, error: fetchError } = await supabase
+    .from('households')
+    .select('id, created_by')
+    .eq('id', householdId)
+    .single();
+
+  if (fetchError || !household) {
+    throw new Error('Household not found.');
+  }
+
+  if (household.created_by !== userId) {
+    throw new Error('Only the creator can delete this household.');
+  }
+
+  // Delete the household (members cascade automatically via FK)
+  const { error: deleteError } = await supabase
+    .from('households')
+    .delete()
+    .eq('id', householdId);
+
+  if (deleteError) {
+    console.error('Household deletion error:', deleteError);
+    throw new Error('Unable to delete household. Please try again.');
+  }
+}
+
+/**
  * Adds a new member to a household.
  *
  * @param householdId - The household ID

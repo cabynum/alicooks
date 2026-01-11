@@ -51,6 +51,7 @@ export {
   getMembers,
   createHousehold,
   updateHousehold,
+  deleteHousehold,
   addMember,
   removeMember,
   leaveHousehold,

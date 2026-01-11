@@ -7,7 +7,7 @@
 
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, UserPlus, LogOut, Settings, Users, Calendar, Smartphone, Sparkles } from 'lucide-react';
+import { ArrowLeft, UserPlus, LogOut, Trash2, Settings, Users, Calendar, Smartphone, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { MemberList, InviteModal } from '@/components/households';
 import { useHousehold } from '@/hooks';
@@ -24,6 +24,7 @@ export function HouseholdPage() {
     isLoading,
     isCreator,
     leaveCurrentHousehold,
+    deleteCurrentHousehold,
     removeMember,
     error,
   } = useHousehold();
@@ -32,6 +33,9 @@ export function HouseholdPage() {
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [leaveError, setLeaveError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   /**
    * Handle back navigation
@@ -83,6 +87,38 @@ export function HouseholdPage() {
       setLeaveError(getUserFriendlyError(err));
     } finally {
       setIsLeaving(false);
+    }
+  }
+
+  /**
+   * Show delete confirmation (creator only)
+   */
+  function handleDeleteClick() {
+    setShowDeleteConfirm(true);
+    setDeleteError(null);
+  }
+
+  /**
+   * Cancel delete
+   */
+  function handleCancelDelete() {
+    setShowDeleteConfirm(false);
+  }
+
+  /**
+   * Confirm and execute delete (creator only)
+   */
+  async function handleConfirmDelete() {
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      await deleteCurrentHousehold();
+      navigate('/', { replace: true });
+    } catch (err) {
+      setDeleteError(getUserFriendlyError(err));
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -420,6 +456,64 @@ export function HouseholdPage() {
                 >
                   <LogOut size={20} />
                   Leave Household
+                </Button>
+              )}
+            </>
+          )}
+
+          {/* Delete button (creator only) */}
+          {isCreator && (
+            <>
+              {showDeleteConfirm ? (
+                <div
+                  className="rounded-xl p-4"
+                  style={{ backgroundColor: 'var(--color-bg-muted)' }}
+                >
+                  <p
+                    className="text-sm mb-3 font-medium"
+                    style={{ color: 'var(--color-text)' }}
+                  >
+                    Delete {currentHousehold.name}?
+                  </p>
+                  <p
+                    className="text-sm mb-3"
+                    style={{ color: 'var(--color-text-muted)' }}
+                  >
+                    This will permanently delete the household and all its dishes,
+                    plans, and member data. This cannot be undone.
+                  </p>
+                  {deleteError && (
+                    <p className="text-sm text-red-500 mb-3">{deleteError}</p>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={handleCancelDelete}
+                      disabled={isDeleting}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onClick={handleConfirmDelete}
+                      loading={isDeleting}
+                      disabled={isDeleting}
+                      className="flex-1 !bg-red-500"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  variant="ghost"
+                  fullWidth
+                  onClick={handleDeleteClick}
+                  className="!text-red-500"
+                >
+                  <Trash2 size={20} />
+                  Delete Household
                 </Button>
               )}
             </>

@@ -39,6 +39,7 @@ import {
   getHouseholds,
   getMembers,
   createHousehold as createHouseholdService,
+  deleteHousehold as deleteHouseholdService,
   leaveHousehold as leaveHouseholdService,
   removeMember as removeMemberService,
 } from '@/services';
@@ -76,6 +77,9 @@ export interface UseHouseholdReturn {
 
   /** Leave the current household */
   leaveCurrentHousehold: () => Promise<void>;
+
+  /** Delete the current household (creator only) */
+  deleteCurrentHousehold: () => Promise<void>;
 
   /** Remove a member (creator only) */
   removeMember: (memberId: string) => Promise<void>;
@@ -273,6 +277,51 @@ export function useHousehold(): UseHouseholdReturn {
   }, [user, currentHousehold, households]);
 
   /**
+   * Delete the current household (creator only).
+   */
+  const deleteCurrentHousehold = useCallback(async (): Promise<void> => {
+    if (!user || !currentHousehold) {
+      throw new Error('No household to delete.');
+    }
+
+    if (!isCreator) {
+      throw new Error('Only the creator can delete this household.');
+    }
+
+    setError(null);
+    const householdIdToDelete = currentHousehold.id;
+
+    try {
+      await deleteHouseholdService(householdIdToDelete, user.id);
+
+      // Clear local cache for this household (IndexedDB)
+      await clearHouseholdData(householdIdToDelete);
+
+      // Remove from local state
+      const remainingHouseholds = households.filter(
+        (h) => h.id !== householdIdToDelete
+      );
+      setHouseholds(remainingHouseholds);
+
+      // Switch to another household or clear
+      const nextHousehold = remainingHouseholds[0] ?? null;
+      setCurrentHousehold(nextHousehold);
+
+      if (nextHousehold) {
+        localStorage.setItem(CURRENT_HOUSEHOLD_KEY, nextHousehold.id);
+        const householdMembers = await getMembers(nextHousehold.id);
+        setMembers(householdMembers);
+      } else {
+        localStorage.removeItem(CURRENT_HOUSEHOLD_KEY);
+        setMembers([]);
+      }
+    } catch (err) {
+      setError(getUserFriendlyError(err));
+      throw err;
+    }
+  }, [user, currentHousehold, households, isCreator]);
+
+  /**
    * Remove a member from the current household (creator only).
    */
   const removeMember = useCallback(
@@ -320,6 +369,7 @@ export function useHousehold(): UseHouseholdReturn {
     switchHousehold,
     createHousehold,
     leaveCurrentHousehold,
+    deleteCurrentHousehold,
     removeMember,
     refresh,
     error,
