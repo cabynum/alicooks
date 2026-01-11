@@ -194,6 +194,13 @@ serve(async (req: Request) => {
     const inviteUrl = `https://havedishcourse.vercel.app/join/${inviteCode}`;
     const message = `You're invited to join "${householdName}" on DishCourse! Tap to accept: ${inviteUrl}`;
 
+    // Log the SMS attempt
+    console.log("Attempting to send SMS:", {
+      to: destination,
+      from: fromNumber,
+      messageLength: message.length,
+    });
+
     // Send the SMS
     const result = await sendTwilioSMS(
       destination,
@@ -203,13 +210,17 @@ serve(async (req: Request) => {
       fromNumber
     );
 
+    console.log("Twilio result:", result);
+
     if (!result.success) {
+      console.error("SMS send failed:", result.error);
       return new Response(JSON.stringify({ error: result.error }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    console.log("SMS sent successfully, SID:", result.sid);
     return new Response(
       JSON.stringify({ success: true, messageSid: result.sid }),
       {

@@ -6,20 +6,22 @@
  * 2. Shows the household being joined
  * 3. Redirects to auth if not logged in
  * 4. Adds the user to the household
+ * 5. Offers to migrate local dishes
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Users, AlertCircle, CheckCircle } from 'lucide-react';
+import { Users, AlertCircle, CheckCircle, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { useInvite, useHousehold } from '@/hooks';
 import { useAuthContext } from '@/components/auth';
+import { getLocalDishCount, migrateLocalDishes } from '@/services/sync';
 import type { Household, InviteValidation } from '@/types';
 
 export function JoinPage() {
   const navigate = useNavigate();
   const { code } = useParams<{ code: string }>();
-  const { isAuthenticated, isLoading: authLoading } = useAuthContext();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuthContext();
   const { validateCode, joinWithCode, isLoading: inviteLoading } = useInvite();
   const { refresh: refreshHouseholds } = useHousehold();
 
@@ -28,6 +30,12 @@ export function JoinPage() {
   const [isJoining, setIsJoining] = useState(false);
   const [joinedHousehold, setJoinedHousehold] = useState<Household | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [migrateDishes, setMigrateDishes] = useState(true);
+  const [isMigrating, setIsMigrating] = useState(false);
+  
+  // Check for local dishes
+  const localDishCount = getLocalDishCount();
+  const hasLocalDishes = localDishCount > 0;
 
   // Validate the invite code on mount
   useEffect(() => {
@@ -55,13 +63,25 @@ export function JoinPage() {
    * Handle join button click
    */
   async function handleJoin() {
-    if (!code || !isAuthenticated) return;
+    if (!code || !isAuthenticated || !user) return;
 
     setIsJoining(true);
     setError(null);
 
     try {
       const household = await joinWithCode(code);
+      
+      // Migrate local dishes if user opted in
+      if (hasLocalDishes && migrateDishes) {
+        setIsMigrating(true);
+        const result = await migrateLocalDishes(household.id, user.id);
+        if (!result.success) {
+          console.error('Migration failed:', result.error);
+          // Continue anyway - dishes are still in localStorage
+        }
+        setIsMigrating(false);
+      }
+      
       setJoinedHousehold(household);
       // Refresh household list in background
       refreshHouseholds();
@@ -89,7 +109,7 @@ export function JoinPage() {
     navigate('/', { replace: true });
   }
 
-  const isLoading = authLoading || isValidating || inviteLoading;
+  const isLoading = authLoading || isValidating || inviteLoading || isMigrating;
 
   // Loading state
   if (isLoading && !validation && !joinedHousehold) {
@@ -299,6 +319,44 @@ export function JoinPage() {
           You'll be able to share dishes and collaborate on meal plans.
         </p>
 
+        {/* Migration option - show if user has local dishes and is authenticated */}
+        {isAuthenticated && hasLocalDishes && (
+          <div
+            className="rounded-xl p-4 mb-6 flex items-start gap-3 text-left"
+            style={{ backgroundColor: 'var(--color-bg-muted)' }}
+          >
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: 'var(--color-accent)' }}
+            >
+              <Utensils size={20} style={{ color: 'var(--color-primary)' }} />
+            </div>
+            <div className="flex-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={migrateDishes}
+                  onChange={(e) => setMigrateDishes(e.target.checked)}
+                  disabled={isJoining}
+                  className="w-5 h-5 rounded border-stone-300 text-amber-500 focus:ring-amber-500"
+                />
+                <span
+                  className="font-medium"
+                  style={{ color: 'var(--color-text)' }}
+                >
+                  Bring my {localDishCount} dish{localDishCount !== 1 ? 'es' : ''}
+                </span>
+              </label>
+              <p
+                className="text-sm mt-1"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                Add your existing dishes so everyone can see them.
+              </p>
+            </div>
+          </div>
+        )}
+
         {error && (
           <p className="text-sm text-red-500 mb-4">{error}</p>
         )}
@@ -308,10 +366,10 @@ export function JoinPage() {
             variant="primary"
             fullWidth
             onClick={handleJoin}
-            loading={isJoining}
-            disabled={isJoining}
+            loading={isJoining || isMigrating}
+            disabled={isJoining || isMigrating}
           >
-            Join Household
+            {isMigrating ? 'Migrating dishes...' : 'Join Household'}
           </Button>
         ) : (
           <div className="space-y-3">

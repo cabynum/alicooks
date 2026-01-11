@@ -331,7 +331,7 @@ export function InviteModal({
                   </div>
                 </div>
 
-                {/* Send via SMS */}
+                {/* SMS invite - hidden until A2P 10DLC or Toll-Free registration
                 <div
                   className="pt-4 border-t"
                   style={{ borderColor: 'var(--color-bg-muted)' }}
@@ -347,9 +347,10 @@ export function InviteModal({
                     <div className="flex-1">
                       <Input
                         type="tel"
+                        label=""
                         placeholder="Phone number"
                         value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        onChange={setPhoneNumber}
                         disabled={isSendingSms}
                         aria-label="Phone number for SMS invite"
                       />
@@ -376,6 +377,7 @@ export function InviteModal({
                     </p>
                   )}
                 </div>
+                */}
 
                 {/* Share button (if supported) */}
                 {canShare && (

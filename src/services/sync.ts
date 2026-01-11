@@ -1033,3 +1033,102 @@ export async function resolveConflict(
     return false;
   }
 }
+
+// ============================================================================
+// LOCAL DISH MIGRATION
+// ============================================================================
+
+import { getDishes as getLocalDishes, deleteDish as deleteLocalDish } from './storage';
+
+/**
+ * Check if there are local dishes that can be migrated to a household.
+ * Local dishes are stored in localStorage (not IndexedDB) and don't have a householdId.
+ *
+ * @returns The number of local dishes available for migration
+ */
+export function getLocalDishCount(): number {
+  const localDishes = getLocalDishes();
+  return localDishes.length;
+}
+
+/**
+ * Get all local dishes that can be migrated.
+ *
+ * @returns Array of local dishes
+ */
+export function getLocalDishesForMigration(): Dish[] {
+  return getLocalDishes() as Dish[];
+}
+
+/**
+ * Migrate local dishes to a household.
+ * This uploads them to Supabase, stores them in IndexedDB, and clears localStorage.
+ *
+ * @param householdId - The household to migrate dishes to
+ * @param userId - The user performing the migration (becomes addedBy)
+ * @returns Result of the migration
+ */
+export async function migrateLocalDishes(
+  householdId: string,
+  userId: string
+): Promise<{ success: boolean; migratedCount: number; error?: string }> {
+  const localDishes = getLocalDishes();
+
+  if (localDishes.length === 0) {
+    return { success: true, migratedCount: 0 };
+  }
+
+  try {
+    const timestamp = new Date().toISOString();
+    let migratedCount = 0;
+
+    for (const localDish of localDishes) {
+      // Create the dish with household context
+      const dish: Dish = {
+        id: localDish.id,
+        name: localDish.name,
+        type: localDish.type,
+        householdId,
+        addedBy: userId,
+        createdAt: localDish.createdAt,
+        updatedAt: timestamp,
+        ...(localDish.recipeUrls && { recipeUrls: localDish.recipeUrls }),
+        ...(localDish.cookTimeMinutes !== undefined && {
+          cookTimeMinutes: localDish.cookTimeMinutes,
+        }),
+      };
+
+      // Upload to Supabase
+      const serverDish = transformDishToServer(dish);
+      const { error } = await supabase.from('dishes').upsert(serverDish, {
+        onConflict: 'id',
+      });
+
+      if (error) {
+        console.error('Failed to migrate dish:', dish.name, error);
+        continue; // Try to migrate remaining dishes
+      }
+
+      // Store in local IndexedDB cache
+      const cached = withSyncMetadata(dish, 'synced');
+      await db.dishes.put(cached);
+
+      // Remove from localStorage
+      deleteLocalDish(localDish.id);
+
+      migratedCount++;
+    }
+
+    // Notify listeners that data changed
+    dataChangeCallbacks.forEach((callback) => callback());
+
+    return { success: true, migratedCount };
+  } catch (error) {
+    console.error('Migration failed:', error);
+    return {
+      success: false,
+      migratedCount: 0,
+      error: error instanceof Error ? error.message : 'Migration failed',
+    };
+  }
+}

@@ -5,18 +5,20 @@
  * After creation, they become the creator/admin of that household.
  * 
  * If the user is not authenticated, they are redirected to sign in first.
+ * If they have local dishes, offers to migrate them to the new household.
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, Users, Utensils } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { useHousehold } from '@/hooks';
 import { useAuthContext } from '@/components/auth';
+import { getLocalDishCount, migrateLocalDishes } from '@/services/sync';
 
 export function HouseholdCreatePage() {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading: authLoading } = useAuthContext();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuthContext();
   const { createHousehold, isLoading: hookLoading } = useHousehold();
 
   // Redirect to auth if not signed in
@@ -29,8 +31,14 @@ export function HouseholdCreatePage() {
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [migrateDishes, setMigrateDishes] = useState(true);
+  const [isMigrating, setIsMigrating] = useState(false);
+  
+  // Check for local dishes
+  const localDishCount = getLocalDishCount();
+  const hasLocalDishes = localDishCount > 0;
 
-  const isLoading = hookLoading || isSubmitting;
+  const isLoading = hookLoading || isSubmitting || isMigrating;
 
   /**
    * Handle back navigation
@@ -61,6 +69,18 @@ export function HouseholdCreatePage() {
 
     try {
       const household = await createHousehold({ name: trimmedName });
+      
+      // Migrate local dishes if user opted in
+      if (hasLocalDishes && migrateDishes && user) {
+        setIsMigrating(true);
+        const result = await migrateLocalDishes(household.id, user.id);
+        if (!result.success) {
+          console.error('Migration failed:', result.error);
+          // Continue anyway - dishes are still in localStorage
+        }
+        setIsMigrating(false);
+      }
+      
       // Navigate to the new household's page
       navigate(`/household/${household.id}`, { replace: true });
     } catch (err) {
@@ -147,6 +167,44 @@ export function HouseholdCreatePage() {
               error={error ?? undefined}
             />
 
+            {/* Migration option - show if user has local dishes */}
+            {hasLocalDishes && (
+              <div
+                className="rounded-xl p-4 flex items-start gap-3"
+                style={{ backgroundColor: 'var(--color-bg-muted)' }}
+              >
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: 'var(--color-accent)' }}
+                >
+                  <Utensils size={20} style={{ color: 'var(--color-primary)' }} />
+                </div>
+                <div className="flex-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={migrateDishes}
+                      onChange={(e) => setMigrateDishes(e.target.checked)}
+                      disabled={isLoading}
+                      className="w-5 h-5 rounded border-stone-300 text-amber-500 focus:ring-amber-500"
+                    />
+                    <span
+                      className="font-medium"
+                      style={{ color: 'var(--color-text)' }}
+                    >
+                      Bring my {localDishCount} dish{localDishCount !== 1 ? 'es' : ''}
+                    </span>
+                  </label>
+                  <p
+                    className="text-sm mt-1"
+                    style={{ color: 'var(--color-text-muted)' }}
+                  >
+                    Add your existing dishes to this household so everyone can see them.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <Button
               type="submit"
               variant="primary"
@@ -154,7 +212,7 @@ export function HouseholdCreatePage() {
               loading={isLoading}
               disabled={isLoading}
             >
-              Create Household
+              {isMigrating ? 'Migrating dishes...' : 'Create Household'}
             </Button>
           </form>
         </div>

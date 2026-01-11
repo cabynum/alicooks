@@ -176,6 +176,19 @@ Core features:
 - **Palette**: Black (#1A1A1A), Charcoal (#2C2C2C), White, Sunflower Yellow (#FFB800)
 - **Typography**: "DishCourse" with yellow "Dish" + white "Course" (Outfit font)
 
+### Production Readiness TODOs
+
+- [ ] **SMS Invites (deferred)** — US carriers require A2P 10DLC registration for app-to-person SMS.
+  - Current status: Edge Function works, but messages blocked (error 30034)
+  - To enable: Get a Toll-Free number (~$2/mo) and complete verification
+  - Code is ready in `InviteModal.tsx` (commented out) and `send-invite-sms` Edge Function
+  - For now: Use link/code invite methods instead
+
+- [ ] **User-friendly error messages** — InviteModal shows raw Edge Function errors. Before prod:
+  - Map technical errors to friendly messages (e.g., "Unable to send SMS. Please try again.")
+  - Log technical details to console/monitoring, show simple message to user
+  - Applies to: `InviteModal.tsx` smsError display
+
 ### Notes
 
 - Use two trailing spaces for line breaks (not tables) unless truly tabular

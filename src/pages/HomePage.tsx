@@ -287,15 +287,25 @@ export function HomePage() {
         {/* Dishes Section */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2
-              className="text-xl font-semibold"
-              style={{
-                fontFamily: 'var(--font-display)',
-                color: 'var(--color-text)',
-              }}
-            >
-              My Dishes
-            </h2>
+            <div>
+              <h2
+                className="text-xl font-semibold"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  color: 'var(--color-text)',
+                }}
+              >
+                {isSyncedMode && currentHousehold ? `${currentHousehold.name}'s Dishes` : 'My Dishes'}
+              </h2>
+              {isSyncedMode && currentHousehold && (
+                <p
+                  className="text-xs"
+                  style={{ color: 'var(--color-text-muted)' }}
+                >
+                  Shared with your household
+                </p>
+              )}
+            </div>
             {dishes.length > 0 && (
               <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                 {dishes.length} {dishes.length === 1 ? 'dish' : 'dishes'}
