@@ -33,7 +33,7 @@ export function AuthPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { profile, isLoading, isAuthenticated, signIn, updateProfile } = useAuthContext();
+  const { profile, isLoading, isAuthenticated, signIn, verifyCode, updateProfile } = useAuthContext();
 
   // Track if we're on the verification callback route
   const isVerifyRoute = location.pathname === '/auth/verify';
@@ -286,10 +286,11 @@ export function AuthPage() {
             Sign in to sync your dishes across devices and share with your household.
           </p>
 
-          {/* Magic Link Form */}
+          {/* OTP Authentication Form */}
           <MagicLinkForm
             mode="signin"
             sendMagicLink={signIn}
+            verifyCode={verifyCode}
             onSuccess={handleMagicLinkSuccess}
           />
         </div>

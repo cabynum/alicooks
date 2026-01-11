@@ -2,21 +2,22 @@
  * Auth Service
  *
  * Handles all authentication operations using Supabase Auth.
- * Provides magic link authentication (passwordless email-based login)
+ * Provides OTP code authentication (passwordless email-based login)
  * which aligns with the Constitution's User-First Simplicity principle.
+ *
+ * OTP codes work better than magic links for PWA users because
+ * there's no redirect required — users simply enter the code.
  *
  * @example
  * ```typescript
- * // Send a magic link
- * await signInWithMagicLink('user@example.com');
+ * // Send an OTP code
+ * await sendOtpCode('user@example.com');
+ *
+ * // Verify the code
+ * await verifyOtpCode('user@example.com', '123456');
  *
  * // Get the current user
  * const user = await getCurrentUser();
- *
- * // Listen for auth changes
- * const unsubscribe = onAuthStateChange((user) => {
- *   console.log('Auth changed:', user?.email);
- * });
  * ```
  */
 
@@ -24,68 +25,118 @@ import { supabase } from '@/lib/supabase';
 import type { User, Profile, UpdateProfileInput } from '@/types';
 
 /**
- * Sends a magic link email for passwordless authentication.
+ * Handles common auth errors and throws user-friendly messages.
+ */
+function handleAuthError(error: { message: string; status?: number; name?: string }): never {
+  // Log the full error for debugging
+  console.error('Supabase auth error:', {
+    message: error.message,
+    status: error.status,
+    name: error.name,
+  });
+  
+  // Provide user-friendly error messages
+  if (error.message.includes('rate limit')) {
+    throw new Error('Too many attempts. Please wait a few minutes and try again.');
+  }
+  if (error.message.includes('invalid email')) {
+    throw new Error('Please enter a valid email address.');
+  }
+  if (error.message.includes('Token has expired') || error.message.includes('otp_expired')) {
+    throw new Error('This code has expired. Please request a new one.');
+  }
+  if (error.message.includes('Invalid') && error.message.includes('token')) {
+    throw new Error('Invalid code. Please check and try again.');
+  }
+  // Safari/iOS network errors
+  if (error.message.includes('Load Failed') || 
+      error.message.includes('network connection was lost') ||
+      error.message.includes('NetworkError')) {
+    throw new Error('Unable to connect. Please check your internet connection and try again.');
+  }
+  throw new Error(`Auth error: ${error.message}`);
+}
+
+/**
+ * Sends a 6-digit OTP code to the user's email.
  *
- * The user will receive an email with a link that signs them in
- * when clicked. No password required.
+ * The user will receive an email with a code they can enter
+ * in the app to sign in. No redirect required — perfect for PWAs.
  *
  * @param email - The user's email address
  * @throws Error if the email fails to send
  */
-export async function signInWithMagicLink(email: string): Promise<void> {
-  // Log request details for debugging mobile issues
-  console.log('🔐 Magic link request:', {
+export async function sendOtpCode(email: string): Promise<void> {
+  console.log('🔐 OTP code request:', {
     email: email.replace(/(.{2}).*@/, '$1***@'), // Partially mask email
-    origin: window.location.origin,
-    redirectTo: `${window.location.origin}/auth/verify`,
-    userAgent: navigator.userAgent.substring(0, 100),
   });
 
   try {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        // Where to redirect after clicking the magic link
-        emailRedirectTo: `${window.location.origin}/auth/verify`,
+        // Don't use email redirect — we want the user to enter the code
+        shouldCreateUser: true,
       },
     });
 
     if (error) {
-      // Log the full error for debugging
-      console.error('Supabase auth error:', {
-        message: error.message,
-        status: error.status,
-        name: error.name,
-        code: (error as unknown as Record<string, unknown>).code,
-        cause: (error as unknown as Record<string, unknown>).cause,
-      });
-      
-      // Provide user-friendly error messages
-      if (error.message.includes('rate limit')) {
-        throw new Error('Too many attempts. Please wait a few minutes and try again.');
-      }
-      if (error.message.includes('invalid email')) {
-        throw new Error('Please enter a valid email address.');
-      }
-      // Safari/iOS network errors
-      if (error.message.includes('Load Failed') || 
-          error.message.includes('network connection was lost') ||
-          error.message.includes('NetworkError')) {
-        throw new Error('Unable to connect. Please check your internet connection and try again.');
-      }
-      throw new Error(`Auth error: ${error.message}`);
+      handleAuthError(error);
     }
 
-    console.log('✅ Magic link sent successfully');
+    console.log('✅ OTP code sent successfully');
   } catch (err) {
-    // Catch any errors not handled by Supabase's error object
-    console.error('🚨 Magic link request failed:', {
-      error: err,
-      message: err instanceof Error ? err.message : String(err),
-      stack: err instanceof Error ? err.stack : undefined,
-    });
+    if (err instanceof Error && err.message.startsWith('Auth error:')) {
+      throw err;
+    }
+    console.error('🚨 OTP request failed:', err);
     throw err;
   }
+}
+
+/**
+ * Verifies the OTP code entered by the user.
+ *
+ * @param email - The user's email address (must match the one used to send the code)
+ * @param code - The 6-digit code from the email
+ * @returns The authenticated user
+ * @throws Error if verification fails
+ */
+export async function verifyOtpCode(email: string, code: string): Promise<User> {
+  console.log('🔐 Verifying OTP code for:', email.replace(/(.{2}).*@/, '$1***@'));
+
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: 'email',
+    });
+
+    if (error) {
+      handleAuthError(error);
+    }
+
+    if (!data.user) {
+      throw new Error('Verification failed. Please try again.');
+    }
+
+    console.log('✅ OTP verified successfully');
+    return data.user;
+  } catch (err) {
+    if (err instanceof Error && (err.message.startsWith('Auth error:') || err.message.includes('code'))) {
+      throw err;
+    }
+    console.error('🚨 OTP verification failed:', err);
+    throw err;
+  }
+}
+
+/**
+ * @deprecated Use sendOtpCode instead. Magic links don't work well with PWAs.
+ */
+export async function signInWithMagicLink(email: string): Promise<void> {
+  // Redirect to OTP flow
+  return sendOtpCode(email);
 }
 
 /**

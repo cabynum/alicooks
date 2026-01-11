@@ -29,7 +29,9 @@ export { suggest, suggestMany } from './suggestion';
 
 // Auth service for authentication operations
 export {
-  signInWithMagicLink,
+  sendOtpCode,
+  verifyOtpCode,
+  signInWithMagicLink, // @deprecated - use sendOtpCode instead
   signOut,
   getCurrentUser,
   getSession,

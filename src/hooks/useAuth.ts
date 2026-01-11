@@ -30,7 +30,8 @@ import type { User, Profile, UpdateProfileInput } from '@/types';
 import {
   getCurrentUser,
   getProfile,
-  signInWithMagicLink,
+  sendOtpCode,
+  verifyOtpCode,
   signOut as authSignOut,
   updateProfile as authUpdateProfile,
   onAuthStateChange,
@@ -54,8 +55,11 @@ export interface UseAuthReturn {
   /** True if user is authenticated */
   isAuthenticated: boolean;
 
-  /** Send a magic link to the given email */
+  /** Send an OTP code to the given email */
   signIn: (email: string) => Promise<void>;
+
+  /** Verify an OTP code and sign in */
+  verifyCode: (email: string, code: string) => Promise<void>;
 
   /** Sign out the current user */
   signOut: () => Promise<void>;
@@ -143,12 +147,26 @@ export function useAuth(): UseAuthReturn {
   }, []);
 
   /**
-   * Send a magic link to the given email.
+   * Send an OTP code to the given email.
    */
   const signIn = useCallback(async (email: string): Promise<void> => {
     setError(null);
     try {
-      await signInWithMagicLink(email);
+      await sendOtpCode(email);
+    } catch (err) {
+      setError(getUserFriendlyError(err));
+      throw err;
+    }
+  }, []);
+
+  /**
+   * Verify an OTP code and sign in.
+   */
+  const verifyCode = useCallback(async (email: string, code: string): Promise<void> => {
+    setError(null);
+    try {
+      await verifyOtpCode(email, code);
+      // User state will be updated by the onAuthStateChange listener
     } catch (err) {
       setError(getUserFriendlyError(err));
       throw err;
@@ -205,6 +223,7 @@ export function useAuth(): UseAuthReturn {
     isLoading,
     isAuthenticated: !!user,
     signIn,
+    verifyCode,
     signOut,
     updateProfile,
     error,

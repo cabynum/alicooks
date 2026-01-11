@@ -45,6 +45,16 @@ Link a dish to an external recipe source:
 Domain-specific icons (Instagram, YouTube, TikTok, Pinterest). Tap icon on DishCard to
 open URL. Also added `cookTimeMinutes` as bonus. All in expandable "More details" section.
 
+### Dish Photos
+
+**Added**: 2026-01-11
+
+Allow users to upload a photo of a dish that displays on the dish card. A picture of your homemade lasagna or that perfectly grilled salmon makes the dish list more appetizing and helps jog memory when meal planning.
+
+*Consideration*: Need to handle image storage (local? cloud?), compression for performance, and graceful fallback when no photo exists. Aligns with Principle II (Delight Over Features) — a visual dish library feels more personal and inviting. Keep upload optional; dishes should still work great without photos.
+
+---
+
 ### Restaurant Orders / Go-To Orders
 
 **Added**: 2026-01-11
@@ -96,16 +106,19 @@ members should be able to:
 implementation. May need a v2 milestone. Constitution principle IV (Data Ownership) must still
 apply — users should be able to export their shared data.
 
-### Household Meal Voting
+### Meal Proposals & Voting
 
-**Added**: 2024-12-18
+**Added**: 2024-12-18  
+**Expanded**: 2026-01-11
 
-Share a meal suggestion with household members and let them vote — like or reject the idea
-before committing to dinner. Takes the guesswork out of "what does everyone want?"
+Let household members propose a meal for the night and vote on it:
 
-*Consideration*: Multi-household features are out of scope for v1 per constitution. Would
-require user accounts, sharing mechanism (link? app invite?), and real-time or async voting
-UI. Big feature, but addresses a real pain point for families. **Connects to Family Collaboration above.**
+- **Propose a meal** — Either construct your own (pick entree + sides) OR propose a meal that came from the suggestion feature
+- **Notify household** — Members get notified when someone proposes a meal
+- **Vote** — Thumbs up or thumbs down to accept or reject the proposal
+- **Decide together** — Takes the guesswork out of "what does everyone want?"
+
+*Consideration*: Requires Family Collaboration infrastructure (accounts, households, notifications). Push notifications would enhance this but aren't required — could start with in-app notification badges. Voting UI should be dead simple: see the meal, tap thumbs up/down. **Connects to Family Collaboration above.**
 
 ---
 

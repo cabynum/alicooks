@@ -1,26 +1,32 @@
 /**
- * MagicLinkForm Component
+ * OTP Authentication Form Component
  *
- * Email input form for passwordless authentication via magic link.
- * Sends a sign-in link to the user's email — no password required.
+ * Two-step email authentication form:
+ * 1. User enters email → receives 6-digit code via email
+ * 2. User enters code → gets signed in
  *
- * Follows Constitution principle I: User-First Simplicity — magic links
- * are intuitive and don't require remembering passwords.
+ * This works better than magic links for PWA users because
+ * there's no redirect required — users simply enter the code.
+ *
+ * Follows Constitution principle I: User-First Simplicity.
  */
 
-import { useState, type FormEvent } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { getUserFriendlyError } from '@/utils';
 
 export interface MagicLinkFormProps {
-  /** Called when magic link is successfully sent */
+  /** Called when authentication is complete */
   onSuccess: () => void;
-  /** Whether the form is for sign in or sign up */
+  /** Whether the form is for sign in or sign up (display only) */
   mode: 'signin' | 'signup';
   /** Externally controlled loading state */
   loading?: boolean;
-  /** Function to send the magic link */
+  /** Function to send the OTP code */
   sendMagicLink: (email: string) => Promise<void>;
+  /** Function to verify the OTP code */
+  verifyCode?: (email: string, code: string) => Promise<unknown>;
 }
 
 /**
@@ -32,21 +38,23 @@ function isValidEmail(email: string): boolean {
 }
 
 /**
- * MagicLinkForm - Passwordless email authentication.
+ * OTP Authentication Form
  *
  * Features:
  * - Email input with validation
- * - Loading state during send
- * - Success state showing "check your email" message
+ * - 6-digit code entry with auto-focus
+ * - Loading states during send/verify
  * - Error display for failures
+ * - Resend code option
  * - Mobile-friendly with proper touch targets
  *
  * @example
  * ```tsx
  * <MagicLinkForm
  *   mode="signin"
- *   sendMagicLink={signIn}
- *   onSuccess={() => setShowSuccess(true)}
+ *   sendMagicLink={sendOtpCode}
+ *   verifyCode={verifyOtpCode}
+ *   onSuccess={() => navigate('/')}
  * />
  * ```
  */
@@ -55,23 +63,41 @@ export function MagicLinkForm({
   mode,
   loading: externalLoading,
   sendMagicLink,
+  verifyCode,
 }: MagicLinkFormProps) {
   const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSent, setIsSent] = useState(false);
+  const [step, setStep] = useState<'email' | 'code'>('email');
+  const [resendCountdown, setResendCountdown] = useState(0);
+
+  const codeInputRef = useRef<HTMLInputElement>(null);
 
   const loading = externalLoading ?? isLoading;
 
+  // Focus code input when entering code step
+  useEffect(() => {
+    if (step === 'code' && codeInputRef.current) {
+      codeInputRef.current.focus();
+    }
+  }, [step]);
+
+  // Countdown timer for resend
+  useEffect(() => {
+    if (resendCountdown > 0) {
+      const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCountdown]);
+
   /**
-   * Handle form submission.
-   * Validates email and sends magic link.
+   * Handle email submission — sends OTP code
    */
-  async function handleSubmit(e: FormEvent) {
+  async function handleEmailSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
-    // Validate email
     const trimmedEmail = email.trim().toLowerCase();
     if (!trimmedEmail) {
       setError('Please enter your email address.');
@@ -86,7 +112,41 @@ export function MagicLinkForm({
 
     try {
       await sendMagicLink(trimmedEmail);
-      setIsSent(true);
+      setStep('code');
+      setResendCountdown(60); // 60 second cooldown before resend
+    } catch (err) {
+      setError(getUserFriendlyError(err));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  /**
+   * Handle code submission — verifies OTP and signs in
+   */
+  async function handleCodeSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    const trimmedCode = code.trim();
+    if (!trimmedCode) {
+      setError('Please enter the code from your email.');
+      return;
+    }
+    if (!/^\d{6}$/.test(trimmedCode)) {
+      setError('Please enter the 6-digit code.');
+      return;
+    }
+
+    if (!verifyCode) {
+      setError('Verification not available.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await verifyCode(email.trim().toLowerCase(), trimmedCode);
       onSuccess();
     } catch (err) {
       setError(getUserFriendlyError(err));
@@ -95,87 +155,157 @@ export function MagicLinkForm({
     }
   }
 
-  // Success state — email has been sent
-  if (isSent) {
+  /**
+   * Resend the OTP code
+   */
+  async function handleResend() {
+    if (resendCountdown > 0) return;
+
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      await sendMagicLink(email.trim().toLowerCase());
+      setResendCountdown(60);
+      setCode('');
+    } catch (err) {
+      setError(getUserFriendlyError(err));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  /**
+   * Go back to email step
+   */
+  function handleBack() {
+    setStep('email');
+    setCode('');
+    setError(null);
+  }
+
+  // Step 2: Code entry
+  if (step === 'code') {
     return (
-      <div className="text-center space-y-4 py-8">
-        {/* Email icon */}
-        <div
-          className="mx-auto w-16 h-16 rounded-full flex items-center justify-center"
-          style={{ backgroundColor: 'var(--color-accent)' }}
-        >
-          <svg
-            className="w-8 h-8"
-            style={{ color: 'var(--color-primary)' }}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-            />
-          </svg>
-        </div>
-
-        <h2
-          className="text-xl font-semibold font-display"
-          style={{ color: 'var(--color-text)' }}
-        >
-          Check your email
-        </h2>
-
-        <p
-          className="text-base"
-          style={{ color: 'var(--color-text-muted)' }}
-        >
-          We sent a sign-in link to{' '}
-          <span className="font-medium" style={{ color: 'var(--color-text)' }}>
-            {email}
-          </span>
-        </p>
-
-        <p
-          className="text-sm"
-          style={{ color: 'var(--color-text-light)' }}
-        >
-          Click the link in the email to sign in. It expires in 1 hour.
-        </p>
-
+      <div className="space-y-6">
+        {/* Back button */}
         <button
           type="button"
-          onClick={() => {
-            setIsSent(false);
-            setEmail('');
-          }}
-          className="text-sm underline hover:no-underline transition-all"
-          style={{ color: 'var(--color-secondary)' }}
+          onClick={handleBack}
+          className="flex items-center gap-1 text-sm hover:opacity-80 transition-opacity"
+          style={{ color: 'var(--color-text-muted)' }}
         >
-          Use a different email
+          <ArrowLeft size={16} />
+          <span>Back</span>
         </button>
+
+        {/* Email icon */}
+        <div className="text-center">
+          <div
+            className="mx-auto w-16 h-16 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: 'var(--color-accent)' }}
+          >
+            <svg
+              className="w-8 h-8"
+              style={{ color: 'var(--color-primary)' }}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div className="text-center">
+          <h2
+            className="text-xl font-semibold"
+            style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}
+          >
+            Check your email
+          </h2>
+          <p
+            className="mt-2 text-sm"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
+            We sent a 6-digit code to{' '}
+            <span className="font-medium" style={{ color: 'var(--color-text)' }}>
+              {email}
+            </span>
+          </p>
+        </div>
+
+        <form onSubmit={handleCodeSubmit} className="space-y-4">
+          <Input
+            ref={codeInputRef}
+            label="Verification code"
+            value={code}
+            onChange={setCode}
+            placeholder="123456"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="one-time-code"
+            maxLength={6}
+            disabled={loading}
+            error={error ?? undefined}
+          />
+
+          <Button
+            type="submit"
+            variant="primary"
+            fullWidth
+            loading={loading}
+            disabled={loading || code.length !== 6}
+          >
+            Sign in
+          </Button>
+        </form>
+
+        {/* Resend option */}
+        <p
+          className="text-center text-sm"
+          style={{ color: 'var(--color-text-muted)' }}
+        >
+          Didn&apos;t get the code?{' '}
+          {resendCountdown > 0 ? (
+            <span>Resend in {resendCountdown}s</span>
+          ) : (
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={loading}
+              className="underline hover:no-underline transition-all"
+              style={{ color: 'var(--color-secondary)' }}
+            >
+              Resend code
+            </button>
+          )}
+        </p>
       </div>
     );
   }
 
-  // Form state
+  // Step 1: Email entry
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <Input
-          label="Email address"
-          value={email}
-          onChange={setEmail}
-          placeholder="you@example.com"
-          type="email"
-          autoComplete="email"
-          autoFocus
-          disabled={loading}
-          error={error ?? undefined}
-        />
-      </div>
+    <form onSubmit={handleEmailSubmit} className="space-y-6">
+      <Input
+        label="Email address"
+        value={email}
+        onChange={setEmail}
+        placeholder="you@example.com"
+        type="email"
+        autoComplete="email"
+        autoFocus
+        disabled={loading}
+        error={error ?? undefined}
+      />
 
       <Button
         type="submit"
@@ -184,14 +314,14 @@ export function MagicLinkForm({
         loading={loading}
         disabled={loading}
       >
-        {mode === 'signin' ? 'Send sign-in link' : 'Continue with email'}
+        {mode === 'signin' ? 'Send code' : 'Continue'}
       </Button>
 
       <p
         className="text-center text-sm"
         style={{ color: 'var(--color-text-muted)' }}
       >
-        No password needed — we&apos;ll email you a magic link.
+        No password needed — we&apos;ll email you a code.
       </p>
     </form>
   );

@@ -11,6 +11,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/lib/supabase', () => {
   const mockAuth = {
     signInWithOtp: vi.fn(),
+    verifyOtp: vi.fn(),
     signOut: vi.fn(),
     getUser: vi.fn(),
     getSession: vi.fn(),
@@ -38,7 +39,8 @@ vi.stubGlobal('window', {
 // Import after mocking
 import { supabase } from '@/lib/supabase';
 import {
-  signInWithMagicLink,
+  sendOtpCode,
+  verifyOtpCode,
   signOut,
   getCurrentUser,
   getSession,
@@ -51,6 +53,7 @@ import {
 // Get references to mocks after import
 const mockSupabaseAuth = supabase.auth as unknown as {
   signInWithOtp: ReturnType<typeof vi.fn>;
+  verifyOtp: ReturnType<typeof vi.fn>;
   signOut: ReturnType<typeof vi.fn>;
   getUser: ReturnType<typeof vi.fn>;
   getSession: ReturnType<typeof vi.fn>;
@@ -65,16 +68,16 @@ describe('Auth Service', () => {
     vi.clearAllMocks();
   });
 
-  describe('signInWithMagicLink', () => {
+  describe('sendOtpCode', () => {
     it('calls Supabase signInWithOtp with email', async () => {
       mockSupabaseAuth.signInWithOtp.mockResolvedValue({ error: null });
 
-      await signInWithMagicLink('test@example.com');
+      await sendOtpCode('test@example.com');
 
       expect(mockSupabaseAuth.signInWithOtp).toHaveBeenCalledWith({
         email: 'test@example.com',
         options: {
-          emailRedirectTo: 'http://localhost:5173/auth/verify',
+          shouldCreateUser: true,
         },
       });
     });
@@ -84,7 +87,7 @@ describe('Auth Service', () => {
         error: { message: 'rate limit exceeded' },
       });
 
-      await expect(signInWithMagicLink('test@example.com')).rejects.toThrow(
+      await expect(sendOtpCode('test@example.com')).rejects.toThrow(
         'Too many attempts'
       );
     });
@@ -94,7 +97,7 @@ describe('Auth Service', () => {
         error: { message: 'invalid email address' },
       });
 
-      await expect(signInWithMagicLink('bad-email')).rejects.toThrow(
+      await expect(sendOtpCode('bad-email')).rejects.toThrow(
         'valid email address'
       );
     });
@@ -104,8 +107,60 @@ describe('Auth Service', () => {
         error: { message: 'unknown error' },
       });
 
-      await expect(signInWithMagicLink('test@example.com')).rejects.toThrow(
+      await expect(sendOtpCode('test@example.com')).rejects.toThrow(
         'Auth error: unknown error'
+      );
+    });
+  });
+
+  describe('verifyOtpCode', () => {
+    it('calls Supabase verifyOtp with email and code', async () => {
+      const mockUser = { id: 'user-123', email: 'test@example.com' };
+      mockSupabaseAuth.verifyOtp.mockResolvedValue({
+        data: { user: mockUser },
+        error: null,
+      });
+
+      const user = await verifyOtpCode('test@example.com', '123456');
+
+      expect(mockSupabaseAuth.verifyOtp).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        token: '123456',
+        type: 'email',
+      });
+      expect(user).toEqual(mockUser);
+    });
+
+    it('throws user-friendly error on expired code', async () => {
+      mockSupabaseAuth.verifyOtp.mockResolvedValue({
+        data: { user: null },
+        error: { message: 'Token has expired' },
+      });
+
+      await expect(verifyOtpCode('test@example.com', '123456')).rejects.toThrow(
+        'code has expired'
+      );
+    });
+
+    it('throws user-friendly error on invalid code', async () => {
+      mockSupabaseAuth.verifyOtp.mockResolvedValue({
+        data: { user: null },
+        error: { message: 'Invalid token' },
+      });
+
+      await expect(verifyOtpCode('test@example.com', '000000')).rejects.toThrow(
+        'Invalid code'
+      );
+    });
+
+    it('throws error when user is null after verification', async () => {
+      mockSupabaseAuth.verifyOtp.mockResolvedValue({
+        data: { user: null },
+        error: null,
+      });
+
+      await expect(verifyOtpCode('test@example.com', '123456')).rejects.toThrow(
+        'Verification failed'
       );
     });
   });

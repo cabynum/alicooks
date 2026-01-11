@@ -10,7 +10,8 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 // Mock auth service
 const mockGetCurrentUser = vi.fn();
 const mockGetProfile = vi.fn();
-const mockSignInWithMagicLink = vi.fn();
+const mockSendOtpCode = vi.fn();
+const mockVerifyOtpCode = vi.fn();
 const mockSignOut = vi.fn();
 const mockUpdateProfile = vi.fn();
 const mockOnAuthStateChange = vi.fn();
@@ -18,7 +19,8 @@ const mockOnAuthStateChange = vi.fn();
 vi.mock('@/services', () => ({
   getCurrentUser: () => mockGetCurrentUser(),
   getProfile: (userId: string) => mockGetProfile(userId),
-  signInWithMagicLink: (email: string) => mockSignInWithMagicLink(email),
+  sendOtpCode: (email: string) => mockSendOtpCode(email),
+  verifyOtpCode: (email: string, code: string) => mockVerifyOtpCode(email, code),
   signOut: () => mockSignOut(),
   updateProfile: (userId: string, updates: unknown) => mockUpdateProfile(userId, updates),
   onAuthStateChange: (callback: (user: unknown) => void) => mockOnAuthStateChange(callback),
@@ -85,8 +87,8 @@ describe('useAuth', () => {
   });
 
   describe('signIn', () => {
-    it('calls signInWithMagicLink service', async () => {
-      mockSignInWithMagicLink.mockResolvedValue(undefined);
+    it('calls sendOtpCode service', async () => {
+      mockSendOtpCode.mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useAuth());
 
@@ -98,11 +100,11 @@ describe('useAuth', () => {
         await result.current.signIn('test@example.com');
       });
 
-      expect(mockSignInWithMagicLink).toHaveBeenCalledWith('test@example.com');
+      expect(mockSendOtpCode).toHaveBeenCalledWith('test@example.com');
     });
 
     it('sets error on failure', async () => {
-      mockSignInWithMagicLink.mockRejectedValue(new Error('Send failed'));
+      mockSendOtpCode.mockRejectedValue(new Error('Send failed'));
 
       const { result } = renderHook(() => useAuth());
 
@@ -119,6 +121,44 @@ describe('useAuth', () => {
       });
 
       expect(result.current.error).toBe('Send failed');
+    });
+  });
+
+  describe('verifyCode', () => {
+    it('calls verifyOtpCode service', async () => {
+      mockVerifyOtpCode.mockResolvedValue({ id: 'user-123' });
+
+      const { result } = renderHook(() => useAuth());
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      await act(async () => {
+        await result.current.verifyCode('test@example.com', '123456');
+      });
+
+      expect(mockVerifyOtpCode).toHaveBeenCalledWith('test@example.com', '123456');
+    });
+
+    it('sets error on verification failure', async () => {
+      mockVerifyOtpCode.mockRejectedValue(new Error('Invalid code'));
+
+      const { result } = renderHook(() => useAuth());
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      await act(async () => {
+        try {
+          await result.current.verifyCode('test@example.com', '000000');
+        } catch {
+          // Expected to throw
+        }
+      });
+
+      expect(result.current.error).toBe('Invalid code');
     });
   });
 
@@ -213,7 +253,7 @@ describe('useAuth', () => {
 
   describe('clearError', () => {
     it('clears the error state', async () => {
-      mockSignInWithMagicLink.mockRejectedValue(new Error('Test error'));
+      mockSendOtpCode.mockRejectedValue(new Error('Test error'));
 
       const { result } = renderHook(() => useAuth());
 
