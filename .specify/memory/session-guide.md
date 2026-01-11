@@ -157,9 +157,8 @@ Core features:
   - ✅ Delete household feature added for creators
   - Ready for Phase 7: Polish & Migration
   - Two test users ready: `test@dishcourse.local`, `test2@dishcourse.local` in "Test Family"
-- **Pending migration**: Run `supabase/migrations/008_unique_display_names.sql` in Supabase SQL Editor
-  - Adds `is_display_name_available()` function and case-insensitive index
-  - Required for display name uniqueness checking
+- **Migration 008 applied**: Display name uniqueness (`is_display_name_available()` function)
+- **Migration 009 applied**: Fixed DELETE RLS recursion for leaving households
 - **User experience**: Zero-friction start implemented — auth only required for collaboration
 - **Sync approach**: All household dishes and plans sync automatically (decided)
 - **Testing limitation**: Browser automation can't properly interact with React controlled inputs
