@@ -16,6 +16,7 @@ import { Button } from '@/components/ui';
 import { useInvite, useHousehold } from '@/hooks';
 import { useAuthContext } from '@/components/auth';
 import { getLocalDishCount, migrateLocalDishes } from '@/services/sync';
+import { getUserFriendlyError } from '@/utils';
 import type { Household, InviteValidation } from '@/types';
 
 export function JoinPage() {
@@ -86,8 +87,7 @@ export function JoinPage() {
       // Refresh household list in background
       refreshHouseholds();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to join household.';
-      setError(message);
+      setError(getUserFriendlyError(err));
     } finally {
       setIsJoining(false);
     }

@@ -44,6 +44,7 @@ import {
 } from '@/services';
 import { clearHouseholdData } from '@/lib/db';
 import { useAuthContext } from '@/components/auth';
+import { getUserFriendlyError } from '@/utils';
 
 /** Key for persisting current household selection */
 const CURRENT_HOUSEHOLD_KEY = 'dishcourse:currentHouseholdId';
@@ -223,8 +224,7 @@ export function useHousehold(): UseHouseholdReturn {
 
         return household;
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unable to create household.';
-        setError(message);
+        setError(getUserFriendlyError(err));
         throw err;
       }
     },
@@ -267,8 +267,7 @@ export function useHousehold(): UseHouseholdReturn {
         setMembers([]);
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to leave household.';
-      setError(message);
+      setError(getUserFriendlyError(err));
       throw err;
     }
   }, [user, currentHousehold, households]);
@@ -290,8 +289,7 @@ export function useHousehold(): UseHouseholdReturn {
         // Remove from local state
         setMembers((prev) => prev.filter((m) => m.id !== memberId));
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unable to remove member.';
-        setError(message);
+        setError(getUserFriendlyError(err));
         throw err;
       }
     },

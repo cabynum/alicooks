@@ -39,6 +39,7 @@ import {
   getActiveInvite,
 } from '@/services';
 import { useAuthContext } from '@/components/auth';
+import { getUserFriendlyError } from '@/utils';
 
 /**
  * Return type for the useInvite hook.
@@ -131,8 +132,7 @@ export function useInvite(householdId?: string): UseInviteReturn {
       setInvite(newInvite);
       return newInvite;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to create invite.';
-      setError(message);
+      setError(getUserFriendlyError(err));
       throw err;
     } finally {
       setIsLoading(false);
@@ -151,8 +151,7 @@ export function useInvite(householdId?: string): UseInviteReturn {
         const result = await validateInviteService(code);
         return result;
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unable to validate code.';
-        setError(message);
+        setError(getUserFriendlyError(err));
         throw err;
       } finally {
         setIsLoading(false);
@@ -177,8 +176,7 @@ export function useInvite(householdId?: string): UseInviteReturn {
         const household = await useInviteService(code, user.id);
         return household;
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unable to join household.';
-        setError(message);
+        setError(getUserFriendlyError(err));
         throw err;
       } finally {
         setIsLoading(false);

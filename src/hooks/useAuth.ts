@@ -36,6 +36,7 @@ import {
   onAuthStateChange,
   devAutoLogin,
 } from '@/services';
+import { getUserFriendlyError } from '@/utils';
 
 /**
  * Return type for the useAuth hook.
@@ -149,8 +150,7 @@ export function useAuth(): UseAuthReturn {
     try {
       await signInWithMagicLink(email);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to send sign-in link.';
-      setError(message);
+      setError(getUserFriendlyError(err));
       throw err;
     }
   }, []);
@@ -165,8 +165,7 @@ export function useAuth(): UseAuthReturn {
       setUser(null);
       setProfile(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to sign out.';
-      setError(message);
+      setError(getUserFriendlyError(err));
       throw err;
     }
   }, []);
@@ -186,8 +185,7 @@ export function useAuth(): UseAuthReturn {
         const updatedProfile = await authUpdateProfile(user.id, updates);
         setProfile(updatedProfile);
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Unable to update profile.';
-        setError(message);
+        setError(getUserFriendlyError(err));
         throw err;
       }
     },

@@ -43,6 +43,7 @@ import {
   LOCK_TIMEOUT_MS,
 } from '@/services';
 import { useAuthContext } from '@/components/auth';
+import { getUserFriendlyError } from '@/utils';
 
 // ============================================================================
 // CONSTANTS
@@ -188,7 +189,7 @@ export function usePlanLock(planId: string | null): UsePlanLockReturn {
 
       return result;
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to acquire lock';
+      const errorMsg = getUserFriendlyError(err);
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
@@ -225,7 +226,7 @@ export function usePlanLock(planId: string | null): UsePlanLockReturn {
 
       return result;
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to release lock';
+      const errorMsg = getUserFriendlyError(err);
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {
@@ -259,7 +260,7 @@ export function usePlanLock(planId: string | null): UsePlanLockReturn {
 
       return result;
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to force unlock';
+      const errorMsg = getUserFriendlyError(err);
       setError(errorMsg);
       return { success: false, error: errorMsg };
     } finally {

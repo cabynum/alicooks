@@ -15,6 +15,7 @@ import { Button, Input } from '@/components/ui';
 import { useHousehold } from '@/hooks';
 import { useAuthContext } from '@/components/auth';
 import { getLocalDishCount, migrateLocalDishes } from '@/services/sync';
+import { getUserFriendlyError } from '@/utils';
 
 export function HouseholdCreatePage() {
   const navigate = useNavigate();
@@ -84,8 +85,7 @@ export function HouseholdCreatePage() {
       // Navigate to the new household's page
       navigate(`/household/${household.id}`, { replace: true });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to create household.';
-      setError(message);
+      setError(getUserFriendlyError(err));
     } finally {
       setIsSubmitting(false);
     }

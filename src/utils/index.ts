@@ -1,3 +1,3 @@
 // Utility functions
-// Re-export utilities as they're created
 
+export { getUserFriendlyError, handleError } from "./errors";

@@ -290,7 +290,7 @@ describe('useExport Hook', () => {
       });
 
       expect(importResult?.success).toBe(false);
-      expect(result.current.error).toContain('Invalid export format');
+      expect(result.current.error).toContain('invalid format');
     });
 
     it('saves imported data to localStorage', async () => {

@@ -41,6 +41,7 @@ import {
 } from '@/services';
 import { useHousehold } from './useHousehold';
 import { useAuthContext } from '@/components/auth';
+import { getUserFriendlyError } from '@/utils';
 
 /**
  * Result of an import operation
@@ -177,9 +178,7 @@ export function useExport(): UseExportReturn {
       const filename = generateExportFilename();
       downloadFile(jsonData, filename);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to export data';
-      setError(message);
+      setError(getUserFriendlyError(err));
     } finally {
       setIsExporting(false);
     }
@@ -259,8 +258,7 @@ export function useExport(): UseExportReturn {
           };
         }
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Failed to import data';
+        const message = getUserFriendlyError(err);
         setError(message);
         setIsImporting(false);
         return {

@@ -10,6 +10,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { Button, Input } from '@/components/ui';
+import { getUserFriendlyError } from '@/utils';
 
 export interface MagicLinkFormProps {
   /** Called when magic link is successfully sent */
@@ -88,8 +89,7 @@ export function MagicLinkForm({
       setIsSent(true);
       onSuccess();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to send sign-in link.';
-      setError(message);
+      setError(getUserFriendlyError(err));
     } finally {
       setIsLoading(false);
     }

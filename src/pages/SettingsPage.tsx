@@ -12,6 +12,7 @@ import { Button, Card } from '@/components/ui';
 import { useExport, useDishes, usePlans, useHousehold } from '@/hooks';
 import { useAuthContext } from '@/components/auth';
 import { devSignInWithPassword } from '@/services';
+import { getUserFriendlyError } from '@/utils';
 
 export function SettingsPage() {
   const navigate = useNavigate();
@@ -135,8 +136,7 @@ export function SettingsPage() {
       // Reload to refresh all state
       window.location.reload();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to switch user';
-      console.error('Dev user switch failed:', message);
+      console.error('Dev user switch failed:', getUserFriendlyError(err));
     } finally {
       setIsSwitchingUser(false);
     }

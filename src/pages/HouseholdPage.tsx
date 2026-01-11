@@ -12,6 +12,7 @@ import { Button } from '@/components/ui';
 import { MemberList, InviteModal } from '@/components/households';
 import { useHousehold } from '@/hooks';
 import { useAuthContext } from '@/components/auth';
+import { getUserFriendlyError } from '@/utils';
 
 export function HouseholdPage() {
   const navigate = useNavigate();
@@ -79,8 +80,7 @@ export function HouseholdPage() {
       await leaveCurrentHousehold();
       navigate('/', { replace: true });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unable to leave household.';
-      setLeaveError(message);
+      setLeaveError(getUserFriendlyError(err));
     } finally {
       setIsLeaving(false);
     }
