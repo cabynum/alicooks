@@ -124,7 +124,7 @@ export function MagicLinkForm({
       setError('Please enter the code from your email.');
       return;
     }
-    if (!/^\d{6}$/.test(trimmedCode)) {
+    if (!/^\d{6,8}$/.test(trimmedCode)) {
       setError('Please enter the verification code from your email.');
       return;
     }
