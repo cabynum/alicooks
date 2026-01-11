@@ -42,23 +42,22 @@ Before we end, please:
 **Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Phase 6 Complete — SMS Invites Done!
+**Current Phase**: Phase 7 (Polish & Migration) — Ready for Family Testing!
 
 ### Completed This Session
 
-- ✅ **Phase 5: Attribution & Management** — All tasks complete:
-  - DishCard shows "Added by [name] [time]" with smart formatting
-  - EditDishPage displays who added dish and when (User/Calendar icons)
-  - Leave Household clears local IndexedDB cache (`clearHouseholdData()`)
-  - MemberList has remove member with confirmation (creator only)
-  - Orphaned Households: PRESERVE policy (can't happen by design)
-  - Added 31 new tests (833 total)
-- ✅ **Phase 6: SMS Invites** — Twilio integration complete:
-  - Created Supabase Edge Function `send-invite-sms` (Deno/Twilio)
-  - Updated InviteModal with phone input and send button
-  - Deployed function to Supabase (ACTIVE)
-  - Configured Twilio secrets (Account SID, Auth Token, Phone Number)
-  - SMS sends invite link: "You're invited to join [household]..."
+- ✅ **Phase 7.1: Local Dish Migration** — Complete:
+  - Added `migrateLocalDishes()` to sync service
+  - HouseholdCreatePage offers "Bring my X dishes" checkbox
+  - JoinPage offers migration when joining a household
+  - Local dishes uploaded to Supabase, cleared from localStorage
+- ✅ **Phase 7.4: Add Household to HomePage** — Complete:
+  - Shows "[Household Name]'s Dishes" when in synced mode
+  - Shows "Shared with your household" subtitle
+  - SyncStatus indicator already in place
+- ✅ **InviteModal bug fix** — Phone input now works correctly
+  - Was using wrong `onChange` signature for the Input component
+  - SMS section hidden (A2P 10DLC registration needed for delivery)
 
 ### Phase Summary
 
@@ -129,9 +128,10 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Test SMS invites end-to-end** — Send a test invite via the InviteModal
-2. **Phase 7: Polish & Migration** — Migrate local dishes when joining a household
-3. **Performance optimization** — Review sync frequency, batch operations
+1. **Family testing** — Create household, invite family, test full sync flow
+2. **Phase 7.7: Error Handling** — User-friendly errors for auth/sync/invite
+3. **Phase 7.5: Offline Mode Polish** — Clear indicator, graceful degradation
+4. **A2P 10DLC registration** — Enable SMS invites (Toll-Free number ~$2/mo)
 
 ### Key Files
 
