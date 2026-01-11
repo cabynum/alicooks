@@ -33,37 +33,58 @@ import type { User, Profile, UpdateProfileInput } from '@/types';
  * @throws Error if the email fails to send
  */
 export async function signInWithMagicLink(email: string): Promise<void> {
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      // Where to redirect after clicking the magic link
-      emailRedirectTo: `${window.location.origin}/auth/verify`,
-    },
+  // Log request details for debugging mobile issues
+  console.log('🔐 Magic link request:', {
+    email: email.replace(/(.{2}).*@/, '$1***@'), // Partially mask email
+    origin: window.location.origin,
+    redirectTo: `${window.location.origin}/auth/verify`,
+    userAgent: navigator.userAgent.substring(0, 100),
   });
 
-  if (error) {
-    // Log the full error for debugging
-    console.error('Supabase auth error:', {
-      message: error.message,
-      status: error.status,
-      name: error.name,
-      code: (error as unknown as Record<string, unknown>).code,
+  try {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        // Where to redirect after clicking the magic link
+        emailRedirectTo: `${window.location.origin}/auth/verify`,
+      },
     });
-    
-    // Provide user-friendly error messages
-    if (error.message.includes('rate limit')) {
-      throw new Error('Too many attempts. Please wait a few minutes and try again.');
+
+    if (error) {
+      // Log the full error for debugging
+      console.error('Supabase auth error:', {
+        message: error.message,
+        status: error.status,
+        name: error.name,
+        code: (error as unknown as Record<string, unknown>).code,
+        cause: (error as unknown as Record<string, unknown>).cause,
+      });
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('rate limit')) {
+        throw new Error('Too many attempts. Please wait a few minutes and try again.');
+      }
+      if (error.message.includes('invalid email')) {
+        throw new Error('Please enter a valid email address.');
+      }
+      // Safari/iOS network errors
+      if (error.message.includes('Load Failed') || 
+          error.message.includes('network connection was lost') ||
+          error.message.includes('NetworkError')) {
+        throw new Error('Unable to connect. Please check your internet connection and try again.');
+      }
+      throw new Error(`Auth error: ${error.message}`);
     }
-    if (error.message.includes('invalid email')) {
-      throw new Error('Please enter a valid email address.');
-    }
-    // Safari/iOS network errors
-    if (error.message.includes('Load Failed') || 
-        error.message.includes('network connection was lost') ||
-        error.message.includes('NetworkError')) {
-      throw new Error('Unable to connect. Please check your internet connection and try again.');
-    }
-    throw new Error(`Auth error: ${error.message}`);
+
+    console.log('✅ Magic link sent successfully');
+  } catch (err) {
+    // Catch any errors not handled by Supabase's error object
+    console.error('🚨 Magic link request failed:', {
+      error: err,
+      message: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+    });
+    throw err;
   }
 }
 
