@@ -42,13 +42,16 @@ Before we end, please:
 **Current Branch**: `master`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Family Collaboration MERGED ✅ — Testing
+**Current Phase**: Family Collaboration MERGED ✅ — Production fixes
 
 ### Completed This Session
 
-- ✅ Reviewed project status and ideas backlog
-- ✅ Added "Restaurant Orders / Go-To Orders" idea to backlog
-- 🧪 **Next**: Family testing of collaboration features
+- ✅ Fixed mobile auth: Replaced magic links with OTP code entry (better for PWA)
+- ✅ Fixed Vercel env var: Corrected `VITE_SUPABASE_URL` (was dashboard URL, not API URL)
+- ✅ Fixed OTP validation: Accept 6-8 digit codes, allow copy-paste
+- ✅ Added display name change with uniqueness check
+- ✅ Added delete household feature for creators
+- 🧪 **Next**: Continue family testing, apply migration for display name uniqueness
 
 ### Phase Summary
 
@@ -80,7 +83,7 @@ Core features:
 | ------------------ | ------- |
 | Storage Service | 50 |
 | Suggestion Service | 20 |
-| Auth Service | 23 |
+| Auth Service | 25 |
 | useDishes Hook | 15 |
 | useSuggestion Hook | 17 |
 | usePlans Hook | 26 |
@@ -115,7 +118,7 @@ Core features:
 | usePlanLock Hook | 13 |
 | LockIndicator | 15 |
 | **MemberList** | 14 |
-| **Total** | **833** |
+| **Total** | **849** |
 
 ### Recommended Next Steps
 
@@ -151,8 +154,12 @@ Core features:
   - ✅ SMS invites via Twilio Edge Function deployed and active
   - ✅ InviteModal has phone input with send button
   - ✅ Dish attribution, plan locking, leave/remove member all working
+  - ✅ Delete household feature added for creators
   - Ready for Phase 7: Polish & Migration
   - Two test users ready: `test@dishcourse.local`, `test2@dishcourse.local` in "Test Family"
+- **Pending migration**: Run `supabase/migrations/008_unique_display_names.sql` in Supabase SQL Editor
+  - Adds `is_display_name_available()` function and case-insensitive index
+  - Required for display name uniqueness checking
 - **User experience**: Zero-friction start implemented — auth only required for collaboration
 - **Sync approach**: All household dishes and plans sync automatically (decided)
 - **Testing limitation**: Browser automation can't properly interact with React controlled inputs
