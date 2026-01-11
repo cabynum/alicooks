@@ -278,6 +278,7 @@ export function usePlans(): UsePlansReturn {
   /**
    * Assign a dish to a specific day in a plan.
    * Adds the dish ID to the end of the day's dishIds array.
+   * In synced mode, records who made the assignment.
    */
   const assignDishToDay = useCallback(
     async (planId: string, date: string, dishId: string): Promise<boolean> => {
@@ -293,6 +294,8 @@ export function usePlans(): UsePlansReturn {
           return {
             ...day,
             dishIds: [...day.dishIds, dishId],
+            // Record who made this assignment in synced mode
+            ...(isSyncedMode && user && { assignedBy: user.id }),
           };
         }
         return day;
@@ -301,7 +304,7 @@ export function usePlans(): UsePlansReturn {
       const result = await updatePlan(planId, { days: newDays });
       return result !== undefined;
     },
-    [plans, updatePlan]
+    [plans, updatePlan, isSyncedMode, user]
   );
 
   /**

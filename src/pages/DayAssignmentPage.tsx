@@ -3,14 +3,18 @@
  *
  * Shows the current day's assignments and allows adding/removing dishes.
  * Users can also get a suggestion for this day.
+ *
+ * In synced mode, this page acquires a lock on the plan to prevent
+ * concurrent edits by other household members.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, Plus, X, Dices } from 'lucide-react';
-import { usePlans, useDishes, useSuggestion } from '@/hooks';
-import { DishCard } from '@/components/meals';
+import { usePlans, useDishes, useSuggestion, usePlanLock, useHousehold } from '@/hooks';
+import { DishCard, LockIndicator } from '@/components/meals';
 import { Button, EmptyState } from '@/components/ui';
+import { useAuthContext } from '@/components/auth';
 
 /**
  * Formats a date string for display (e.g., "Monday, December 16")
@@ -27,9 +31,48 @@ function formatDateLong(dateString: string): string {
 export function DayAssignmentPage() {
   const navigate = useNavigate();
   const { planId, date } = useParams<{ planId: string; date: string }>();
-  const { getPlanById, assignDishToDay, removeDishFromDay, isLoading: plansLoading } = usePlans();
+  const { getPlanById, assignDishToDay, removeDishFromDay, isLoading: plansLoading, isSyncedMode } = usePlans();
   const { dishes, getDishById, isLoading: dishesLoading } = useDishes();
   const { suggestion, generate, isAvailable: canSuggest } = useSuggestion();
+  const { isAuthenticated } = useAuthContext();
+  const { members } = useHousehold();
+
+  // Plan locking for collaborative editing
+  const {
+    lockStatus,
+    acquireLock,
+    releaseLock,
+    forceUnlock,
+    isReleasing,
+  } = usePlanLock(planId ?? null);
+
+  // Determine if we should use locking (only in synced mode)
+  const shouldLock = isSyncedMode && isAuthenticated;
+
+  // Find the display name of the user who has the lock
+  const lockedByName = useMemo(() => {
+    if (!lockStatus.lockedBy) return undefined;
+    const member = members.find((m) => m.userId === lockStatus.lockedBy);
+    return member?.profile?.displayName ?? 'Someone';
+  }, [lockStatus.lockedBy, members]);
+
+  // Acquire lock when entering edit mode
+  useEffect(() => {
+    if (shouldLock && planId) {
+      acquireLock();
+    }
+
+    // Release lock when leaving the page
+    return () => {
+      if (shouldLock && planId) {
+        releaseLock();
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldLock, planId]);
+
+  // Check if editing is blocked by another user's lock
+  const isEditBlocked = shouldLock && lockStatus.isLocked && !lockStatus.isLockedByCurrentUser;
 
   // Get the current plan and day
   const plan = planId ? getPlanById(planId) : null;
@@ -61,12 +104,14 @@ export function DayAssignmentPage() {
   };
 
   const handleAddDish = (dishId: string) => {
+    if (isEditBlocked) return; // Blocked by lock
     if (planId && date) {
       assignDishToDay(planId, date, dishId);
     }
   };
 
   const handleRemoveDish = (dishId: string) => {
+    if (isEditBlocked) return; // Blocked by lock
     if (planId && date) {
       removeDishFromDay(planId, date, dishId);
     }
@@ -77,6 +122,7 @@ export function DayAssignmentPage() {
   };
 
   const handleAddSuggestion = () => {
+    if (isEditBlocked) return; // Blocked by lock
     if (!suggestion || !planId || !date) return;
 
     // Add the entree
@@ -169,6 +215,19 @@ export function DayAssignmentPage() {
 
       {/* Main content */}
       <main className="max-w-lg mx-auto px-4 py-6 pb-24">
+        {/* Lock indicator if blocked by another user */}
+        {isEditBlocked && (
+          <div className="mb-6">
+            <LockIndicator
+              lockedByName={lockedByName}
+              lockedAt={lockStatus.lockedAt}
+              isStale={lockStatus.isStale}
+              onForceUnlock={lockStatus.isStale ? forceUnlock : undefined}
+              isUnlocking={isReleasing}
+            />
+          </div>
+        )}
+
         {/* Currently assigned dishes */}
         {assignedDishes.length > 0 && (
           <section className="mb-8">
@@ -190,9 +249,11 @@ export function DayAssignmentPage() {
                   <button
                     type="button"
                     onClick={() => handleRemoveDish(dish.id)}
-                    className="p-2 rounded-xl transition-colors focus:outline-none focus-visible:ring-2"
+                    disabled={isEditBlocked}
+                    className="p-2 rounded-xl transition-colors focus:outline-none focus-visible:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ color: 'var(--color-text-muted)' }}
                     onMouseEnter={(e) => {
+                      if (isEditBlocked) return;
                       e.currentTarget.style.color = 'var(--color-error)';
                       e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
                     }}
@@ -241,6 +302,7 @@ export function DayAssignmentPage() {
                       variant="primary"
                       size="sm"
                       onClick={handleAddSuggestion}
+                      disabled={isEditBlocked}
                     >
                       <span className="flex items-center gap-1">
                         <Check size={16} strokeWidth={2.5} />
@@ -313,12 +375,14 @@ export function DayAssignmentPage() {
                   key={dish.id}
                   type="button"
                   onClick={() => handleAddDish(dish.id)}
-                  className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-left cursor-pointer transition-all duration-150 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  disabled={isEditBlocked}
+                  className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-left cursor-pointer transition-all duration-150 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     backgroundColor: 'var(--color-card)',
                     border: '1px solid var(--color-bg-muted)',
                   }}
                   onMouseEnter={(e) => {
+                    if (isEditBlocked) return;
                     e.currentTarget.style.borderColor = 'var(--color-accent)';
                     e.currentTarget.style.backgroundColor = 'rgba(255, 184, 0, 0.05)';
                   }}

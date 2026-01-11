@@ -22,3 +22,5 @@ export type { SuggestionCardProps } from './SuggestionCard';
 export { PlanCard } from './PlanCard';
 export type { PlanCardProps } from './PlanCard';
 
+export { LockIndicator } from './LockIndicator';
+export type { LockIndicatorProps } from './LockIndicator';

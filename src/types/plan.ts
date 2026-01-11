@@ -26,6 +26,9 @@ export interface DayAssignment {
    * - Can contain duplicates (same dish twice)
    */
   dishIds: string[];
+
+  /** User ID of who made this assignment (synced mode only) */
+  assignedBy?: string;
 }
 
 /**

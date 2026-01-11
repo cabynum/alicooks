@@ -5,10 +5,10 @@
  * Users can tap a day to assign dishes to that day.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Calendar, Plus } from 'lucide-react';
-import { usePlans, useDishes } from '@/hooks';
+import { usePlans, useDishes, useHousehold } from '@/hooks';
 import { DaySlot } from '@/components/meals';
 import { Button, EmptyState } from '@/components/ui';
 
@@ -39,8 +39,21 @@ const DAY_COUNT_OPTIONS = [3, 5, 7, 14];
 export function PlanPage() {
   const navigate = useNavigate();
   const { planId } = useParams<{ planId?: string }>();
-  const { createPlan, getPlanById, isLoading: plansLoading } = usePlans();
+  const { createPlan, getPlanById, isLoading: plansLoading, isSyncedMode } = usePlans();
   const { dishes, getDishById, isLoading: dishesLoading } = useDishes();
+  const { members } = useHousehold();
+
+  /**
+   * Get display name for a user ID from household members.
+   */
+  const getMemberName = useCallback(
+    (userId: string | undefined): string | undefined => {
+      if (!userId || !isSyncedMode) return undefined;
+      const member = members.find((m) => m.userId === userId);
+      return member?.profile?.displayName;
+    },
+    [members, isSyncedMode]
+  );
 
   // For new plan creation
   const [selectedDayCount, setSelectedDayCount] = useState(7);
@@ -68,8 +81,9 @@ export function PlanPage() {
       dishes: day.dishIds
         .map((id) => getDishById(id))
         .filter((d): d is NonNullable<typeof d> => d !== undefined),
+      assignedByName: getMemberName(day.assignedBy),
     }));
-  }, [currentPlan, getDishById]);
+  }, [currentPlan, getDishById, getMemberName]);
 
   const handleBack = () => {
     navigate('/');
@@ -310,6 +324,7 @@ export function PlanPage() {
                 dishes={day.dishes}
                 onClick={() => handleDayClick(day.date)}
                 isToday={day.date === today}
+                assignedByName={day.assignedByName}
               />
             </div>
           ))}

@@ -42,6 +42,7 @@ import {
   leaveHousehold as leaveHouseholdService,
   removeMember as removeMemberService,
 } from '@/services';
+import { clearHouseholdData } from '@/lib/db';
 import { useAuthContext } from '@/components/auth';
 
 /** Key for persisting current household selection */
@@ -239,13 +240,17 @@ export function useHousehold(): UseHouseholdReturn {
     }
 
     setError(null);
+    const householdIdToLeave = currentHousehold.id;
 
     try {
-      await leaveHouseholdService(currentHousehold.id, user.id);
+      await leaveHouseholdService(householdIdToLeave, user.id);
+
+      // Clear local cache for this household (IndexedDB)
+      await clearHouseholdData(householdIdToLeave);
 
       // Remove from local state
       const remainingHouseholds = households.filter(
-        (h) => h.id !== currentHousehold.id
+        (h) => h.id !== householdIdToLeave
       );
       setHouseholds(remainingHouseholds);
 

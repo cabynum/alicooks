@@ -17,6 +17,8 @@ export interface DaySlotProps {
   onClick: () => void;
   /** Highlight if this is today's date */
   isToday?: boolean;
+  /** Name of who assigned dishes (for collaborative mode) */
+  assignedByName?: string;
 }
 
 /**
@@ -61,6 +63,7 @@ export function DaySlot({
   dishes,
   onClick,
   isToday = false,
+  assignedByName,
 }: DaySlotProps) {
   const dayName = getDayName(date);
   const dayNumber = getDayNumber(date);
@@ -146,6 +149,11 @@ export function DaySlot({
           {extraCount > 0 && (
             <span className="text-xs text-stone-500 pl-4">
               +{extraCount} more
+            </span>
+          )}
+          {assignedByName && (
+            <span className="text-xs text-stone-400 pl-4">
+              Assigned by {assignedByName}
             </span>
           )}
         </div>

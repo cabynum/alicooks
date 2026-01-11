@@ -294,6 +294,20 @@ export async function removeMember(memberId: string): Promise<void> {
 /**
  * Allows a user to leave a household voluntarily.
  *
+ * **Orphaned Household Policy: PRESERVE**
+ *
+ * By design, households cannot become orphaned because:
+ * 1. Creators cannot leave their own household
+ * 2. Only the creator can remove other members
+ * 3. The household always has at least the creator
+ *
+ * If in the future we support creator account deletion or ownership transfer,
+ * we may need to revisit this policy. Options would be:
+ * - DELETE: Cascade delete household and all its data when last member leaves
+ * - PRESERVE: Keep household data for potential re-invite/rejoin
+ *
+ * Current implementation: Preserve (no orphan cleanup needed)
+ *
  * @param householdId - The household ID
  * @param userId - The user's profile ID
  * @throws Error if the user is the creator (creators cannot leave)

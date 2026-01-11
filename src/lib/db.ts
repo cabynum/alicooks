@@ -315,6 +315,37 @@ export async function clearAllData(): Promise<void> {
 }
 
 /**
+ * Clear all local data for a specific household.
+ * Called when a user leaves a household to clean up local cache.
+ *
+ * @param householdId - The ID of the household to clear data for
+ */
+export async function clearHouseholdData(householdId: string): Promise<void> {
+  // Clear dishes for this household
+  await db.dishes.where('householdId').equals(householdId).delete();
+  
+  // Clear meal plans for this household
+  await db.mealPlans.where('householdId').equals(householdId).delete();
+  
+  // Clear members for this household
+  await db.members.where('householdId').equals(householdId).delete();
+  
+  // Clear the household record itself
+  await db.households.delete(householdId);
+  
+  // Clear any pending operations for entities in this household
+  // Note: We need to check each queued operation's entity
+  const dishIds = await db.dishes.where('householdId').equals(householdId).primaryKeys();
+  const planIds = await db.mealPlans.where('householdId').equals(householdId).primaryKeys();
+  const entityIds = [...dishIds, ...planIds];
+  
+  for (const entityId of entityIds) {
+    await db.offlineQueue.where('entityId').equals(entityId).delete();
+    await db.conflicts.where('entityId').equals(entityId).delete();
+  }
+}
+
+/**
  * Get a sync metadata value.
  */
 export async function getSyncMeta<T>(key: string): Promise<T | undefined> {

@@ -5,10 +5,10 @@
  * Navigates back to home on successful save, delete, or cancel.
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Trash2 } from 'lucide-react';
-import { useDishes } from '@/hooks';
+import { ArrowLeft, Trash2, User, Calendar } from 'lucide-react';
+import { useDishes, useHousehold } from '@/hooks';
 import { DishForm, type DishFormValues } from '@/components/meals';
 import { Button, Card, EmptyState } from '@/components/ui';
 
@@ -16,6 +16,7 @@ export function EditDishPage() {
   const navigate = useNavigate();
   const { dishId } = useParams<{ dishId: string }>();
   const { dishes, getDishById, updateDish, deleteDish, isLoading } = useDishes();
+  const { members } = useHousehold();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Get the dish to edit
@@ -25,6 +26,24 @@ export function EditDishPage() {
   const existingNames = dishes
     .filter((d) => d.id !== dishId)
     .map((d) => d.name);
+
+  // Resolve addedBy user ID to display name
+  const addedByName = useMemo(() => {
+    if (!dish?.addedBy) return null;
+    const member = members.find((m) => m.userId === dish.addedBy);
+    return member?.profile?.displayName ?? null;
+  }, [dish?.addedBy, members]);
+
+  // Format the creation date
+  const formattedDate = useMemo(() => {
+    if (!dish?.createdAt) return null;
+    const date = new Date(dish.createdAt);
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }, [dish?.createdAt]);
 
   /**
    * Handle form submission - update the dish and navigate home
@@ -173,6 +192,27 @@ export function EditDishPage() {
             existingNames={existingNames}
           />
         </Card>
+
+        {/* Attribution section */}
+        {(addedByName || formattedDate) && (
+          <div
+            className="mt-4 px-4 py-3 rounded-xl space-y-2"
+            style={{ backgroundColor: 'var(--color-bg-muted)' }}
+          >
+            {addedByName && (
+              <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                <User size={16} strokeWidth={2} aria-hidden="true" />
+                <span>Added by <span className="font-medium" style={{ color: 'var(--color-text)' }}>{addedByName}</span></span>
+              </div>
+            )}
+            {formattedDate && (
+              <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                <Calendar size={16} strokeWidth={2} aria-hidden="true" />
+                <span>Created on <span className="font-medium" style={{ color: 'var(--color-text)' }}>{formattedDate}</span></span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Delete section */}
         <div className="mt-6">

@@ -38,36 +38,27 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2026-01-04  
+**Last Updated**: 2026-01-10  
 **Current Branch**: `002-family-collaboration`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Phase 3 Complete — Sync Infrastructure Done!
+**Current Phase**: Phase 6 Complete — SMS Invites Done!
 
 ### Completed This Session
 
-- ✅ **Implemented Offline Queue (Task 3.3)** — Queue writes when offline, process on reconnect:
-  - Added `offlineQueue` table to IndexedDB (Dexie v2 migration)
-  - Implemented intelligent deduplication (add+delete cancels, update+delete keeps delete)
-  - Queue operations processed in FIFO order with retry logic
-  - `MAX_QUEUE_RETRIES` (5) prevents infinite retry loops
-  - All write operations now queue when offline, sync when back online
-  - Added 17 new tests for queue operations
-- ✅ **Implemented Conflict Detection (Task 3.9)** — Detect concurrent edits during sync:
-  - Added `conflicts` table to IndexedDB (Dexie v3 migration)
-  - Real-time handlers now detect when server changes conflict with pending local changes
-  - Stores both local and server versions for user resolution
-  - `resolveConflict()` function to choose 'local' or 'server' version
-  - `onConflict()` callback for UI notifications
-  - Added 11 new tests for conflict detection
-- ✅ **Built ConflictResolver Component (Task 3.10)** — UI for resolving sync conflicts:
-  - Side-by-side comparison of local vs server versions
-  - Clear "Your Changes" vs "Other Changes" labeling
-  - Highlights fields that differ between versions
-  - "Keep Mine" / "Keep Theirs" resolution buttons
-  - `useConflicts` hook for React integration
-  - Integrated as global overlay in App.tsx
-  - Added 18 new tests for ConflictResolver (now 744 total tests)
+- ✅ **Phase 5: Attribution & Management** — All tasks complete:
+  - DishCard shows "Added by [name] [time]" with smart formatting
+  - EditDishPage displays who added dish and when (User/Calendar icons)
+  - Leave Household clears local IndexedDB cache (`clearHouseholdData()`)
+  - MemberList has remove member with confirmation (creator only)
+  - Orphaned Households: PRESERVE policy (can't happen by design)
+  - Added 31 new tests (833 total)
+- ✅ **Phase 6: SMS Invites** — Twilio integration complete:
+  - Created Supabase Edge Function `send-invite-sms` (Deno/Twilio)
+  - Updated InviteModal with phone input and send button
+  - Deployed function to Supabase (ACTIVE)
+  - Configured Twilio secrets (Account SID, Auth Token, Phone Number)
+  - SMS sends invite link: "You're invited to join [household]..."
 
 ### Phase Summary
 
@@ -99,12 +90,12 @@ Core features:
 | ------------------ | ------- |
 | Storage Service | 50 |
 | Suggestion Service | 20 |
-| **Auth Service** | 23 |
+| Auth Service | 23 |
 | useDishes Hook | 15 |
 | useSuggestion Hook | 17 |
 | usePlans Hook | 26 |
 | useExport Hook | 17 |
-| **useAuth Hook** | 17 |
+| useAuth Hook | 17 |
 | Button | 26 |
 | Input | 22 |
 | Card | 18 |
@@ -112,30 +103,34 @@ Core features:
 | UrlInput | 31 |
 | EmptyState | 14 |
 | ErrorBoundary | 14 |
-| **MagicLinkForm** | 15 |
+| MagicLinkForm | 15 |
 | DishTypeSelector | 18 |
-| DishCard | 32 |
+| **DishCard** | 40 |
 | DishList | 37 |
 | SuggestionCard | 17 |
 | DaySlot | 22 |
 | DishForm | 44 |
 | PlanCard | 25 |
 | AddDishPage | 14 |
-| EditDishPage | 26 |
+| **EditDishPage** | 30 |
 | SettingsPage | 23 |
 | SuggestionPage | 16 |
 | PlanPage | 20 |
 | DayAssignmentPage | 22 |
 | HomePage | 26 |
 | App | 2 |
-| Local DB (Dexie) | 40 |
+| **Local DB (Dexie)** | 45 |
 | Sync Components | 18 |
-| **Total** | **744** |
+| Locks Service | 30 |
+| usePlanLock Hook | 13 |
+| LockIndicator | 15 |
+| **MemberList** | 14 |
+| **Total** | **833** |
 
 ### Recommended Next Steps
 
-1. **Start Phase 4: Collaborative Planning** — Implement plan locking for multi-user editing
-2. **Polish and test end-to-end** — Manual browser testing of complete sync flow
+1. **Test SMS invites end-to-end** — Send a test invite via the InviteModal
+2. **Phase 7: Polish & Migration** — Migrate local dishes when joining a household
 3. **Performance optimization** — Review sync frequency, batch operations
 
 ### Key Files
@@ -161,13 +156,12 @@ Core features:
 
 ### Open Decisions
 
-- **Collaboration feature**: Phases 1, 2, and 3 complete!
-  - ✅ All Phase 3 tasks (3.1–3.10) verified working
-  - ✅ Real-time sync for both dishes AND meal plans
-  - ✅ Export/import works in both local and synced modes
-  - ✅ Offline queue with deduplication and retry logic
-  - ✅ Conflict detection and resolution UI
-  - Ready to start Phase 4: Collaborative Planning (plan locking)
+- **Collaboration feature**: Phases 1–6 complete!
+  - ✅ All Phase 6 tasks (6.1–6.3) verified working
+  - ✅ SMS invites via Twilio Edge Function deployed and active
+  - ✅ InviteModal has phone input with send button
+  - ✅ Dish attribution, plan locking, leave/remove member all working
+  - Ready for Phase 7: Polish & Migration
   - Two test users ready: `test@dishcourse.local`, `test2@dishcourse.local` in "Test Family"
 - **User experience**: Zero-friction start implemented — auth only required for collaboration
 - **Sync approach**: All household dishes and plans sync automatically (decided)

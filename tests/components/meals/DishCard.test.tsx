@@ -134,18 +134,20 @@ describe('DishCard', () => {
   describe('selected state', () => {
     it('shows selected styling when selected is true', () => {
       const dish = createTestDish();
-      render(<DishCard dish={dish} selected />);
+      const { container } = render(<DishCard dish={dish} selected />);
 
-      const card = screen.getByText(dish.name).closest('div');
+      // The outer card container has the border styling
+      const card = container.querySelector('.rounded-xl') as HTMLElement;
       // Uses design system accent color for selected state border
       expect(card?.style.borderColor).toBe('var(--color-accent)');
     });
 
     it('shows default styling when selected is false', () => {
       const dish = createTestDish();
-      render(<DishCard dish={dish} selected={false} />);
+      const { container } = render(<DishCard dish={dish} selected={false} />);
 
-      const card = screen.getByText(dish.name).closest('div');
+      // The outer card container has the border styling
+      const card = container.querySelector('.rounded-xl') as HTMLElement;
       // Unselected cards have transparent border
       expect(card?.style.borderColor).toBe('transparent');
     });
@@ -154,17 +156,19 @@ describe('DishCard', () => {
   describe('compact mode', () => {
     it('uses smaller padding in compact mode', () => {
       const dish = createTestDish();
-      render(<DishCard dish={dish} compact />);
+      const { container } = render(<DishCard dish={dish} compact />);
 
-      const card = screen.getByText(dish.name).closest('div');
+      // The outer card container has the padding classes
+      const card = container.querySelector('.rounded-xl');
       expect(card).toHaveClass('px-3', 'py-2');
     });
 
     it('uses larger padding in normal mode', () => {
       const dish = createTestDish();
-      render(<DishCard dish={dish} compact={false} />);
+      const { container } = render(<DishCard dish={dish} compact={false} />);
 
-      const card = screen.getByText(dish.name).closest('div');
+      // The outer card container has the padding classes
+      const card = container.querySelector('.rounded-xl');
       expect(card).toHaveClass('px-4', 'py-3');
     });
 
@@ -204,9 +208,10 @@ describe('DishCard', () => {
 
     it('has minimum 44px height even in non-interactive mode', () => {
       const dish = createTestDish();
-      render(<DishCard dish={dish} />);
+      const { container } = render(<DishCard dish={dish} />);
 
-      const card = screen.getByText(dish.name).closest('div');
+      // The outer card container has the min-height class
+      const card = container.querySelector('.rounded-xl');
       expect(card).toHaveClass('min-h-[44px]');
     });
   });
@@ -259,6 +264,71 @@ describe('DishCard', () => {
       render(<DishCard dish={dish} onClick={() => {}} />);
 
       expect(screen.getByRole('button')).toHaveClass('active:scale-[0.98]');
+    });
+  });
+
+  describe('attribution display', () => {
+    it('does not show attribution when addedByName is not provided', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} />);
+
+      expect(screen.queryByText(/Added by/i)).not.toBeInTheDocument();
+    });
+
+    it('shows "Added by [name]" when addedByName is provided', () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} addedByName="Alice" />);
+
+      expect(screen.getByText(/Added by Alice/i)).toBeInTheDocument();
+    });
+
+    it('shows "today" when addedAt is today', () => {
+      const dish = createTestDish();
+      const today = new Date().toISOString();
+      render(<DishCard dish={dish} addedByName="Bob" addedAt={today} />);
+
+      expect(screen.getByText(/Added by Bob today/i)).toBeInTheDocument();
+    });
+
+    it('shows "yesterday" when addedAt is yesterday', () => {
+      const dish = createTestDish();
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      render(<DishCard dish={dish} addedByName="Carol" addedAt={yesterday} />);
+
+      expect(screen.getByText(/Added by Carol yesterday/i)).toBeInTheDocument();
+    });
+
+    it('shows "X days ago" when addedAt is within the last week', () => {
+      const dish = createTestDish();
+      const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+      render(<DishCard dish={dish} addedByName="Dan" addedAt={threeDaysAgo} />);
+
+      expect(screen.getByText(/Added by Dan 3 days ago/i)).toBeInTheDocument();
+    });
+
+    it('shows date when addedAt is more than a week ago', () => {
+      const dish = createTestDish();
+      const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+      render(<DishCard dish={dish} addedByName="Eve" addedAt={twoWeeksAgo.toISOString()} />);
+
+      // Should show "Added by Eve on [date]"
+      expect(screen.getByText(/Added by Eve on/i)).toBeInTheDocument();
+    });
+
+    it('shows attribution in interactive mode', async () => {
+      const dish = createTestDish();
+      render(<DishCard dish={dish} addedByName="Frank" onClick={() => {}} />);
+
+      expect(screen.getByText(/Added by Frank/i)).toBeInTheDocument();
+    });
+
+    it('shows attribution with recipe icons present', () => {
+      const dish = createTestDish({
+        recipeUrls: ['https://instagram.com/post/123'],
+      });
+      render(<DishCard dish={dish} addedByName="Grace" onClick={() => {}} />);
+
+      expect(screen.getByText(/Added by Grace/i)).toBeInTheDocument();
     });
   });
 

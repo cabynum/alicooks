@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   db,
   clearAllData,
+  clearHouseholdData,
   withSyncMetadata,
   getPendingItems,
   markAsSynced,
@@ -27,6 +28,9 @@ import {
   clearConflicts,
   markAsConflict,
   type CachedDish,
+  type CachedMealPlan,
+  type CachedHouseholdMember,
+  type CachedHousehold,
   type DishType,
   type ConflictRecord,
   type Dish,
@@ -696,6 +700,172 @@ describe('Local Database (Dexie)', () => {
         const updated = await db.dishes.get('dish-1');
         expect(updated?._syncStatus).toBe('conflict');
       });
+    });
+  });
+
+  describe('clearHouseholdData', () => {
+    it('clears dishes for the specified household', async () => {
+      const dishes: CachedDish[] = [
+        {
+          id: 'dish-1',
+          householdId: 'household-1',
+          name: 'Dish A',
+          type: 'entree',
+          addedBy: 'user-1',
+          createdAt: '2024-12-28T00:00:00Z',
+          updatedAt: '2024-12-28T00:00:00Z',
+          _syncStatus: 'synced',
+          _localUpdatedAt: '2024-12-28T00:00:00Z',
+        },
+        {
+          id: 'dish-2',
+          householdId: 'household-2',
+          name: 'Dish B',
+          type: 'side',
+          addedBy: 'user-2',
+          createdAt: '2024-12-28T00:00:00Z',
+          updatedAt: '2024-12-28T00:00:00Z',
+          _syncStatus: 'synced',
+          _localUpdatedAt: '2024-12-28T00:00:00Z',
+        },
+      ];
+
+      await db.dishes.bulkAdd(dishes);
+      await clearHouseholdData('household-1');
+
+      const remaining = await db.dishes.toArray();
+      expect(remaining).toHaveLength(1);
+      expect(remaining[0].householdId).toBe('household-2');
+    });
+
+    it('clears meal plans for the specified household', async () => {
+      const plans: CachedMealPlan[] = [
+        {
+          id: 'plan-1',
+          householdId: 'household-1',
+          name: 'Week 1',
+          startDate: '2024-12-28',
+          days: [],
+          createdBy: 'user-1',
+          createdAt: '2024-12-28T00:00:00Z',
+          updatedAt: '2024-12-28T00:00:00Z',
+          _syncStatus: 'synced',
+          _localUpdatedAt: '2024-12-28T00:00:00Z',
+        },
+        {
+          id: 'plan-2',
+          householdId: 'household-2',
+          name: 'Week 2',
+          startDate: '2024-12-28',
+          days: [],
+          createdBy: 'user-2',
+          createdAt: '2024-12-28T00:00:00Z',
+          updatedAt: '2024-12-28T00:00:00Z',
+          _syncStatus: 'synced',
+          _localUpdatedAt: '2024-12-28T00:00:00Z',
+        },
+      ];
+
+      await db.mealPlans.bulkAdd(plans);
+      await clearHouseholdData('household-1');
+
+      const remaining = await db.mealPlans.toArray();
+      expect(remaining).toHaveLength(1);
+      expect(remaining[0].householdId).toBe('household-2');
+    });
+
+    it('clears members for the specified household', async () => {
+      const members: CachedHouseholdMember[] = [
+        {
+          id: 'member-1',
+          householdId: 'household-1',
+          userId: 'user-1',
+          role: 'creator',
+          joinedAt: '2024-12-28T00:00:00Z',
+          _syncStatus: 'synced',
+          _localUpdatedAt: '2024-12-28T00:00:00Z',
+        },
+        {
+          id: 'member-2',
+          householdId: 'household-2',
+          userId: 'user-2',
+          role: 'member',
+          joinedAt: '2024-12-28T00:00:00Z',
+          _syncStatus: 'synced',
+          _localUpdatedAt: '2024-12-28T00:00:00Z',
+        },
+      ];
+
+      await db.members.bulkAdd(members);
+      await clearHouseholdData('household-1');
+
+      const remaining = await db.members.toArray();
+      expect(remaining).toHaveLength(1);
+      expect(remaining[0].householdId).toBe('household-2');
+    });
+
+    it('clears the household record itself', async () => {
+      const households: CachedHousehold[] = [
+        {
+          id: 'household-1',
+          name: 'Family 1',
+          createdBy: 'user-1',
+          createdAt: '2024-12-28T00:00:00Z',
+          updatedAt: '2024-12-28T00:00:00Z',
+          _syncStatus: 'synced',
+          _localUpdatedAt: '2024-12-28T00:00:00Z',
+        },
+        {
+          id: 'household-2',
+          name: 'Family 2',
+          createdBy: 'user-2',
+          createdAt: '2024-12-28T00:00:00Z',
+          updatedAt: '2024-12-28T00:00:00Z',
+          _syncStatus: 'synced',
+          _localUpdatedAt: '2024-12-28T00:00:00Z',
+        },
+      ];
+
+      await db.households.bulkAdd(households);
+      await clearHouseholdData('household-1');
+
+      const remaining = await db.households.toArray();
+      expect(remaining).toHaveLength(1);
+      expect(remaining[0].id).toBe('household-2');
+    });
+
+    it('does not affect other households', async () => {
+      const dish1: CachedDish = {
+        id: 'dish-1',
+        householdId: 'household-1',
+        name: 'Dish A',
+        type: 'entree',
+        addedBy: 'user-1',
+        createdAt: '2024-12-28T00:00:00Z',
+        updatedAt: '2024-12-28T00:00:00Z',
+        _syncStatus: 'synced',
+        _localUpdatedAt: '2024-12-28T00:00:00Z',
+      };
+
+      const dish2: CachedDish = {
+        id: 'dish-2',
+        householdId: 'household-2',
+        name: 'Dish B',
+        type: 'side',
+        addedBy: 'user-2',
+        createdAt: '2024-12-28T00:00:00Z',
+        updatedAt: '2024-12-28T00:00:00Z',
+        _syncStatus: 'synced',
+        _localUpdatedAt: '2024-12-28T00:00:00Z',
+      };
+
+      await db.dishes.bulkAdd([dish1, dish2]);
+      await clearHouseholdData('household-1');
+
+      // Household 2's data should remain intact
+      const dish = await db.dishes.get('dish-2');
+      expect(dish).toBeDefined();
+      expect(dish?.name).toBe('Dish B');
     });
   });
 });

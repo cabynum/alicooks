@@ -30,3 +30,6 @@ export type { UseSyncReturn } from './useSync';
 
 export { useConflicts } from './useConflicts';
 export type { UseConflictsReturn } from './useConflicts';
+
+export { usePlanLock } from './usePlanLock';
+export type { UsePlanLockReturn } from './usePlanLock';

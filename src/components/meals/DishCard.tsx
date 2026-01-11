@@ -21,6 +21,10 @@ export interface DishCardProps {
   compact?: boolean;
   /** Show recipe URL icons (default: true) */
   showRecipeIcons?: boolean;
+  /** Name of who added the dish (for collaborative mode) */
+  addedByName?: string;
+  /** When the dish was added (ISO timestamp, for collaborative mode) */
+  addedAt?: string;
 }
 
 /**
@@ -82,11 +86,36 @@ export function DishCard({
   selected = false,
   compact = false,
   showRecipeIcons = true,
+  addedByName,
+  addedAt,
 }: DishCardProps) {
   const isInteractive = Boolean(onClick);
   const badge = typeBadgeStyles[dish.type];
   const hasRecipeUrls = dish.recipeUrls && dish.recipeUrls.length > 0;
   const shouldShowIcons = showRecipeIcons && hasRecipeUrls;
+  
+  // Format "Added by" text
+  const formatAddedBy = () => {
+    if (!addedByName) return null;
+    let text = `Added by ${addedByName}`;
+    if (addedAt) {
+      const date = new Date(addedAt);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) {
+        text += ' today';
+      } else if (diffDays === 1) {
+        text += ' yesterday';
+      } else if (diffDays < 7) {
+        text += ` ${diffDays} days ago`;
+      } else {
+        text += ` on ${date.toLocaleDateString()}`;
+      }
+    }
+    return text;
+  };
 
   /**
    * Opens a recipe URL in a new tab.
@@ -160,6 +189,7 @@ export function DishCard({
   // When we have recipe icons AND an onClick, we need to render as a div
   // to avoid nested buttons (button inside button is invalid HTML)
   if (isInteractive && shouldShowIcons) {
+    const addedByText = formatAddedBy();
     return (
       <div
         role="button"
@@ -170,17 +200,30 @@ export function DishCard({
         onKeyDown={handleKeyDown}
         aria-label={`${dish.name}, ${badge.label}`}
       >
-        {/* Dish name - truncates on overflow */}
-        <span
-          className={[
-            'truncate flex-1 text-left',
-            'font-medium',
-            compact ? 'text-sm' : 'text-base',
-          ].join(' ')}
-          style={{ color: 'var(--color-text)' }}
-        >
-          {dish.name}
-        </span>
+        {/* Left side: Name and attribution */}
+        <div className="flex-1 min-w-0">
+          {/* Dish name - truncates on overflow */}
+          <span
+            className={[
+              'truncate block',
+              'font-medium',
+              compact ? 'text-sm' : 'text-base',
+            ].join(' ')}
+            style={{ color: 'var(--color-text)' }}
+          >
+            {dish.name}
+          </span>
+          
+          {/* Attribution line */}
+          {addedByText && (
+            <span
+              className="text-xs truncate block"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              {addedByText}
+            </span>
+          )}
+        </div>
 
         {/* Right side: Recipe icons and type badge */}
         <div className="flex items-center gap-2 shrink-0">
@@ -221,19 +264,33 @@ export function DishCard({
   }
 
   // Standard content for button or non-interactive div
+  const addedByText = formatAddedBy();
   const content = (
     <>
-      {/* Dish name - truncates on overflow */}
-      <span
-        className={[
-          'truncate flex-1 text-left',
-          'font-medium',
-          compact ? 'text-sm' : 'text-base',
-        ].join(' ')}
-        style={{ color: 'var(--color-text)' }}
-      >
-        {dish.name}
-      </span>
+      {/* Left side: Name and attribution */}
+      <div className="flex-1 min-w-0 text-left">
+        {/* Dish name - truncates on overflow */}
+        <span
+          className={[
+            'truncate block',
+            'font-medium',
+            compact ? 'text-sm' : 'text-base',
+          ].join(' ')}
+          style={{ color: 'var(--color-text)' }}
+        >
+          {dish.name}
+        </span>
+        
+        {/* Attribution line */}
+        {addedByText && (
+          <span
+            className="text-xs truncate block"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
+            {addedByText}
+          </span>
+        )}
+      </div>
 
       {/* Right side: Recipe icons (only when not interactive) and type badge */}
       <div className="flex items-center gap-2 shrink-0">

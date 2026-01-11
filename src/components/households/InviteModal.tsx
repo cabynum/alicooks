@@ -6,9 +6,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { X, Copy, Share2, Check, Link } from 'lucide-react';
-import { Button } from '@/components/ui';
+import { X, Copy, Share2, Check, Link, MessageSquare, Send } from 'lucide-react';
+import { Button, Input } from '@/components/ui';
 import { useInvite } from '@/hooks';
+import { supabase } from '@/lib/supabase';
 
 export interface InviteModalProps {
   /** The household ID to invite to */
@@ -47,6 +48,12 @@ export function InviteModal({
 
   const [copied, setCopied] = useState<'link' | 'code' | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
+  
+  // SMS invite state
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isSendingSms, setIsSendingSms] = useState(false);
+  const [smsSuccess, setSmsSuccess] = useState(false);
+  const [smsError, setSmsError] = useState<string | null>(null);
 
   // Generate invite if none exists when modal opens
   useEffect(() => {
@@ -119,12 +126,55 @@ export function InviteModal({
   }
 
   /**
+   * Send SMS invite via Twilio Edge Function
+   */
+  async function handleSendSms() {
+    if (!invite || !phoneNumber.trim()) return;
+
+    setIsSendingSms(true);
+    setSmsError(null);
+    setSmsSuccess(false);
+
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('send-invite-sms', {
+        body: {
+          phoneOrEmail: phoneNumber.trim(),
+          inviteCode: invite.code,
+          householdName,
+        },
+      });
+
+      if (fnError) {
+        throw new Error(fnError.message || 'Failed to send SMS');
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setSmsSuccess(true);
+      setPhoneNumber('');
+      
+      // Clear success after 3 seconds
+      setTimeout(() => setSmsSuccess(false), 3000);
+    } catch (err) {
+      console.error('SMS send error:', err);
+      setSmsError(err instanceof Error ? err.message : 'Failed to send SMS');
+    } finally {
+      setIsSendingSms(false);
+    }
+  }
+
+  /**
    * Handle modal close
    */
   function handleClose() {
     clearError();
     setShareError(null);
     setCopied(null);
+    setPhoneNumber('');
+    setSmsError(null);
+    setSmsSuccess(false);
     onClose();
   }
 
@@ -279,6 +329,52 @@ export function InviteModal({
                       )}
                     </Button>
                   </div>
+                </div>
+
+                {/* Send via SMS */}
+                <div
+                  className="pt-4 border-t"
+                  style={{ borderColor: 'var(--color-bg-muted)' }}
+                >
+                  <label
+                    className="flex items-center gap-2 text-sm font-medium mb-2"
+                    style={{ color: 'var(--color-text)' }}
+                  >
+                    <MessageSquare size={16} />
+                    Send invite via text message
+                  </label>
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <Input
+                        type="tel"
+                        placeholder="Phone number"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        disabled={isSendingSms}
+                        aria-label="Phone number for SMS invite"
+                      />
+                    </div>
+                    <Button
+                      variant="primary"
+                      onClick={handleSendSms}
+                      disabled={!phoneNumber.trim() || isSendingSms}
+                      loading={isSendingSms}
+                      aria-label="Send SMS invite"
+                    >
+                      <Send size={18} />
+                    </Button>
+                  </div>
+                  {smsSuccess && (
+                    <p className="mt-2 text-sm text-green-600 flex items-center gap-1">
+                      <Check size={14} />
+                      Invite sent!
+                    </p>
+                  )}
+                  {smsError && (
+                    <p className="mt-2 text-sm text-red-500">
+                      {smsError}
+                    </p>
+                  )}
                 </div>
 
                 {/* Share button (if supported) */}

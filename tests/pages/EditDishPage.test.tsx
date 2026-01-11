@@ -29,22 +29,24 @@ vi.mock('@/hooks/useAuth', () => ({
   }),
 }));
 
-// Mock useHousehold to avoid Supabase dependency
+// Mock useHousehold - we'll override this in specific tests
+const mockUseHousehold = vi.fn(() => ({
+  households: [],
+  currentHousehold: null,
+  members: [],
+  isLoading: false,
+  isCreator: false,
+  switchHousehold: vi.fn(),
+  createHousehold: vi.fn(),
+  leaveCurrentHousehold: vi.fn(),
+  removeMember: vi.fn(),
+  refresh: vi.fn(),
+  error: null,
+  clearError: vi.fn(),
+}));
+
 vi.mock('@/hooks/useHousehold', () => ({
-  useHousehold: () => ({
-    households: [],
-    currentHousehold: null,
-    members: [],
-    isLoading: false,
-    isCreator: false,
-    switchHousehold: vi.fn(),
-    createHousehold: vi.fn(),
-    leaveCurrentHousehold: vi.fn(),
-    removeMember: vi.fn(),
-    refresh: vi.fn(),
-    error: null,
-    clearError: vi.fn(),
-  }),
+  useHousehold: () => mockUseHousehold(),
 }));
 
 // Mock localStorage
@@ -450,6 +452,137 @@ describe('EditDishPage', () => {
       // Should have submitted and navigated
       expect(getDishes()[0].name).toBe('Keyboard Update');
       expect(navigatedTo).toBe('/');
+    });
+  });
+
+  describe('attribution display', () => {
+    beforeEach(() => {
+      // Reset mock to default
+      mockUseHousehold.mockReturnValue({
+        households: [],
+        currentHousehold: null,
+        members: [],
+        isLoading: false,
+        isCreator: false,
+        switchHousehold: vi.fn(),
+        createHousehold: vi.fn(),
+        leaveCurrentHousehold: vi.fn(),
+        removeMember: vi.fn(),
+        refresh: vi.fn(),
+        error: null,
+        clearError: vi.fn(),
+      });
+    });
+
+    it('does not show "Added by" when dish has no addedBy', () => {
+      const dish = createTestDish();
+      renderEditDishPage(dish.id);
+
+      expect(screen.queryByText(/Added by/i)).not.toBeInTheDocument();
+    });
+
+    it('shows creation date for all dishes', () => {
+      const dish = createTestDish();
+      renderEditDishPage(dish.id);
+
+      // The dish was just created, so it should show "Created on" with today's date
+      expect(screen.getByText(/Created on/i)).toBeInTheDocument();
+    });
+
+    it('shows "Added by [name]" when addedBy matches a household member', () => {
+      // First create the dish with addedBy field
+      const dishId = 'test-dish-with-attribution';
+      const dishWithAddedBy: Dish = {
+        id: dishId,
+        name: 'Collaborative Dish',
+        type: 'entree',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        addedBy: 'user-123',
+      };
+      localStorage.setItem('dishcourse_dishes', JSON.stringify([dishWithAddedBy]));
+
+      // Mock household with member BEFORE rendering
+      mockUseHousehold.mockReturnValue({
+        households: [],
+        currentHousehold: null,
+        members: [
+          {
+            id: 'member-1',
+            householdId: 'household-1',
+            userId: 'user-123',
+            role: 'member',
+            joinedAt: new Date().toISOString(),
+            profile: {
+              id: 'user-123',
+              displayName: 'Alice Smith',
+              email: 'alice@example.com',
+            },
+          },
+        ],
+        isLoading: false,
+        isCreator: false,
+        switchHousehold: vi.fn(),
+        createHousehold: vi.fn(),
+        leaveCurrentHousehold: vi.fn(),
+        removeMember: vi.fn(),
+        refresh: vi.fn(),
+        error: null,
+        clearError: vi.fn(),
+      });
+
+      renderEditDishPage(dishId);
+
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    });
+
+    it('does not show "Added by" when addedBy does not match any member', () => {
+      // First create the dish with addedBy field
+      const dishId = 'test-dish-unknown-user';
+      const dishWithAddedBy: Dish = {
+        id: dishId,
+        name: 'Unknown Dish',
+        type: 'entree',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        addedBy: 'unknown-user-id',
+      };
+      localStorage.setItem('dishcourse_dishes', JSON.stringify([dishWithAddedBy]));
+
+      // Mock household with member that doesn't match
+      mockUseHousehold.mockReturnValue({
+        households: [],
+        currentHousehold: null,
+        members: [
+          {
+            id: 'member-1',
+            householdId: 'household-1',
+            userId: 'different-user',
+            role: 'member',
+            joinedAt: new Date().toISOString(),
+            profile: {
+              id: 'different-user',
+              displayName: 'Bob Jones',
+              email: 'bob@example.com',
+            },
+          },
+        ],
+        isLoading: false,
+        isCreator: false,
+        switchHousehold: vi.fn(),
+        createHousehold: vi.fn(),
+        leaveCurrentHousehold: vi.fn(),
+        removeMember: vi.fn(),
+        refresh: vi.fn(),
+        error: null,
+        clearError: vi.fn(),
+      });
+
+      renderEditDishPage(dishId);
+
+      // Should not show "Added by" since no member matches
+      const addedByElements = screen.queryAllByText(/Added by/i);
+      expect(addedByElements).toHaveLength(0);
     });
   });
 });

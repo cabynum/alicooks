@@ -101,3 +101,21 @@ export {
   // Cleanup
   cleanupSync,
 } from './sync';
+
+// Locks service for meal plan locking
+export {
+  // Constants
+  LOCK_TIMEOUT_MS,
+  // Types
+  type LockResult,
+  type LockStatus,
+  // Operations
+  acquireLock,
+  releaseLock,
+  forceUnlock,
+  checkLock,
+  refreshLock,
+  // Helpers
+  isLockStale,
+  formatLockTime,
+} from './locks';

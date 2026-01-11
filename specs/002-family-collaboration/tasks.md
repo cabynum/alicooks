@@ -528,55 +528,66 @@ See who added what, leave/manage household.
 
 ### 5.1 Update DishCard for Attribution
 
-- [ ] Add addedBy display option
-- [ ] Show "Added by [name]" when enabled
-- [ ] Use in dish detail view
-- [ ] Write component tests
+- [x] Add addedBy display option (`addedByName`, `addedAt` props)
+- [x] Show "Added by [name] [time]" when enabled
+- [x] Smart time formatting (today/yesterday/X days ago/date)
+- [x] Write component tests (7 new tests)
 
-**Verify**: Dish attribution visible where appropriate
+**Verify**: Dish attribution visible where appropriate ✅
 
 ---
 
 ### 5.2 Update Dish Detail View
 
-- [ ] Show who added the dish
-- [ ] Show when it was added
-- [ ] Allow editing by any household member
+- [x] Show who added the dish (resolves user ID to display name)
+- [x] Show when it was added (formatted date)
+- [x] Allow editing by any household member (already worked)
+- [x] Write component tests (4 new tests)
 
-**Verify**: Dish detail shows full attribution
+**Verify**: Dish detail shows full attribution ✅
 
 ---
 
 ### 5.3 Implement Leave Household
 
-- [ ] Add leave flow in HouseholdPage
-- [ ] Confirm before leaving
-- [ ] Handle last member case (delete household?)
-- [ ] Clear local cache for that household
-- [ ] Redirect to household selection
+- [x] Add leave flow in HouseholdPage (already existed)
+- [x] Confirm before leaving (confirmation dialog)
+- [x] Handle last member case → See 5.5 (preserve policy)
+- [x] Clear local cache for that household (`clearHouseholdData()`)
+- [x] Redirect to household selection
+- [x] Write tests (5 new tests for clearHouseholdData)
 
-**Verify**: Can leave household, data cleaned up
+**Verify**: Can leave household, data cleaned up ✅
 
 ---
 
 ### 5.4 Implement Remove Member
 
-- [ ] Add remove flow for creator
-- [ ] Confirm before removing
-- [ ] Cannot remove self
-- [ ] Member loses access immediately
+- [x] Add remove flow for creator (MemberList component)
+- [x] Confirm before removing (confirmation dialog)
+- [x] Cannot remove self (enforced in UI)
+- [x] Member loses access immediately
+- [x] Write component tests (14 new tests)
 
-**Verify**: Creator can remove members
+**Verify**: Creator can remove members ✅
 
 ---
 
 ### 5.5 Handle Orphaned Households
 
-- [ ] Decide policy: delete or preserve?
-- [ ] Implement cleanup if deleting
-- [ ] Or implement re-join if preserving
+- [x] Decide policy: delete or preserve? → **PRESERVE**
+- [x] ~~Implement cleanup if deleting~~ (N/A - using preserve)
+- [x] Preserved by design: creators cannot leave, so households always have at least one member
 
-**Verify**: Edge case handled gracefully
+**Policy Decision**: Households cannot become orphaned because:
+
+1. Creators cannot leave their own household
+2. Only the creator can remove other members
+3. The household always has at least the creator as a member
+
+If future features (account deletion, ownership transfer) change this, revisit the policy.
+
+**Verify**: Edge case handled gracefully ✅
 
 ---
 
