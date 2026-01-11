@@ -236,12 +236,10 @@ export function MagicLinkForm({
           <Input
             label="Verification code"
             value={code}
-            onChange={setCode}
+            onChange={(val) => setCode(val.replace(/\D/g, ''))}
             autoFocus
-            placeholder="123456"
-            type="text"
+            placeholder="Enter code from email"
             inputMode="numeric"
-            pattern="[0-9]*"
             autoComplete="one-time-code"
             maxLength={8}
             disabled={loading}
