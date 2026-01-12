@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { Utensils, RefreshCw } from 'lucide-react';
+import { Utensils, RefreshCw, Leaf } from 'lucide-react';
 import type { MealSuggestion } from '@/types';
 import { Button } from '../ui';
 
@@ -138,9 +138,11 @@ export function SuggestionCard({
                       'shadow-sm',
                     ].join(' ')}
                   >
-                    <span className="text-lg" role="img" aria-hidden="true">
-                      🥗
-                    </span>
+                    <Leaf
+                      size={18}
+                      className="text-emerald-600"
+                      aria-hidden="true"
+                    />
                     <span className="font-medium text-stone-700">
                       {side.name}
                     </span>
