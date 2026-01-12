@@ -171,6 +171,181 @@ describe('suggest', () => {
 // suggestMany() Tests
 // ============================================================================
 
+// ============================================================================
+// Pairing Preference Tests
+// ============================================================================
+
+describe('pairing preference', () => {
+  // Helper to create dishes with pairing relationships
+  function createDishWithPairings(
+    id: string,
+    name: string,
+    type: 'entree' | 'side' | 'other',
+    pairsWellWith: string[] = []
+  ): Dish {
+    return {
+      id,
+      name,
+      type,
+      pairsWellWith,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    };
+  }
+
+  describe('when entree has defined pairings', () => {
+    it('prefers paired sides in suggestions', () => {
+      // Create dishes: 1 entree paired with 1 of 3 sides
+      const dishes = [
+        createDishWithPairings('e1', 'Chicken', 'entree', ['s1']),
+        createDishWithPairings('s1', 'Rice', 'side'),
+        createDishWithPairings('s2', 'Fries', 'side'),
+        createDishWithPairings('s3', 'Salad', 'side'),
+      ];
+
+      // Run many times and count how often the paired side is selected
+      let pairedCount = 0;
+      const runs = 100;
+
+      for (let i = 0; i < runs; i++) {
+        const result = suggest(dishes);
+        if (result && result.sides.some(s => s.id === 's1')) {
+          pairedCount++;
+        }
+      }
+
+      // With 80% preference for paired sides, should see Rice much more often
+      // than random chance (1 in 3 = ~33%). Expect at least 50% to be safe.
+      expect(pairedCount).toBeGreaterThan(runs * 0.5);
+    });
+
+    it('still occasionally picks non-paired sides for variety', () => {
+      // Create dishes: 1 entree paired with only 1 side
+      const dishes = [
+        createDishWithPairings('e1', 'Chicken', 'entree', ['s1']),
+        createDishWithPairings('s1', 'Rice', 'side'),
+        createDishWithPairings('s2', 'Fries', 'side'),
+        createDishWithPairings('s3', 'Salad', 'side'),
+      ];
+
+      // Run many times and check if we ever get non-paired sides
+      let nonPairedCount = 0;
+      const runs = 100;
+
+      for (let i = 0; i < runs; i++) {
+        const result = suggest(dishes);
+        if (result && result.sides.some(s => s.id !== 's1')) {
+          nonPairedCount++;
+        }
+      }
+
+      // With 20% chance of random, we should see at least some non-paired
+      // This is probabilistic, but 100 runs should show at least a few
+      expect(nonPairedCount).toBeGreaterThan(0);
+    });
+
+    it('handles multiple paired sides', () => {
+      // Create dishes: 1 entree paired with 2 of 4 sides
+      const dishes = [
+        createDishWithPairings('e1', 'Chicken', 'entree', ['s1', 's2']),
+        createDishWithPairings('s1', 'Rice', 'side'),
+        createDishWithPairings('s2', 'Salad', 'side'),
+        createDishWithPairings('s3', 'Fries', 'side'),
+        createDishWithPairings('s4', 'Beans', 'side'),
+      ];
+
+      // Run many times and count paired selections
+      let pairedCount = 0;
+      const runs = 100;
+
+      for (let i = 0; i < runs; i++) {
+        const result = suggest(dishes);
+        if (result) {
+          // Check if all selected sides are from the paired set
+          const allPaired = result.sides.every(s => 
+            ['s1', 's2'].includes(s.id)
+          );
+          if (allPaired && result.sides.length > 0) {
+            pairedCount++;
+          }
+        }
+      }
+
+      // Should see mostly paired combinations
+      expect(pairedCount).toBeGreaterThan(runs * 0.5);
+    });
+  });
+
+  describe('when entree has no pairings', () => {
+    it('falls back to random selection', () => {
+      // Create dishes without any pairings
+      const dishes = [
+        createDishWithPairings('e1', 'Chicken', 'entree'), // No pairsWellWith
+        createDishWithPairings('s1', 'Rice', 'side'),
+        createDishWithPairings('s2', 'Fries', 'side'),
+        createDishWithPairings('s3', 'Salad', 'side'),
+      ];
+
+      // Run many times and check distribution
+      const sideCounts: Record<string, number> = { s1: 0, s2: 0, s3: 0 };
+      const runs = 100;
+
+      for (let i = 0; i < runs; i++) {
+        const result = suggest(dishes);
+        if (result) {
+          result.sides.forEach(s => {
+            sideCounts[s.id]++;
+          });
+        }
+      }
+
+      // All sides should get picked at least sometimes (rough distribution)
+      expect(sideCounts.s1).toBeGreaterThan(0);
+      expect(sideCounts.s2).toBeGreaterThan(0);
+      expect(sideCounts.s3).toBeGreaterThan(0);
+    });
+  });
+
+  describe('when paired sides are not available', () => {
+    it('falls back to random when paired sides are missing', () => {
+      // Create dishes where pairing references a non-existent side
+      const dishes = [
+        createDishWithPairings('e1', 'Chicken', 'entree', ['s-nonexistent']),
+        createDishWithPairings('s1', 'Rice', 'side'),
+        createDishWithPairings('s2', 'Fries', 'side'),
+      ];
+
+      // Should still work and pick from available sides
+      const result = suggest(dishes);
+
+      expect(result).not.toBeNull();
+      expect(result?.sides.length).toBeGreaterThanOrEqual(1);
+      expect(['s1', 's2']).toContain(result?.sides[0].id);
+    });
+  });
+
+  describe('no duplicate sides in meal', () => {
+    it('avoids selecting the same side twice', () => {
+      // Create dishes with an entree that pairs with one side
+      const dishes = [
+        createDishWithPairings('e1', 'Chicken', 'entree', ['s1']),
+        createDishWithPairings('s1', 'Rice', 'side'),
+        createDishWithPairings('s2', 'Fries', 'side'),
+      ];
+
+      // Run many times - should never get duplicate sides
+      for (let i = 0; i < 50; i++) {
+        const result = suggest(dishes);
+        if (result && result.sides.length > 1) {
+          const sideIds = result.sides.map(s => s.id);
+          const uniqueIds = new Set(sideIds);
+          expect(uniqueIds.size).toBe(sideIds.length);
+        }
+      }
+    });
+  });
+});
+
 describe('suggestMany', () => {
   describe('when dishes are available', () => {
     it('returns requested number of suggestions when possible', () => {

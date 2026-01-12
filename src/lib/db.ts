@@ -94,6 +94,8 @@ export interface Dish {
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
+  /** Side dish IDs that pair well with this entree (only applies to entrees) */
+  pairsWellWith?: string[];
 }
 
 /**

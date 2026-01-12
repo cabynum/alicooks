@@ -61,6 +61,9 @@ export interface Dish {
 
   /** Soft delete timestamp (synced mode only) */
   deletedAt?: string;
+
+  /** Side dish IDs that pair well with this entree (only applies to entrees) */
+  pairsWellWith?: string[];
 }
 
 /**
@@ -79,6 +82,9 @@ export interface CreateDishInput {
 
   /** Cook time in minutes (optional) */
   cookTimeMinutes?: number;
+
+  /** Side dish IDs that pair well with this entree (optional, entrees only) */
+  pairsWellWith?: string[];
 }
 
 /**
@@ -97,6 +103,9 @@ export interface UpdateDishInput {
 
   /** Cook time in minutes */
   cookTimeMinutes?: number;
+
+  /** Side dish IDs that pair well with this entree (entrees only) */
+  pairsWellWith?: string[];
 }
 
 /**

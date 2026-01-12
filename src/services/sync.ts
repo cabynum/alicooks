@@ -837,6 +837,9 @@ export async function getPlansFromCache(householdId: string): Promise<MealPlan[]
  * Transform a dish from Supabase format to app format.
  */
 function transformDishFromServer(record: Record<string, unknown>): Dish {
+  // Handle pairs_well_with - Supabase stores as UUID[], but may come as null or undefined
+  const pairsWellWith = record.pairs_well_with as string[] | null | undefined;
+  
   return {
     id: record.id as string,
     householdId: record.household_id as string,
@@ -848,6 +851,8 @@ function transformDishFromServer(record: Record<string, unknown>): Dish {
     createdAt: record.created_at as string,
     updatedAt: record.updated_at as string,
     deletedAt: record.deleted_at as string | undefined,
+    // Only include pairsWellWith if it has values
+    ...(pairsWellWith && pairsWellWith.length > 0 && { pairsWellWith }),
   };
 }
 
@@ -868,6 +873,8 @@ function transformDishToServer(
     created_at: dish.createdAt,
     updated_at: dish.updatedAt,
     deleted_at: dish.deletedAt ?? null,
+    // Store as empty array if undefined (PostgreSQL UUID[] default)
+    pairs_well_with: dish.pairsWellWith ?? [],
   };
 }
 
@@ -1097,6 +1104,10 @@ export async function migrateLocalDishes(
         ...(localDish.recipeUrls && { recipeUrls: localDish.recipeUrls }),
         ...(localDish.cookTimeMinutes !== undefined && {
           cookTimeMinutes: localDish.cookTimeMinutes,
+        }),
+        // Include pairings if present (though local dishes typically don't have them)
+        ...(localDish.pairsWellWith && localDish.pairsWellWith.length > 0 && {
+          pairsWellWith: localDish.pairsWellWith,
         }),
       };
 

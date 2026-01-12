@@ -24,3 +24,6 @@ export type { PlanCardProps } from './PlanCard';
 
 export { LockIndicator } from './LockIndicator';
 export type { LockIndicatorProps } from './LockIndicator';
+
+export { PairingSelector } from './PairingSelector';
+export type { PairingSelectorProps } from './PairingSelector';

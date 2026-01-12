@@ -156,6 +156,10 @@ export function useDishes(): UseDishesReturn {
         ...(input.cookTimeMinutes !== undefined && {
           cookTimeMinutes: input.cookTimeMinutes,
         }),
+        // Pairing data (entrees only)
+        ...(input.pairsWellWith && input.pairsWellWith.length > 0 && {
+          pairsWellWith: input.pairsWellWith,
+        }),
         // Synced mode fields
         ...(isSyncedMode &&
           currentHousehold && {
@@ -198,6 +202,10 @@ export function useDishes(): UseDishesReturn {
         }),
         ...(input.cookTimeMinutes !== undefined && {
           cookTimeMinutes: input.cookTimeMinutes || undefined,
+        }),
+        // Pairing data - update if explicitly provided (can be empty to clear)
+        ...(input.pairsWellWith !== undefined && {
+          pairsWellWith: input.pairsWellWith.length > 0 ? input.pairsWellWith : undefined,
         }),
       };
 

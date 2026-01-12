@@ -18,6 +18,12 @@ import type { Dish, MealSuggestion } from '@/types';
 const MIN_SIDES = 1;
 const MAX_SIDES = 2;
 
+/**
+ * Probability of selecting a paired side (if available) vs. random.
+ * 0.8 = 80% chance to pick from paired sides, 20% random for variety.
+ */
+const PAIRING_PREFERENCE = 0.8;
+
 // ============================================================================
 // Utility Functions
 // ============================================================================
@@ -81,6 +87,74 @@ function determineSideCount(availableSides: number): number {
   return MIN_SIDES + Math.floor(Math.random() * (maxPossible - MIN_SIDES + 1));
 }
 
+/**
+ * Picks a side dish with preference for paired sides.
+ * 
+ * If the entree has defined pairings:
+ * - 80% chance to pick from paired sides (if any are available)
+ * - 20% chance to pick randomly for variety
+ * 
+ * Falls back to random selection if no pairings exist.
+ * 
+ * @param entree - The entree to find pairings for
+ * @param allSides - All available side dishes
+ * @param excludeIds - IDs of sides already selected (to avoid duplicates)
+ * @returns A side dish, or undefined if none available
+ */
+function pickSideWithPairing(
+  entree: Dish,
+  allSides: Dish[],
+  excludeIds: string[] = []
+): Dish | undefined {
+  // Filter out already-selected sides
+  const availableSides = allSides.filter((s) => !excludeIds.includes(s.id));
+  
+  if (availableSides.length === 0) return undefined;
+
+  // Get paired sides that are available
+  const pairedIds = entree.pairsWellWith ?? [];
+  const pairedSides = availableSides.filter((s) => pairedIds.includes(s.id));
+
+  // If we have paired sides and roll under the preference threshold, pick from pairs
+  if (pairedSides.length > 0 && Math.random() < PAIRING_PREFERENCE) {
+    return pickRandom(pairedSides);
+  }
+
+  // Otherwise pick randomly from all available sides
+  return pickRandom(availableSides);
+}
+
+/**
+ * Picks multiple side dishes with preference for paired sides.
+ * Ensures no duplicates in the selection.
+ * 
+ * @param entree - The entree to find pairings for  
+ * @param allSides - All available side dishes
+ * @param count - How many sides to pick
+ * @returns Array of side dishes (may be fewer than requested)
+ */
+function pickSidesWithPairing(
+  entree: Dish,
+  allSides: Dish[],
+  count: number
+): Dish[] {
+  const selected: Dish[] = [];
+  const excludeIds: string[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const side = pickSideWithPairing(entree, allSides, excludeIds);
+    if (side) {
+      selected.push(side);
+      excludeIds.push(side.id);
+    } else {
+      // No more sides available
+      break;
+    }
+  }
+
+  return selected;
+}
+
 // ============================================================================
 // Main Functions
 // ============================================================================
@@ -88,7 +162,8 @@ function determineSideCount(availableSides: number): number {
 /**
  * Generates a single meal suggestion from the given dishes.
  *
- * A suggestion pairs one random entree with 1-2 random side dishes.
+ * A suggestion pairs one random entree with 1-2 side dishes.
+ * Sides are selected with preference for user-defined pairings (80% paired / 20% random).
  * Returns null if there are no entrees available.
  *
  * @param dishes - The user's dish collection
@@ -116,9 +191,9 @@ export function suggest(dishes: Dish[]): MealSuggestion | null {
   const entree = pickRandom(entrees);
   if (!entree) return null; // Type guard, shouldn't happen
 
-  // Pick 1-2 random sides (or 0 if no sides available)
+  // Pick 1-2 sides with preference for paired sides
   const sideCount = determineSideCount(sides.length);
-  const selectedSides = pickRandomMany(sides, sideCount);
+  const selectedSides = pickSidesWithPairing(entree, sides, sideCount);
 
   return {
     entree,
@@ -130,6 +205,7 @@ export function suggest(dishes: Dish[]): MealSuggestion | null {
  * Generates multiple unique meal suggestions.
  *
  * Each suggestion uses a different entree to provide variety.
+ * Sides are selected with preference for user-defined pairings (80% paired / 20% random).
  * Returns fewer suggestions if there aren't enough entrees.
  *
  * @param dishes - The user's dish collection
@@ -158,7 +234,7 @@ export function suggestMany(dishes: Dish[], count: number): MealSuggestion[] {
 
   for (const entree of selectedEntrees) {
     const sideCount = determineSideCount(sides.length);
-    const selectedSides = pickRandomMany(sides, sideCount);
+    const selectedSides = pickSidesWithPairing(entree, sides, sideCount);
 
     suggestions.push({
       entree,

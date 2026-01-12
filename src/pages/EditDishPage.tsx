@@ -27,6 +27,9 @@ export function EditDishPage() {
     .filter((d) => d.id !== dishId)
     .map((d) => d.name);
 
+  // Get available sides for pairing selector (exclude the current dish if it's a side)
+  const availableSides = dishes.filter((d) => d.type === 'side' && d.id !== dishId);
+
   // Resolve addedBy user ID to display name
   const addedByName = useMemo(() => {
     if (!dish?.addedBy) return null;
@@ -185,11 +188,13 @@ export function EditDishPage() {
               type: dish.type,
               recipeUrls: dish.recipeUrls,
               cookTimeMinutes: dish.cookTimeMinutes,
+              pairsWellWith: dish.pairsWellWith,
             }}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             submitLabel="Save Changes"
             existingNames={existingNames}
+            availableSides={availableSides}
           />
         </Card>
 

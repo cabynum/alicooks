@@ -109,6 +109,8 @@ export function saveDish(input: CreateDishInput): Dish {
     // Optional extended details
     ...(input.recipeUrls && input.recipeUrls.length > 0 && { recipeUrls: input.recipeUrls }),
     ...(input.cookTimeMinutes !== undefined && { cookTimeMinutes: input.cookTimeMinutes }),
+    // Pairing data (entrees only)
+    ...(input.pairsWellWith && input.pairsWellWith.length > 0 && { pairsWellWith: input.pairsWellWith }),
   };
 
   dishes.push(newDish);
@@ -143,6 +145,8 @@ export function updateDish(
     // Optional extended details - only update if explicitly provided
     ...(input.recipeUrls !== undefined && { recipeUrls: input.recipeUrls.length > 0 ? input.recipeUrls : undefined }),
     ...(input.cookTimeMinutes !== undefined && { cookTimeMinutes: input.cookTimeMinutes || undefined }),
+    // Pairing data - update if explicitly provided (can be empty array to clear)
+    ...(input.pairsWellWith !== undefined && { pairsWellWith: input.pairsWellWith.length > 0 ? input.pairsWellWith : undefined }),
   };
 
   dishes[index] = updated;

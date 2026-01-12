@@ -4,12 +4,14 @@
  * A form for creating or editing a dish.
  * Includes name input, type selector, and optional extended details
  * (cook time, recipe URLs) in a collapsible section.
+ * For entrees, also includes a pairing selector to choose which sides go well.
  */
 
 import { useState } from 'react';
-import { type DishType } from '@/types';
+import { type DishType, type Dish } from '@/types';
 import { Button, Input, CookTimePicker, UrlInput } from '@/components/ui';
 import { DishTypeSelector } from './DishTypeSelector';
+import { PairingSelector } from './PairingSelector';
 
 export interface DishFormValues {
   /** Dish name */
@@ -20,6 +22,8 @@ export interface DishFormValues {
   recipeUrls?: string[];
   /** Cook time in minutes (optional) */
   cookTimeMinutes?: number;
+  /** Side dish IDs that pair well with this entree (optional, entrees only) */
+  pairsWellWith?: string[];
 }
 
 export interface DishFormProps {
@@ -38,6 +42,16 @@ export interface DishFormProps {
    * When editing, exclude the current dish's name from this list.
    */
   existingNames?: string[];
+  /** 
+   * Available side dishes for pairing selection.
+   * Only needed when adding/editing entrees.
+   */
+  availableSides?: Dish[];
+  /**
+   * Callback when user wants to add a new side dish inline.
+   * If not provided, the "Add Side" button won't be shown.
+   */
+  onAddNewSide?: () => void;
 }
 
 /**
@@ -102,6 +116,8 @@ export function DishForm({
   submitLabel = 'Save',
   isSubmitting = false,
   existingNames = [],
+  availableSides = [],
+  onAddNewSide,
 }: DishFormProps) {
   // Core form state
   const [name, setName] = useState(initialValues?.name ?? '');
@@ -115,6 +131,11 @@ export function DishForm({
   );
   const [recipeUrls, setRecipeUrls] = useState<string[]>(
     initialValues?.recipeUrls ?? []
+  );
+  
+  // Pairing state (for entrees only)
+  const [pairsWellWith, setPairsWellWith] = useState<string[]>(
+    initialValues?.pairsWellWith ?? []
   );
 
   // Expandable section state - auto-expand if there are initial extended details
@@ -186,6 +207,8 @@ export function DishForm({
       // Only include optional fields if they have values
       ...(recipeUrls.length > 0 && { recipeUrls }),
       ...(cookTimeMinutes !== undefined && { cookTimeMinutes }),
+      // Include pairings for entrees only if there are values
+      ...(type === 'entree' && pairsWellWith.length > 0 && { pairsWellWith }),
     });
   };
 
@@ -208,6 +231,17 @@ export function DishForm({
         onChange={setType}
         disabled={isSubmitting}
       />
+
+      {/* Pairing selector (entrees only) */}
+      {type === 'entree' && (
+        <PairingSelector
+          selectedIds={pairsWellWith}
+          onChange={setPairsWellWith}
+          sides={availableSides}
+          onAddNewSide={onAddNewSide}
+          disabled={isSubmitting}
+        />
+      )}
 
       {/* Expandable details section */}
       <div className="border border-stone-200 rounded-lg overflow-hidden">

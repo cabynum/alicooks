@@ -18,6 +18,9 @@ export function AddDishPage() {
   // Get existing dish names for duplicate detection
   const existingNames = dishes.map((dish) => dish.name);
 
+  // Get available sides for pairing selector
+  const availableSides = dishes.filter((dish) => dish.type === 'side');
+
   /**
    * Handle form submission - save the dish and navigate home
    */
@@ -80,6 +83,7 @@ export function AddDishPage() {
             onCancel={handleCancel}
             submitLabel="Add Dish"
             existingNames={existingNames}
+            availableSides={availableSides}
           />
         </Card>
       </main>
