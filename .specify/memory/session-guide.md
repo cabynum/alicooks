@@ -38,20 +38,21 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2026-01-11  
+**Last Updated**: 2026-01-12  
 **Current Branch**: `master`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Family Collaboration MERGED ✅ — Production fixes
+**Current Phase**: Smart Meal Pairing — Spec Complete, Ready to Build
 
 ### Completed This Session
 
-- ✅ Fixed mobile auth: Replaced magic links with OTP code entry (better for PWA)
-- ✅ Fixed Vercel env var: Corrected `VITE_SUPABASE_URL` (was dashboard URL, not API URL)
-- ✅ Fixed OTP validation: Accept 6-8 digit codes, allow copy-paste
-- ✅ Added display name change with uniqueness check
-- ✅ Added delete household feature for creators
-- 🧪 **Next**: Continue family testing, apply migration for display name uniqueness
+- ✅ Fixed new user signup: Robust trigger, profile upsert, INSERT RLS policy
+- ✅ Fixed Supabase config: Disabled email confirmation, set production redirect URLs
+- ✅ Family testing: Successfully onboarded second household member
+- ✅ Prioritized ideas backlog (High → Low)
+- ✅ Created Smart Meal Pairing spec (`specs/003-smart-meal-pairing/`)
+- ✅ Created blog post Part 12
+- 🚀 **Next**: Implement Smart Meal Pairing (Phase 1: Data Model)
 
 ### Phase Summary
 
@@ -122,8 +123,8 @@ Core features:
 
 ### Recommended Next Steps
 
-1. **Phase 7.5: Offline Mode Polish** — Clear "offline" indicator, graceful degradation messaging
-2. **Family testing** — Create household, invite family, test full sync flow live
+1. **Smart Meal Pairing** — Implement spec (see `specs/003-smart-meal-pairing/tasks.md`)
+2. **Meal Proposals & Voting** — Design and build after pairing is complete
 3. **A2P 10DLC registration** — Enable SMS invites (Toll-Free number ~$2/mo)
 
 ### Key Files

@@ -11,6 +11,30 @@ not commitment. Ideas here may or may not make it into the product.
 
 ---
 
+## Prioritized Roadmap
+
+*Last reviewed: 2026-01-12*
+
+### 🔴 High Priority (Core Vision)
+
+1. **Smart Meal Pairing** — Make suggestions smarter than random. User-defined or AI pairings.
+2. **Meal Proposals & Voting** — Propose meals, vote as household, celebrate consensus.
+
+### 🟡 Medium Priority
+
+3. **Dish Photos** — Upload photos for dish cards
+4. **Restaurant Orders** — Store go-to orders for fast food runs
+5. **Onboarding Flow** — Welcome experience with mascots
+
+### 🟢 Low Priority
+
+6. **Extended Dish Details** — Difficulty + Notes fields
+7. **Household Favorites Tagging** — Tag dishes by who likes them
+8. **Micro-Interactions Polish** — General animations (note: voting needs celebration animation)
+9. **Suggestion History & Variety** — Avoid repeat suggestions
+
+---
+
 ## Dish Enhancements
 
 Ideas for enriching the dish data model beyond name + type.

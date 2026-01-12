@@ -16,6 +16,7 @@ development and AI pair programming.
 9. [Part 9: Design System](./part-9-design-system.md) — Sunflower & Charcoal visual identity
 10. [Part 10: The Rename](./part-10-rename.md) — AliCooks becomes DishCourse
 11. [Part 11: Sync Infrastructure](./part-11-sync-infrastructure.md) — Optimistic UI, dual-mode storage
+12. [Part 12: Smart Meal Pairing](./part-12-smart-meal-pairing.md) — From random to relevant suggestions
 
 ## About This Series
 
