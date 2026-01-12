@@ -38,26 +38,28 @@ Before we end, please:
 
 ## Current Status
 
-**Last Updated**: 2026-01-11  
+**Last Updated**: 2026-01-12  
 **Current Branch**: `master`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Meal Proposals & Voting — Specification Complete
+**Current Phase**: Meal Proposals & Voting — Complete!
 
 ### Completed This Session
 
-- ✅ Created full specification for **Meal Proposals & Voting** feature (004)
-  - `specs/004-meal-proposals/spec.md` — comprehensive spec with user stories, data model, UI
-  - `specs/004-meal-proposals/tasks.md` — 5 implementation phases, ~165 estimated tests
-- ✅ Defined and documented **6 Voting Rules** (canonical reference for voting behavior)
+- ✅ **Implemented Meal Proposals & Voting feature** (004) — All 5 phases complete!
+  - Phase 1: Database migration, TypeScript types, proposals service, Dexie cache, sync
+  - Phase 2: VotingButtons, ProposalCard, ProposalList, CelebrationModal, ProposeModal
+  - Phase 3: useProposals hook, ProposalsPage, SuggestionPage integration, HomePage banner, BottomNav tab
+  - Phase 4: Optional "Add to Plan" action (per user feedback - assignment is optional)
+  - Phase 5: 69 new tests, CSS animations for modals
+- ✅ All **6 Voting Rules** implemented and tested:
   - Rule 1: Strict veto (one "no" = rejected)
   - Rule 2: All must vote or proposal expires in 24h
   - Rule 3: Vote results visible to all members
   - Rule 4: Members can manually dismiss/clear results
   - Rule 5: Results auto-clear 24h after closing
   - Rule 6: Feature hidden for solo households
-- ✅ Updated session guide and ideas backlog
-- 🚀 **Next**: Implement Phase 1 (database migration, types, service layer)
+- ✅ Merged to master, ready for production testing
 
 ### Phase Summary
 
@@ -125,15 +127,17 @@ Core features:
 | usePlanLock Hook | 13 |
 | LockIndicator | 15 |
 | **MemberList** | 14 |
-| **Total** | **868** |
+| **VotingButtons** | 14 |
+| **ProposalCard** | 25 |
+| **Proposals Service** | 30 |
+| **Total** | **937** |
 
 ### Recommended Next Steps
 
-1. **Meal Proposals & Voting** — Spec complete with voting rules! Ready to implement Phase 1
-   - See `specs/004-meal-proposals/spec.md` — includes canonical Voting Rules section
-   - 5 phases, ~165 new tests estimated
+1. **Apply migration 013** — Run `supabase db push` to create proposals tables in production
 2. **A2P 10DLC registration** — Enable SMS invites (Toll-Free number ~$2/mo)
 3. **Quick-add side flow** — Add new side without leaving DishForm (deferred from pairing)
+4. **Test proposals in production** — Family testing of voting workflow
 
 ### Key Files
 
