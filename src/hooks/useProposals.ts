@@ -25,7 +25,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import type { Proposal, ProposedMeal, Vote, ProposalDismissal } from '@/types';
+import type { Proposal, ProposedMeal, Vote } from '@/types';
 import {
   createProposal as createProposalService,
   getProposals as getProposalsService,
@@ -37,12 +37,7 @@ import {
   expirePendingProposals,
   isVisibleToUser,
 } from '@/services/proposals';
-import {
-  getProposalsFromCache,
-  getVotesFromCache,
-  getDismissalsFromCache,
-  onDataChange,
-} from '@/services';
+import { onDataChange } from '@/services';
 import { useHousehold } from './useHousehold';
 import { useAuthContext } from '@/components/auth';
 

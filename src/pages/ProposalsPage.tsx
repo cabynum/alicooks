@@ -28,8 +28,8 @@ export function ProposalsPage() {
     clearCelebration,
   } = useProposals();
 
-  // Get current user ID from members (the one matching auth context)
-  const currentUserId = members.find((m) => true)?.userId ?? '';
+  // Get current user ID from members
+  const currentUserId = members[0]?.userId ?? '';
 
   const handleBack = () => {
     navigate('/');
@@ -133,7 +133,7 @@ export function ProposalsPage() {
           <EmptyState
             icon={<Vote size={48} className="text-amber-400" />}
             title="Proposals Need a Crew"
-            description={
+            message={
               currentHousehold
                 ? 'Invite someone to your household to start proposing meals and voting together!'
                 : 'Join or create a household to use the proposals feature.'

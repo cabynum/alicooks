@@ -144,7 +144,7 @@ export function ProposalList({
       <EmptyState
         icon={<Vote size={48} className="text-amber-400" />}
         title={filter === 'pending' ? 'All Caught Up' : 'No Proposals Yet'}
-        description={emptyMessage}
+        message={emptyMessage}
         action={
           onCreateProposal
             ? {

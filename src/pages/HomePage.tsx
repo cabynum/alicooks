@@ -56,9 +56,9 @@ export function HomePage() {
   const navigate = useNavigate();
   const { dishes, isLoading: dishesLoading, isSyncedMode } = useDishes();
   const { plans, isLoading: plansLoading } = usePlans();
-  const { proposals, pendingCount, isAvailable: proposalsAvailable } = useProposals();
+  const { pendingCount, isAvailable: proposalsAvailable } = useProposals();
   const { profile, isAuthenticated } = useAuthContext();
-  const { currentHousehold, members } = useHousehold();
+  const { currentHousehold } = useHousehold();
   const [photoIndex] = useState(getRandomPhotoIndex);
 
   // Show sync status when user is authenticated and has a household
