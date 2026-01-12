@@ -166,7 +166,7 @@ the selection; users retain full control.
 The work breaks into five phases:
 
 | Phase | What | Effort |
-|-------|------|--------|
+| ----- | ---- | ------ |
 | 1 | Data model (migration, types) | Small |
 | 2 | PairingSelector component + DishForm integration | Medium |
 | 3 | Data layer (save/sync pairings) | Small |

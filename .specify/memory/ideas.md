@@ -13,7 +13,7 @@ not commitment. Ideas here may or may not make it into the product.
 
 ## Prioritized Roadmap
 
-*Last reviewed: 2026-01-12*
+Last reviewed: 2026-01-12
 
 ### 🔴 High Priority (Core Vision)
 
@@ -22,16 +22,16 @@ not commitment. Ideas here may or may not make it into the product.
 
 ### 🟡 Medium Priority
 
-3. **Dish Photos** — Upload photos for dish cards
-4. **Restaurant Orders** — Store go-to orders for fast food runs
-5. **Onboarding Flow** — Welcome experience with mascots
+1. **Dish Photos** — Upload photos for dish cards
+2. **Restaurant Orders** — Store go-to orders for fast food runs
+3. **Onboarding Flow** — Welcome experience with mascots
 
 ### 🟢 Low Priority
 
-6. **Extended Dish Details** — Difficulty + Notes fields
-7. **Household Favorites Tagging** — Tag dishes by who likes them
-8. **Micro-Interactions Polish** — General animations (note: voting needs celebration animation)
-9. **Suggestion History & Variety** — Avoid repeat suggestions
+1. **Extended Dish Details** — Difficulty + Notes fields
+2. **Household Favorites Tagging** — Tag dishes by who likes them
+3. **Micro-Interactions Polish** — General animations (note: voting needs celebration animation)
+4. **Suggestion History & Variety** — Avoid repeat suggestions
 
 ---
 

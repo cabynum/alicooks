@@ -26,7 +26,7 @@ Add a "Pairs well with" section to the dish form when the dish type is **Entree*
 
 ### Adding/Editing an Entree
 
-```
+```text
 ┌─────────────────────────────────────────────┐
 │ Add a Dish                                  │
 ├─────────────────────────────────────────────┤
@@ -154,7 +154,7 @@ ADD COLUMN pairs_well_with UUID[] DEFAULT '{}';
 
 ## Future Enhancement (Stashed)
 
-- **AI Pairing Suggestions**: Button to ask AI "what sides go well with this?" 
+- **AI Pairing Suggestions**: Button to ask AI "what sides go well with this?"
 - Not in scope for v1, but UI should not preclude adding this later
 
 ## Success Criteria

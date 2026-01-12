@@ -46,12 +46,14 @@ Word bank component showing all household sides as selectable chips.
 **File**: `src/components/meals/PairingSelector.tsx`
 
 **Props**:
+
 - `selectedIds: string[]`
-- `onChange: (ids: string[]) => void`  
+- `onChange: (ids: string[]) => void`
 - `sides: Dish[]` (filtered list of sides)
 - `onAddNewSide?: () => void`
 
 **Behavior**:
+
 - Display sides as tappable chips
 - Selected chips are highlighted
 - Multi-select supported
@@ -68,6 +70,7 @@ Show PairingSelector when dish type is "entree".
 **File**: `src/components/meals/DishForm.tsx`
 
 **Changes**:
+
 - Add state for `pairsWellWith`
 - Conditionally render PairingSelector
 - Pass value to save handler
@@ -81,6 +84,7 @@ Show PairingSelector when dish type is "entree".
 "Add New Side" creates a side dish inline without leaving the form.
 
 **Options**:
+
 - Modal with minimal side form
 - Inline expansion
 - Navigate away and return (less ideal)
@@ -98,6 +102,7 @@ Handle `pairsWellWith` in create/update operations.
 **File**: `src/services/storage.ts` (or relevant service)
 
 **Changes**:
+
 - Include pairsWellWith in dish save
 - Include in dish fetch
 - Handle sync for this field
@@ -125,6 +130,7 @@ Prefer paired sides when generating suggestions.
 **File**: `src/services/suggestion.ts`
 
 **Changes**:
+
 - When picking sides, check entree's pairsWellWith
 - 80% chance to pick from pairs if available
 - 20% random for variety
@@ -179,7 +185,7 @@ Ensure suggestion hook passes entree pairings to suggestion service.
 ## Task Summary
 
 | Phase | Task | Effort |
-|-------|------|--------|
+| ----- | ---- | ------ |
 | 1 | Database migration | Small |
 | 1 | TypeScript types | Small |
 | 1 | Local DB schema | Small |
