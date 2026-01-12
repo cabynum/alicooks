@@ -42,17 +42,20 @@ Before we end, please:
 **Current Branch**: `master`  
 **Repository**: <https://github.com/cabynum/dishcourse>  
 **Live URL**: <https://havedishcourse.vercel.app>  
-**Current Phase**: Smart Meal Pairing — Spec Complete, Ready to Build
+**Current Phase**: Smart Meal Pairing — Complete & Deployed
 
 ### Completed This Session
 
-- ✅ Fixed new user signup: Robust trigger, profile upsert, INSERT RLS policy
-- ✅ Fixed Supabase config: Disabled email confirmation, set production redirect URLs
-- ✅ Family testing: Successfully onboarded second household member
-- ✅ Prioritized ideas backlog (High → Low)
-- ✅ Created Smart Meal Pairing spec (`specs/003-smart-meal-pairing/`)
-- ✅ Created blog post Part 12
-- 🚀 **Next**: Implement Smart Meal Pairing (Phase 1: Data Model)
+- ✅ Implemented Smart Meal Pairing feature (all phases)
+  - Database migration: `pairs_well_with UUID[]` column
+  - TypeScript types updated (`Dish`, `CreateDishInput`, `UpdateDishInput`)
+  - `PairingSelector` component (chip-based multi-select)
+  - Integrated into `DishForm` for entrees
+  - Updated storage, sync, and `useDishes` hook
+  - Suggestion algorithm: 80% prefer paired sides, 20% random
+- ✅ Added 21 new tests (PairingSelector + suggestion pairing)
+- ✅ Applied migration 012 to Supabase production
+- 🚀 **Next**: Meal Proposals & Voting, or A2P 10DLC registration
 
 ### Phase Summary
 
@@ -104,6 +107,7 @@ Core features:
 | SuggestionCard | 17 |
 | DaySlot | 22 |
 | DishForm | 44 |
+| **PairingSelector** | 21 |
 | PlanCard | 25 |
 | AddDishPage | 14 |
 | **EditDishPage** | 30 |
@@ -119,13 +123,13 @@ Core features:
 | usePlanLock Hook | 13 |
 | LockIndicator | 15 |
 | **MemberList** | 14 |
-| **Total** | **849** |
+| **Total** | **868** |
 
 ### Recommended Next Steps
 
-1. **Smart Meal Pairing** — Implement spec (see `specs/003-smart-meal-pairing/tasks.md`)
-2. **Meal Proposals & Voting** — Design and build after pairing is complete
-3. **A2P 10DLC registration** — Enable SMS invites (Toll-Free number ~$2/mo)
+1. **Meal Proposals & Voting** — Design and build collaborative meal decisions
+2. **A2P 10DLC registration** — Enable SMS invites (Toll-Free number ~$2/mo)
+3. **Quick-add side flow** — Add new side without leaving DishForm (deferred from pairing)
 
 ### Key Files
 
@@ -139,6 +143,8 @@ Core features:
 | **Collab Components** | `specs/002-family-collaboration/contracts/components.md` |
 | **Collab Tasks** | `specs/002-family-collaboration/tasks.md` |
 | Collab Checklist | `specs/002-family-collaboration/checklists/requirements.md` |
+| **Pairing Spec** | `specs/003-smart-meal-pairing/spec.md` |
+| **Pairing Tasks** | `specs/003-smart-meal-pairing/tasks.md` |
 | Meal Planner Spec | `specs/001-meal-planner/spec.md` |
 | Meal Planner Plan | `specs/001-meal-planner/plan.md` |
 | Blog Posts | `blog/` (Part 1–10) |
@@ -150,6 +156,10 @@ Core features:
 
 ### Open Decisions
 
+- **Smart Meal Pairing**: Complete and deployed!
+  - Entrees can define which sides pair well with them
+  - Suggestion algorithm prefers paired sides (80/20 weighting)
+  - Migration 012 applied to Supabase
 - **Collaboration feature**: Phases 1–6 complete!
   - ✅ All Phase 6 tasks (6.1–6.3) verified working
   - ✅ SMS invites via Twilio Edge Function deployed and active

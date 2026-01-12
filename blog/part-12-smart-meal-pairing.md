@@ -192,11 +192,56 @@ learn.
 **V. Mobile-Ready** — Tappable chips are perfect for touch. The word bank layout
 works on narrow screens.
 
+## Implementation Complete
+
+Later that same day, we built it all. The implementation matched the spec
+closely, with a few small refinements discovered during development.
+
+### What We Built
+
+**PairingSelector component** (`src/components/meals/PairingSelector.tsx`):
+
+- Chip-based word bank showing all household sides
+- Selected chips show checkmark + accent color
+- Smooth toggle interaction
+- Empty state prompts users to add sides first
+
+**DishForm integration**:
+
+- "Pairs well with" section appears for entrees only
+- Hides automatically when switching to Side or Other
+- Passes available sides from the page's dish list
+
+**Suggestion algorithm** (`src/services/suggestion.ts`):
+
+- New `pickSidesWithPairing()` function implements 80/20 weighting
+- Checks entree's `pairsWellWith` array
+- Uses `PAIRING_PREFERENCE` constant (0.8) for easy tuning
+- Maintains variety by falling back to random 20% of the time
+
+**21 new tests** covering:
+
+- PairingSelector rendering and interaction
+- Suggestion pairing preference behavior
+- Edge cases (no sides, no pairings defined, single side)
+
+### What We Deferred
+
+**Quick-add side flow** (Task 2.3): The "Add New Side" button that creates a
+side inline without leaving the form. The UI placeholder exists but isn't wired
+up. This is a nice-to-have enhancement for a future session.
+
+### The Result
+
+Suggestions now feel coherent. When you've defined pairings, Chicken Pot Pie
+gets Pasta Salad (not random mashed potatoes). The feature degrades gracefully —
+entrees without pairings still get random sides, just like before.
+
 ## What's Next
 
-After Smart Meal Pairing, the roadmap continues to **Meal Proposals & Voting** —
-the feature that turns DishCourse from a meal database into a family decision
-tool. Propose a meal, notify the household, vote on it together.
+The roadmap continues to **Meal Proposals & Voting** — the feature that turns
+DishCourse from a meal database into a family decision tool. Propose a meal,
+notify the household, vote on it together.
 
 Combined, these features complete the core vision: smart suggestions that the
 whole family can agree on.
